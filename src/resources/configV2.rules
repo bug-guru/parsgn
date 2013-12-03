@@ -1,6 +1,6 @@
 ConfigFile: @SOF Rule+ I* @EOF;
 
-Rule: I* RuleName I* ":" Expression I* ";";
+Rule: I* Token I* ":" Expression I* ";";
 
 // Ignorable
 I: (WhiteSpace | Comment )+;
@@ -13,15 +13,13 @@ SingleLineComment: "//" #DEFINED* @EOL;
 
 MultiLineComment: "/*" #DEFINED* "*/";
 
-RuleName: Token;
-
 Token: #UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART* -!#UNICODE_IDENTIFIER_PART;
 
-Expression: (I* "-"? I* [Token Sequence OneOf CharType String Event] I* Quantifier?)+;
+Expression: (I* "-"? I* "!" I* [Token Sequence OneOf CharType String Event] I* Quantifier?)+;
 
-Sequence: "(" Expression ")";
+Sequence: "(" Expression I* ")";
 
-OneOF: "[" Expression "]";
+OneOf: "[" Expression I* "]";
 
 CharType: "#" Token;
 
