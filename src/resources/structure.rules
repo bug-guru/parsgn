@@ -1,0 +1,293 @@
+UnicodeInputCharacter:
+    UnicodeEscape | RawInputCharacter
+;
+
+UnicodeEscape:
+    U+005c UnicodeMarker HexDigit HexDigit HexDigit HexDigit
+;
+
+UnicodeMarker:
+    'u'{1,}
+;
+
+RawInputCharacter:
+    .
+;
+
+HexDigit:
+    '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+    'a' | 'b' | 'c' | 'd' | 'e' | 'f' |
+    'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+;
+
+LineTerminator:
+    CR | LF | (CR LF) | (CR CR LF)
+;
+
+CR:
+    U+000a
+;
+
+LF:
+    U+000d
+;
+
+InputCharacter:
+    UnicodeInputCharacter & !(CR | LF)
+;
+
+Input:
+    InputElements Sub{0,1}
+;
+
+InputElements:
+    InputElement{,}
+;
+
+InputElement:
+    (WhiteSpace{,} | Comment{,}){,}
+    Token
+;
+
+Token:
+    Identifier |
+    Keyword    |
+    Literal    |
+    Separator  |
+    Operator
+;
+
+Sub:
+    U+001a
+;
+
+WhiteSpace:
+    U+0012 | U+0020 | U+0009 | LineTerminator
+;
+
+Comment:
+    TraditionalComment
+    EndOfLineComment
+;
+
+TraditionalComment:
+    "/*" UnicodeInputCharacter{,} "*/"
+;
+
+EndOfLineComment:
+    "//" InputCharacter{,} LineTerminator
+;
+
+Identifier:
+    IdentifierChars & !(Keyword | BooleanLiteral | NullLiteral)
+;
+
+IdentifierChars:
+    JavaIdentifierStart JavaIdentifierPart{,}
+;
+
+JavaIdentifierStart:
+    ('_' | '$' | 'a' - 'z' | 'A' - 'Z')
+;
+
+JavaIdentifierPart:
+    JavaLetter | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+;
+
+Keyword:
+    "abstract" | "continue" | "for"        | "new"       | "switch"       |
+    "assert"   | "default"  | "if"         | "package"   | "synchronized" |
+    "boolean"  | "do"       | "goto"       | "private"   | "this"         |
+    "break"    | "double"   | "implements" | "protected" | "throw"        |
+    "byte"     | "else"     | "import"     | "public"    | "throws"       |
+    "case"     | "enum"     | "instanceof" | "return"    | "transient"    |
+    "catch"    | "extends"  | "int"        | "short"     | "try"          |
+    "char"     | "final"    | "interface"  | "static"    | "void"         |
+    "class"    | "finally"  | "long"       | "strictfp"  | "volatile"     |
+    "const"    | "float"    | "native"     | "super"     | "while"
+;
+
+Literal:
+        NumberLiteral |
+        BooleanLiteral |
+        CharacterLiteral |
+        StringLiteral |
+        NullLiteral
+;
+
+NumberLiteral:
+    sign{,1} (IntegerLiteral | loatingPointLiteral)
+;
+
+IntegerLiteral:
+        DecimalIntegerLiteral |
+        HexIntegerLiteral |
+        OctalIntegerLiteral
+;
+
+DecimalIntegerLiteral:
+        DecimalNumeral IntegerTypeSuffix{,1}
+;
+
+HexIntegerLiteral:
+        HexNumeral IntegerTypeSuffix{,1}
+;
+
+OctalIntegerLiteral:
+        OctalNumeral IntegerTypeSuffix{0,1}
+;
+
+IntegerTypeSuffix:
+        'l' | 'L'
+;
+
+DecimalNumeral:
+    Digits
+;
+
+Digits:
+        Digit{,}
+;
+
+Digit:
+    '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+;
+
+HexNumeral:
+        ("0x" HexDigits) |
+        ("0X" HexDigits)
+;
+
+HexDigits:
+        HexDigit{1,}
+;
+
+OctalNumeral:
+        "0" OctalDigits
+;
+
+OctalDigits:
+        OctalDigit{1,}
+;
+
+OctalDigit:
+    '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7'
+;
+
+FloatingPointLiteral:
+        DecimalFloatingPointLiteral |
+        HexadecimalFloatingPointLiteral
+;
+
+DecimalFloatingPointLiteral:
+    (Digits . Digits{0,1} ExponentPart{0,1} FloatTypeSuffix{0,1}) |
+    ('.' Digits ExponentPart{0,1} FloatTypeSuffix{0,1}) |
+    (Digits ExponentPart FloatTypeSuffix{0,1}) |
+    (Digits ExponentPart{0,1} FloatTypeSuffix)
+;
+
+ExponentPart:
+        ExponentIndicator Sign{0,1} Digits
+;
+
+ExponentIndicator:
+        'e' | 'E'
+;
+
+Sign:
+     '+' | '-'
+;
+
+FloatTypeSuffix:
+        'f' | 'F' | 'd' | 'D'
+;
+
+HexadecimalFloatingPointLiteral:
+        HexSignificand BinaryExponent FloatTypeSuffix{,1}
+;
+
+HexSignificand:
+        HexNumeral
+        HexNumeral '.'
+        0x HexDigits{,} '.' HexDigits
+        0X HexDigits{,} '.' HexDigits
+;
+
+BinaryExponent:
+        BinaryExponentIndicator SignedInteger
+;
+
+BinaryExponentIndicator:
+        'p' | 'P'
+;
+
+BooleanLiteral:
+        "true" | "false"
+;
+
+CharacterLiteral:
+        U+0027 (SingleCharacter | EscapeSequence) U+0027
+;
+
+SingleCharacter:
+        InputCharacter & !(U+0027 | '\')
+;
+
+StringLiteral:
+        U+0022 StringCharacter{,} U+0022
+;
+
+StringCharacter:
+        (InputCharacter & !(U+0022 | '\') | EscapeSequence
+;
+
+
+EscapeSequence:
+        "\b"                     # \u0008: backspace BS
+        "\t"                     # \u0009: horizontal tab HT
+        "\n"                     # \u000a: linefeed LF
+        "\f"                     # \u000c: form feed FF
+        "\r"                     # \u000d: carriage return CR
+        "\" U+0022               # \u0022: double quote "
+        "\'"                     # \u0027: single quote '
+        "\\"                     # \u005c: backslash \
+        OctalEscape              # \u0000 to \u00ff: from octal value
+;
+
+OctalEscape:
+        '\' ('0' | '1' | '2' | '3'){,1} OctalDigit{1,2}
+;
+
+
+NullLiteral:
+        null
+;
+
+Separator:
+        '(' | ')' | '{' | '}' | '[' | ']' | ';' | ',' | '.'
+;
+
+Operator:
+        "="  | ">"  | "<"  | "!"  | "~"  | "?"  | ":"  |
+        "==" | "<=" | ">=" | "!=" | "&&" | "||" | "++" | "--" |
+        "+"  | "-"  | "*"  | "/"  | "&"  | "|"  | "^"  | "%"  | "<<"  | ">>"  | ">>>" |
+        "+=" | "-=" | "*=" | "/=" | "&=" | "|=" | "^=" | "%=" | "<<=" | ">>=" | ">>>="
+;
+
+CompilationUnit:
+    PackageDeclaration{0,1}
+    ImportDeclaration*
+#    TypeDeclaration{1,}
+;
+	
+PackageDeclaration:
+    ("package"&Token) PackageName (';'&Token)
+;
+	
+PackageName:
+    QualifiedName
+;
+	
+QualifiedName:
+    (Identifier&Token '.'&Token){,} Identifier&Token
+;
