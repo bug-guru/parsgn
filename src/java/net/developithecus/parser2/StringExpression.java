@@ -49,5 +49,10 @@ public class StringExpression extends Expression {
         protected String value() {
             return value;
         }
+
+        @Override
+        protected void reset() {
+            pos = 0;
+        }
     }
 }

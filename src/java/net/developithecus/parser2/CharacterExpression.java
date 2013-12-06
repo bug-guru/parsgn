@@ -32,7 +32,7 @@ public class CharacterExpression extends Expression {
 
         @Override
         protected Boolean doCheck(int codePoint) {
-            builder.setLength(0);
+            reset();
             builder.appendCodePoint(codePoint);
             return charType.apply(codePoint);
         }
@@ -44,7 +44,7 @@ public class CharacterExpression extends Expression {
 
         @Override
         protected void reset() {
-            /TODO
+            builder.setLength(0);
         }
     }
 }
