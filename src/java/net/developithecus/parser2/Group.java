@@ -6,22 +6,25 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- *
+ * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
+ * @version 13.5.12
+ * @since 1.0
  */
-public abstract class Group<T extends Group<T>> extends Rule {
-    private List<Rule> ruleList = new ArrayList<>();
 
-    public T addAll(Collection<Rule> ruleList) {
-        this.ruleList.addAll(ruleList);
+public abstract class Group<T extends Group<T>> extends Expression {
+    private List<Expression> expressionList = new ArrayList<>();
+
+    public T addAll(Collection<Expression> expressionList) {
+        this.expressionList.addAll(expressionList);
         return (T) this;
     }
 
-    public T addAll(Rule... ruleList) {
-        this.ruleList.addAll(Arrays.asList(ruleList));
+    public T addAll(Expression... expressionList) {
+        this.expressionList.addAll(Arrays.asList(expressionList));
         return (T) this;
     }
 
-    public void add(Rule rule) {
-        ruleList.add(rule);
+    public void add(Expression expression) {
+        expressionList.add(expression);
     }
 }

@@ -1,60 +1,38 @@
 package net.developithecus.parser2;
 
-
 /**
- *
+ * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
+ * @version 13.5.12
+ * @since 1.0
  */
-public abstract class Rule {
-    private int minRepeats = 1;
-    private int maxRepeats = 1;
+public class Rule {
+    private String name;
+    private Expression expression;
 
-    public int minRepeats() {
-        return minRepeats;
+    public String name() {
+        return name;
     }
 
-    public Rule requiredAtLeast(int min) {
-        this.minRepeats = min;
+    public Rule name(String name) {
+        this.name = name;
         return this;
     }
 
-    public Rule optional() {
-        this.minRepeats = 0;
+    public Expression expression() {
+        return expression;
+    }
+
+    public Rule expression(Expression expression) {
+        this.expression = expression;
         return this;
     }
 
-    public Rule required() {
-        this.minRepeats = 1;
-        return this;
+    public Expression.ExpressionChecker checker() {
+        return checker(null);
     }
 
-    public int maxRepeats() {
-        return maxRepeats;
+    public Expression.ExpressionChecker checker(Node parent) {
+        Node result = parent == null ? new Node() : parent.newChild();
+        return expression.checker(result);
     }
-
-    public Rule repeatNoMore(int max) {
-        this.maxRepeats = max;
-        return this;
-    }
-
-    public Rule repeat() {
-        this.maxRepeats = Integer.MAX_VALUE;
-        return this;
-    }
-
-    public static SequentialGroup sequence(Rule... rules) {
-        return new SequentialGroup().addAll(rules);
-    }
-
-    public static ParallelGroup oneOf(Rule... rules) {
-        return new ParallelGroup().addAll(rules);
-    }
-
-    public static StringRule string(String str) {
-        return new StringRule().value(str);
-    }
-
-    public static ReferenceRule ref(Rule reference) {
-        return new ReferenceRule().reference(reference);
-    }
-
 }

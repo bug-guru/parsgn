@@ -1,21 +1,21 @@
-ConfigFile: @SOF Rule+ I* @EOF;
+ConfigFile: Rule+ I*;
 
 Rule: I* Token I* ":" Expression I* ";";
 
 // Ignorable
-I: (WhiteSpace | Comment )+;
+I: [WhiteSpace Comment ]+;
 
 WhiteSpace: #WHITESPACE+;
 
 Comment: [SingleLineComment MultiLineComment];
 
-SingleLineComment: "//" #DEFINED* @EOL;
+SingleLineComment: "//" #DEFINED* #LINE_SEPARATOR;
 
 MultiLineComment: "/*" #DEFINED* "*/";
 
 Token: #UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART* -!#UNICODE_IDENTIFIER_PART;
 
-Expression: (I* "-"? I* "!" I* [Token Sequence OneOf CharType String Event] I* Quantifier?)+;
+Expression: (I* "-"? I* "!"? I* [Token Sequence OneOf CharType String] I* Quantifier?)+;
 
 Sequence: "(" Expression I* ")";
 
@@ -24,7 +24,5 @@ OneOf: "[" Expression I* "]";
 CharType: "#" Token;
 
 String: "\"" ["\\\"" "\\"" #DEFINED]* "\"";
-
-Event: "@" Token;
 
 Quantifier: I* ["?" "+" "*" ("{" I* #DIGIT+ I* ("," I* #DIGIT*)? I* "}")];

@@ -27,6 +27,9 @@ public class CharacterTest {
         isIdentifierIgnorable('z');
         isIdentifierIgnorable('+');
         isIdentifierIgnorable('$');
+        isIdentifierIgnorable('\u001E');
+        isIdentifierIgnorable('\n');
+        isIdentifierIgnorable('\r');
     }
 
     private void isIdentifierIgnorable(char c) {

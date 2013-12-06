@@ -1,7 +1,9 @@
 package net.developithecus.parser2;
 
 /**
- *
+ * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
+ * @version 13.5.12
+ * @since 1.0
  */
 public enum CharType {
     ALPHABETIC {
@@ -128,6 +130,12 @@ public enum CharType {
         @Override
         public boolean apply(int codePoint) {
             return Character.isWhitespace(codePoint);
+        }
+    },
+    LINE_SEPARATOR {
+        @Override
+        public boolean apply(int codePoint) {
+            return codePoint == '\n' || codePoint == '\r';
         }
     };
 
