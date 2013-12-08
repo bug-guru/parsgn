@@ -6,18 +6,7 @@ package net.developithecus.parser2;
  * @since 1.0
  */
 public enum CheckerStatus {
-    REQUIRED_MORE(false),
-    OPTIONAL_MORE(false),
-    MATCHED(true),
-    MISMATCHED(true);
-
-    private final boolean leaf;
-
-    private CheckerStatus(boolean leaf) {
-        this.leaf = leaf;
-    }
-
-    public boolean isLeaf() {
-        return leaf;
-    }
+    REQUIRED,
+    OPTIONAL,
+    DONE
 }

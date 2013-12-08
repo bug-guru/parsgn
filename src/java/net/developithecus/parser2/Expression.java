@@ -54,25 +54,26 @@ public abstract class Expression {
     public abstract ExpressionChecker checker(Node result);
 
     public abstract class ExpressionChecker {
-        private int round;
+        private int round = -1;
         protected final Node parent;
+        private Node current;
         private CheckerStatus status;
 
         protected ExpressionChecker(Node parent) {
             this.parent = parent;
-            updateStatus();
+            prepareNextRound();
         }
 
         private void updateStatus() {
-            if (status != null && status.isLeaf()) {
+            if (status == CheckerStatus.DONE) {
                 return;
             }
             if (minRepeats > round) {
-                status = CheckerStatus.REQUIRED_MORE;
+                status = CheckerStatus.REQUIRED;
             } else if (maxRepeats > round) {
-                status = CheckerStatus.OPTIONAL_MORE;
+                status = CheckerStatus.OPTIONAL;
             } else {
-                status = CheckerStatus.MATCHED;
+                status = CheckerStatus.DONE;
             }
         }
 
@@ -88,6 +89,7 @@ public abstract class Expression {
 
         private void prepareNextRound() {
             round++;
+            current = new Node();
             updateStatus();
             reset();
         }
@@ -96,15 +98,30 @@ public abstract class Expression {
             Result result = doCheck(codePoint);
             switch (result) {
                 case MATCH:
-                    parent.newChild().apply(value());
-                    return Result.MATCH;
+                    processMatch();
+                    break;
                 case MISMATCH:
-
-            }
-            if (result == Result.MATCH) {
-                parent.newChild().apply(value());
+                    result = processMismatch();
+                    break;
+                case MORE:
+                    break;
+                default:
+                    throw new IllegalStateException(String.valueOf(result));
             }
             return result;
+        }
+
+        private Result processMismatch() {
+            current = null;
+            Result result = status == CheckerStatus.OPTIONAL ? Result.MATCH : Result.MISMATCH;
+            status = CheckerStatus.DONE;
+            return result;
+        }
+
+        private void processMatch() {
+            current.value(value());
+            parent.apply(current);
+            prepareNextRound();
         }
 
     }

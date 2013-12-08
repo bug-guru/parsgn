@@ -1,0 +1,84 @@
+Rule - I - WhiteSpace - #WHITESPACE
+Rule - I - Comment - SingleLineComment - "//"
+Rule - I - Comment - MultiLineComment - "/*"
+Rule - Token - #UNICODE_IDENTIFIER_START
+
+>C (Rule - Token - #UNICODE_IDENTIFIER_START)
+>onfigFile (Rule - Token - #UNICODE_IDENTIFIER_PART)
+
+Rule - Token - #UNICODE_IDENTIFIER_PART
+Rule - I - WhiteSpace - #WHITESPACE
+Rule - I - Comment - SingleLineComment - "//"
+Rule - I - Comment - MultiLineComment - "/*"
+Rule - ":"
+
+>: (Rule - ":")
+>[space] (Rule - Expression - I - WhiteSpace - #WHITESPACE)
+
+Rule - Expression - I - WhiteSpace - #WHITESPACE
+Rule - Expression - I - Comment - SingleLineComment - "//"
+Rule - Expression - I - Comment - MultiLineComment - "/*"
+Rule - Expression - "-"
+Rule - Expression - "!"
+Rule - Expression - Token - #UNICODE_IDENTIFIER_START
+Rule - Expression - Sequence - "("
+Rule - Expression - OneOf - "["
+Rule - Expression - CharType - "#"
+Rule - Expression - String - "\""
+
+>( (Rule - Expression - Sequence - "(")
+
+Rule - Expression - Sequence - Expression - I - WhiteSpace - #WHITESPACE
+Rule - Expression - Sequence - Expression - I - Comment - SingleLineComment - "//"
+Rule - Expression - Sequence - Expression - I - Comment - MultiLineComment - "/*"
+Rule - Expression - Sequence - Expression - "-"
+Rule - Expression - Sequence - Expression - "!"
+Rule - Expression - Sequence - Expression - Token - #UNICODE_IDENTIFIER_START
+Rule - Expression - Sequence - Expression - Sequence - "("
+Rule - Expression - Sequence - Expression - OneOf - "["
+Rule - Expression - Sequence - Expression - CharType - "#"
+Rule - Expression - Sequence - Expression - String - "\""
+
+>R (Rule - Expression - Sequence - Expression - Token - #UNICODE_IDENTIFIER_START)
+>ule (Rule - Expression - Sequence - Expression - Token - #UNICODE_IDENTIFIER_PART)
+
+Rule - Expression - Sequence - Expression - Token - #UNICODE_IDENTIFIER_PART
+Rule - Expression - Sequence - Expression - Quantifier - I - WhiteSpace - #WHITESPACE
+Rule - Expression - Sequence - Expression - Quantifier - I - Comment - SingleLineComment - "//"
+Rule - Expression - Sequence - Expression - Quantifier - I - Comment - MultiLineComment - "/*"
+Rule - Expression - Sequence - Expression - Quantifier - "?"
+Rule - Expression - Sequence - Expression - Quantifier - "+"
+Rule - Expression - Sequence - Expression - Quantifier - "*"
+Rule - Expression - Sequence - Expression - Quantifier - "{"
+Rule - Expression - Sequence - Expression - I - WhiteSpace - #WHITESPACE
+Rule - Expression - Sequence - Expression - I - Comment - SingleLineComment - "//"
+Rule - Expression - Sequence - Expression - I - Comment - MultiLineComment - "/*"
+Rule - Expression - Sequence - Expression - "-"
+Rule - Expression - Sequence - Expression - "!"
+Rule - Expression - Sequence - Expression - Token - #UNICODE_IDENTIFIER_START
+Rule - Expression - Sequence - Expression - Sequence - "("
+Rule - Expression - Sequence - Expression - OneOf - "["
+Rule - Expression - Sequence - Expression - CharType - "#"
+Rule - Expression - Sequence - Expression - String - "\""
+
+>+ (Rule - Expression - Sequence - Expression - Quantifier - "+")
+
+Rule - Expression - I - WhiteSpace - #WHITESPACE
+Rule - Expression - I - Comment - SingleLineComment - "//"
+Rule - Expression - I - Comment - MultiLineComment - "/*"
+Rule - Expression - "-"
+Rule - Expression - "!"
+Rule - Expression - Token - #UNICODE_IDENTIFIER_START
+Rule - Expression - Sequence - "("
+Rule - Expression - OneOf - "["
+Rule - Expression - CharType - "#"
+Rule - Expression - String - "\""
+Rule - I - WhiteSpace - #WHITESPACE
+Rule - I - Comment - SingleLineComment - "//"
+Rule - I - Comment - MultiLineComment - "/*"
+Rule - ";"
+
+>[space] (Rule - Expression - I - WhiteSpace - #WHITESPACE)
+         (Rule - I - WhiteSpace - #WHITESPACE)
+
+

@@ -7,8 +7,6 @@ package net.developithecus.parser2;
  */
 public enum Result {
     MORE,
-    SKIP,
     MATCH,
-    MATCH_MORE,
     MISMATCH
 }

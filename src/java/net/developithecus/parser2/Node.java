@@ -17,21 +17,16 @@ public class Node {
         return parent;
     }
 
-    public Node newChild() {
-        Node result = new Node();
-        result.parent = this;
-        children.add(result);
-        return result;
+    public void apply(Node child) {
+        child.parent = this;
+        children.add(child);
     }
 
-    public void cancel() {
-        if (parent != null) {
-            parent.children.remove(this);
-            parent = null;
-        }
+    public String value() {
+        return value;
     }
 
-    public void apply(String value) {
+    public void value(String value) {
         this.value = value;
     }
 }
