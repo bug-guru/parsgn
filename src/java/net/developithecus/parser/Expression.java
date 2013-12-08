@@ -1,4 +1,4 @@
-package net.developithecus.parser2;
+package net.developithecus.parser;
 
 
 /**

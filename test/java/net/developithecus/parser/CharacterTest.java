@@ -1,6 +1,5 @@
 package net.developithecus.parser;
 
-import net.developithecus.parser2.CharType;
 import org.junit.Test;
 
 /**
