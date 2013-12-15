@@ -39,29 +39,43 @@ public class QuantifierExpression extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker(Node result) {
+    public ExpressionChecker checker() {
         return new Checker();
     }
 
     private class Checker extends ExpressionChecker {
+        private int round = 0;
+        private ExpressionChecker checker = expression.checker();
 
-        private Checker(Node parent) {
-            super(parent);
+        @Override
+        protected Result check(int codePoint) throws ExpressionCheckerException {
+            if (round >= maxRepeats) {
+                throw new FlowCompleteException();
+            }
+            Result result = checker.check(codePoint);
+            if (result == Result.MISMATCH) {
+                return isOptional() && round > 0 ? Result.MATCH : Result.MISMATCH;
+            }
+            if (result == Result.MORE) {
+                return Result.MORE;
+            }
+            round++;
+            if (result == Result.MATCH) {
+                getNode().addChild(checker.getNode());
+                if (round < maxRepeats) {
+                    checker = expression.checker();
+                    return Result.MORE;
+                } else {
+                    return Result.MATCH;
+                }
+            }
+            throw new IllegalStateException();
         }
 
         @Override
-        protected Result doCheck(int codePoint) {
-            return null;
+        protected boolean isOptional() {
+            return minRepeats <= round;
         }
 
-        @Override
-        protected String value() {
-            return null;
-        }
-
-        @Override
-        protected void reset() {
-
-        }
     }
 }

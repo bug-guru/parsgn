@@ -1,5 +1,8 @@
 package net.developithecus.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
  * @version 13.5.12
@@ -8,28 +11,21 @@ package net.developithecus.parser;
 
 public class SequentialGroup extends Group<SequentialGroup> {
     @Override
-    public ExpressionChecker checker(Node result) {
-        return new Checker(result);
+    public ExpressionChecker checker() {
+        return new Checker();
     }
 
     private class Checker extends ExpressionChecker {
-        public Checker(Node result) {
-            super(result);
-        }
+        private List<ExpressionChecker> child = new ArrayList<>();
 
         @Override
-        protected Boolean doCheck(int codePoint) {
+        protected Result check(int codePoint) throws ExpressionCheckerException {
             return null;
         }
 
         @Override
-        protected String value() {
-            return null;
-        }
-
-        @Override
-        protected void reset() {
-
+        protected boolean isOptional() {
+            return false;
         }
     }
 }

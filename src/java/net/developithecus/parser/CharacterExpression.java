@@ -18,33 +18,38 @@ public class CharacterExpression extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker(Node result) {
-        return new Checker(result);
+    public ExpressionChecker checker() {
+        return new Checker();
     }
 
 
     private class Checker extends ExpressionChecker {
-        private StringBuilder builder = new StringBuilder(2);
+        private Node node = new Node();
 
-        public Checker(Node result) {
-            super(result);
+        public Checker() {
+            super();
+        }
+
+        public Node getNode() {
+            return node;
         }
 
         @Override
-        protected Boolean doCheck(int codePoint) {
-            reset();
+        protected Result check(int codePoint) throws ExpressionCheckerException {
+            StringBuilder builder = new StringBuilder(2);
             builder.appendCodePoint(codePoint);
-            return charType.apply(codePoint);
+            if (charType.apply(codePoint)) {
+                node.setValue(builder.toString());
+                return Result.MATCH;
+            } else {
+                return Result.MISMATCH;
+            }
         }
 
         @Override
-        protected String value() {
-            return builder.toString();
+        protected boolean isOptional() {
+            return false;
         }
 
-        @Override
-        protected void reset() {
-            builder.setLength(0);
-        }
     }
 }

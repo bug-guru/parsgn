@@ -17,4 +17,32 @@ public class ReferenceExpression extends Expression {
         this.reference = reference;
         return this;
     }
+
+    @Override
+    public ExpressionChecker checker() {
+        return new Checker();
+    }
+
+    private class Checker extends ExpressionChecker {
+        private ExpressionChecker checker;
+
+        private Checker() {
+            checker = reference.expression().checker();
+            getNode().setValue(reference.name());
+        }
+
+        @Override
+        protected Result check(int codePoint) throws ExpressionCheckerException {
+            Result result = checker.check(codePoint);
+            if (result == Result.MATCH) {
+                getNode().addChild(checker.getNode());
+            }
+            return result;
+        }
+
+        @Override
+        protected boolean isOptional() {
+            return false;
+        }
+    }
 }

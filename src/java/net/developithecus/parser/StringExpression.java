@@ -23,36 +23,27 @@ public class StringExpression extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker(Node result) {
-        return new Checker(result);
+    public ExpressionChecker checker() {
+        return new Checker();
     }
 
     private class Checker extends ExpressionChecker {
         private int pos;
 
-        protected Checker(Node parent) {
-            super(parent);
-        }
-
         @Override
-        protected Boolean doCheck(int codePoint) {
+        protected Result check(int codePoint) throws ExpressionCheckerException {
             if (pos >= len) {
                 throw new IndexOutOfBoundsException(String.valueOf(pos));
             }
             if (codePoints[pos] != codePoint) {
-                return Boolean.FALSE;
+                return Result.MISMATCH;
             }
-            return ++pos == len ? Boolean.TRUE : null;
+            return ++pos == len ? Result.MATCH : Result.MORE;
         }
 
         @Override
-        protected String value() {
-            return value;
-        }
-
-        @Override
-        protected void reset() {
-            pos = 0;
+        protected boolean isOptional() {
+            return false;
         }
     }
 }

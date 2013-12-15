@@ -22,82 +22,17 @@ public abstract class Expression {
         return this;
     }
 
-    public abstract ExpressionChecker checker(Node result);
-
-    public class CheckerIterator {
-        private int round = -1;
-    }
+    public abstract ExpressionChecker checker();
 
     public abstract class ExpressionChecker {
-        private int round = -1;
-        protected final Node parent;
-        private Node current;
-        private CheckerStatus status;
+        private Node node = new Node();
 
-        protected ExpressionChecker(Node parent) {
-            this.parent = parent;
-            prepareNextRound();
+        protected abstract Result check(int codePoint) throws ExpressionCheckerException;
+
+        protected abstract boolean isOptional();
+
+        public Node getNode() {
+            return node;
         }
-
-        private void updateStatus() {
-            if (status == CheckerStatus.DONE) {
-                return;
-            }
-            if (minRepeats > round) {
-                status = CheckerStatus.REQUIRED;
-            } else if (maxRepeats > round) {
-                status = CheckerStatus.OPTIONAL;
-            } else {
-                status = CheckerStatus.DONE;
-            }
-        }
-
-        protected abstract Result doCheck(int codePoint);
-
-        protected abstract String value();
-
-        protected abstract void reset();
-
-        public CheckerStatus status() {
-            return status;
-        }
-
-        private void prepareNextRound() {
-            round++;
-            current = new Node();
-            updateStatus();
-            reset();
-        }
-
-        public Result check(int codePoint) {
-            Result result = doCheck(codePoint);
-            switch (result) {
-                case MATCH:
-                    processMatch();
-                    break;
-                case MISMATCH:
-                    result = processMismatch();
-                    break;
-                case MORE:
-                    break;
-                default:
-                    throw new IllegalStateException(String.valueOf(result));
-            }
-            return result;
-        }
-
-        private Result processMismatch() {
-            current = null;
-            Result result = status == CheckerStatus.OPTIONAL ? Result.MATCH : Result.MISMATCH;
-            status = CheckerStatus.DONE;
-            return result;
-        }
-
-        private void processMatch() {
-            current.setValue(value());
-            parent.addChild(current);
-            prepareNextRound();
-        }
-
     }
 }

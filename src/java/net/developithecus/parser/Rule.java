@@ -26,13 +26,4 @@ public class Rule {
         this.expression = expression;
         return this;
     }
-
-    public Expression.ExpressionChecker checker() {
-        return checker(null);
-    }
-
-    public Expression.ExpressionChecker checker(Node parent) {
-        Node result = parent == null ? new Node() : parent.newChild();
-        return expression.checker(result);
-    }
 }

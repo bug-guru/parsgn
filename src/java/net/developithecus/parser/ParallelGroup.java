@@ -8,7 +8,7 @@ package net.developithecus.parser;
 
 public class ParallelGroup extends Group<ParallelGroup> {
     @Override
-    public ExpressionChecker checker(Node result) {
+    public ExpressionChecker checker() {
         return null;
     }
 }
