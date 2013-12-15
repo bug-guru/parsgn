@@ -9,24 +9,18 @@ import java.util.List;
  * @since 1.0
  */
 public class Node {
-    private Node parent;
     private List<Node> children = new ArrayList<>();
     private String value;
 
-    public Node parent() {
-        return parent;
-    }
-
-    public void apply(Node child) {
-        child.parent = this;
-        children.add(child);
-    }
-
-    public String value() {
+    public String getValue() {
         return value;
     }
 
-    public void value(String value) {
+    public void setValue(String value) {
         this.value = value;
+    }
+
+    public void addChild(Node child) {
+        children.add(child);
     }
 }

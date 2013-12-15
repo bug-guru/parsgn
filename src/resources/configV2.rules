@@ -26,3 +26,4 @@ CharType: ("#" Token);
 String: ("\"" ["\\\"" "\\"" #DEFINED]* "\"");
 
 Quantifier: (I* ["?" "+" "*" ("{" I* #DIGIT+ I* ("," I* #DIGIT*)? I* "}")]);
+

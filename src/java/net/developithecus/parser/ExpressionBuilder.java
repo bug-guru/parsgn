@@ -26,4 +26,36 @@ public final class ExpressionBuilder {
         return new ReferenceExpression().reference(reference);
     }
 
+    public static QuantifierExpression optional(Expression expression) {
+        return repeat(expression, 0, 1);
+    }
+
+    public static QuantifierExpression optional(Rule rule) {
+        return optional(ref(rule));
+    }
+
+    public static QuantifierExpression oneOrMore(Expression expression) {
+        return repeat(expression, 1, Integer.MAX_VALUE);
+    }
+
+    public static QuantifierExpression oneOrMore(Rule rule) {
+        return oneOrMore(ref(rule));
+    }
+
+    public static QuantifierExpression zeroOrMore(Expression expression) {
+        return repeat(expression, 0, Integer.MAX_VALUE);
+    }
+
+    public static QuantifierExpression zeroOrMore(Rule rule) {
+        return zeroOrMore(ref(rule));
+    }
+
+    public static QuantifierExpression repeat(Expression expression, int minRepeat, int maxRepeat) {
+        return new QuantifierExpression().expression(expression).minRepeats(minRepeat).maxRepeats(maxRepeat);
+    }
+
+    public static QuantifierExpression repeat(Rule rule, int minRepeat, int maxRepeat) {
+        return repeat(ref(rule), minRepeat, maxRepeat);
+    }
+
 }

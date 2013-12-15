@@ -8,38 +8,9 @@ package net.developithecus.parser;
  */
 
 public abstract class Expression {
-    private int minRepeats = 1;
-    private int maxRepeats = 1;
     private boolean negative = false;
     private boolean preserve = false;
 
-    public int minRepeats() {
-        return minRepeats;
-    }
-
-    public Expression requiredAtLeast(int min) {
-        this.minRepeats = min;
-        return this;
-    }
-
-    public Expression optional() {
-        this.minRepeats = 0;
-        return this;
-    }
-
-    public int maxRepeats() {
-        return maxRepeats;
-    }
-
-    public Expression repeatNoMore(int max) {
-        this.maxRepeats = max;
-        return this;
-    }
-
-    public Expression repeat() {
-        this.maxRepeats = Integer.MAX_VALUE;
-        return this;
-    }
 
     public Expression negative() {
         this.negative = true;
@@ -52,6 +23,10 @@ public abstract class Expression {
     }
 
     public abstract ExpressionChecker checker(Node result);
+
+    public class CheckerIterator {
+        private int round = -1;
+    }
 
     public abstract class ExpressionChecker {
         private int round = -1;
@@ -119,8 +94,8 @@ public abstract class Expression {
         }
 
         private void processMatch() {
-            current.value(value());
-            parent.apply(current);
+            current.setValue(value());
+            parent.addChild(current);
             prepareNextRound();
         }
 
