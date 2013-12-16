@@ -27,4 +27,8 @@ public abstract class Group<T extends Group<T>> extends Expression {
     public void add(Expression expression) {
         expressionList.add(expression);
     }
+
+    public List<Expression> getExpressions() {
+        return expressionList;
+    }
 }

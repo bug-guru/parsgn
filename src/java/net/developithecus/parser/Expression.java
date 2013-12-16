@@ -34,5 +34,9 @@ public abstract class Expression {
         public Node getNode() {
             return node;
         }
+
+        public Expression getExpression() {
+            return Expression.this;
+        }
     }
 }
