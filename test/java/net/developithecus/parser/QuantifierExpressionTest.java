@@ -27,14 +27,14 @@ public class QuantifierExpressionTest {
     public void testOneRequired_Mismatch() throws ExpressionCheckerException {
         mock.result(Result.MISMATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(0));
+        assertSame(Result.MISMATCH, checker.check(, 0));
     }
 
     @Test
     public void testOneRequired_Match() throws ExpressionCheckerException {
         mock.result(Result.MATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MATCH, checker.check(0));
+        assertSame(Result.MATCH, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
     }
@@ -43,12 +43,12 @@ public class QuantifierExpressionTest {
     public void testOneRequired_MoreAndMatch() throws ExpressionCheckerException {
         mock.result(Result.MORE);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(0));
+        assertSame(Result.MORE, checker.check(, 0));
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(0));
+        assertSame(Result.MORE, checker.check(, 0));
         mock.result(Result.MATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MATCH, checker.check(0));
+        assertSame(Result.MATCH, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
     }
@@ -57,12 +57,12 @@ public class QuantifierExpressionTest {
     public void testOneRequired_MoreAndMismatch() throws ExpressionCheckerException {
         mock.result(Result.MORE);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(0));
+        assertSame(Result.MORE, checker.check(, 0));
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(0));
+        assertSame(Result.MORE, checker.check(, 0));
         mock.result(Result.MISMATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(0));
+        assertSame(Result.MISMATCH, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(0, checker.getNode().getChildren().size());
     }
@@ -72,7 +72,7 @@ public class QuantifierExpressionTest {
         expression.minRepeats(0);
         mock.result(Result.MISMATCH);
         assertTrue(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(0));
+        assertSame(Result.MISMATCH, checker.check(, 0));
     }
 
     @Test
@@ -80,7 +80,7 @@ public class QuantifierExpressionTest {
         expression.minRepeats(0);
         mock.result(Result.MATCH);
         assertTrue(checker.isOptional());
-        assertSame(Result.MATCH, checker.check(0));
+        assertSame(Result.MATCH, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
     }
@@ -90,12 +90,12 @@ public class QuantifierExpressionTest {
         expression.minRepeats(0);
         mock.result(Result.MORE);
         assertTrue(checker.isOptional());
-        assertSame(Result.MORE, checker.check(0));
+        assertSame(Result.MORE, checker.check(, 0));
         assertTrue(checker.isOptional());
-        assertSame(Result.MORE, checker.check(0));
+        assertSame(Result.MORE, checker.check(, 0));
         mock.result(Result.MATCH);
         assertTrue(checker.isOptional());
-        assertSame(Result.MATCH, checker.check(0));
+        assertSame(Result.MATCH, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
     }
@@ -105,12 +105,12 @@ public class QuantifierExpressionTest {
         expression.minRepeats(0);
         mock.result(Result.MORE);
         assertTrue(checker.isOptional());
-        assertSame(Result.MORE, checker.check(0));
+        assertSame(Result.MORE, checker.check(, 0));
         assertTrue(checker.isOptional());
-        assertSame(Result.MORE, checker.check(0));
+        assertSame(Result.MORE, checker.check(, 0));
         mock.result(Result.MISMATCH);
         assertTrue(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(0));
+        assertSame(Result.MISMATCH, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(0, checker.getNode().getChildren().size());
     }
@@ -120,7 +120,7 @@ public class QuantifierExpressionTest {
         expression.maxRepeats(2);
         mock.result(Result.MISMATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(0));
+        assertSame(Result.MISMATCH, checker.check(, 0));
     }
 
     @Test
@@ -128,12 +128,12 @@ public class QuantifierExpressionTest {
         expression.maxRepeats(2);
         mock.result(Result.MATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(0));
+        assertSame(Result.MORE, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
 
         assertTrue(checker.isOptional());
-        assertSame(Result.MATCH, checker.check(0));
+        assertSame(Result.MATCH, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(2, checker.getNode().getChildren().size());
     }
@@ -143,13 +143,13 @@ public class QuantifierExpressionTest {
         expression.maxRepeats(2);
         mock.result(Result.MATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(0));
+        assertSame(Result.MORE, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
 
         mock.result(Result.MISMATCH);
         assertTrue(checker.isOptional());
-        assertSame(Result.MATCH, checker.check(0));
+        assertSame(Result.MATCH, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
     }
@@ -159,7 +159,7 @@ public class QuantifierExpressionTest {
         expression.minRepeats(2).maxRepeats(2);
         mock.result(Result.MISMATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(0));
+        assertSame(Result.MISMATCH, checker.check(, 0));
     }
 
     @Test
@@ -167,12 +167,12 @@ public class QuantifierExpressionTest {
         expression.minRepeats(2).maxRepeats(2);
         mock.result(Result.MATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(0));
+        assertSame(Result.MORE, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
 
         assertFalse(checker.isOptional());
-        assertSame(Result.MATCH, checker.check(0));
+        assertSame(Result.MATCH, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(2, checker.getNode().getChildren().size());
     }
@@ -182,13 +182,13 @@ public class QuantifierExpressionTest {
         expression.minRepeats(2).maxRepeats(2);
         mock.result(Result.MATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(0));
+        assertSame(Result.MORE, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
 
         mock.result(Result.MISMATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(0));
+        assertSame(Result.MISMATCH, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
     }
@@ -198,15 +198,15 @@ public class QuantifierExpressionTest {
         expression.minRepeats(2).maxRepeats(2);
         mock.result(Result.MATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(0));
+        assertSame(Result.MORE, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
 
         assertFalse(checker.isOptional());
-        assertSame(Result.MATCH, checker.check(0));
+        assertSame(Result.MATCH, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(2, checker.getNode().getChildren().size());
 
-        assertSame(Result.MATCH, checker.check(0));
+        assertSame(Result.MATCH, checker.check(, 0));
     }
 }

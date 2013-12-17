@@ -12,15 +12,16 @@ import java.util.List;
 
 public class ParallelGroup extends Group<ParallelGroup> {
     @Override
-    public ExpressionChecker checker() {
-        return new Checker();
+    public ExpressionChecker checker(int pos) {
+        return new Checker(pos);
     }
 
     private class Checker extends ExpressionChecker {
         private List<ExpressionChecker> children = new ArrayList<>();
         private List<Node> candidates = new ArrayList<>();
 
-        private Checker() {
+        private Checker(int pos) {
+            super(pos);
             prepareNextRound();
         }
 

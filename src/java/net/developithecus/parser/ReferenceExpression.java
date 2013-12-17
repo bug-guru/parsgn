@@ -19,21 +19,22 @@ public class ReferenceExpression extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker() {
-        return new Checker();
+    public ExpressionChecker checker(int pos) {
+        return new Checker(pos);
     }
 
     private class Checker extends ExpressionChecker {
         private ExpressionChecker checker;
 
-        private Checker() {
-            checker = reference.expression().checker();
+        private Checker(int pos) {
+            super(pos);
+            checker = reference.expression().checker(pos);
             getNode().setValue(reference.name());
         }
 
         @Override
         protected Result check(int codePoint) throws ExpressionCheckerException {
-            Result result = checker.check(codePoint);
+            Result result = checker.check(, codePoint);
             if (result == Result.MATCH) {
                 getNode().addChild(checker.getNode());
             }

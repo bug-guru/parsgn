@@ -14,6 +14,10 @@ public class Node {
     private int start = Integer.MAX_VALUE;
     private int length = Integer.MIN_VALUE;
 
+    public Node(int start) {
+        this.start = start;
+    }
+
     public String getValue() {
         return value;
     }
@@ -34,10 +38,6 @@ public class Node {
 
     public int getStart() {
         return start;
-    }
-
-    public void setStart(int start) {
-        this.start = start;
     }
 
     public int getLength() {

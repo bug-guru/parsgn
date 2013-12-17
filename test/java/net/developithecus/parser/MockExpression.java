@@ -29,11 +29,15 @@ public class MockExpression extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker() {
+    public ExpressionChecker checker(int pos) {
         return new Checker();
     }
 
     private class Checker extends ExpressionChecker {
+        private Checker() {
+            super();
+        }
+
         @Override
         protected Result check(int codePoint) throws ExpressionCheckerException {
             return result;

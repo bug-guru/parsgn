@@ -23,22 +23,26 @@ public class StringExpression extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker() {
-        return new Checker();
+    public ExpressionChecker checker(int pos) {
+        return new Checker(pos);
     }
 
     private class Checker extends ExpressionChecker {
-        private int pos;
+        private int offset;
+
+        private Checker(int pos) {
+            super(pos);
+        }
 
         @Override
         protected Result check(int codePoint) throws ExpressionCheckerException {
-            if (pos >= len) {
-                throw new IndexOutOfBoundsException(String.valueOf(pos));
+            if (offset >= len) {
+                throw new IndexOutOfBoundsException(String.valueOf(offset));
             }
-            if (codePoints[pos] != codePoint) {
+            if (codePoints[offset] != codePoint) {
                 return Result.MISMATCH;
             }
-            return ++pos == len ? Result.MATCH : Result.MORE;
+            return ++offset == len ? Result.MATCH : Result.MORE;
         }
 
         @Override

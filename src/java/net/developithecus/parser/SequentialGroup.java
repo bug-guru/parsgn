@@ -11,12 +11,16 @@ import java.util.List;
 
 public class SequentialGroup extends Group<SequentialGroup> {
     @Override
-    public ExpressionChecker checker() {
-        return new Checker();
+    public ExpressionChecker checker(int pos) {
+        return new Checker(pos);
     }
 
     private class Checker extends ExpressionChecker {
         private List<ExpressionChecker> child = new ArrayList<>();
+
+        private Checker(int pos) {
+            super(pos);
+        }
 
         @Override
         protected Result check(int codePoint) throws ExpressionCheckerException {

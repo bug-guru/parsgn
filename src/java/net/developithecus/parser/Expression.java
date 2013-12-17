@@ -22,14 +22,23 @@ public abstract class Expression {
         return this;
     }
 
-    public abstract ExpressionChecker checker();
+    public abstract ExpressionChecker checker(int pos);
 
     public abstract class ExpressionChecker {
-        private Node node = new Node();
+        private final Node node;
+
+        protected ExpressionChecker(int pos) {
+            this.node = new Node(pos);
+        }
 
         protected abstract Result check(int codePoint) throws ExpressionCheckerException;
 
         protected abstract boolean isOptional();
+
+        public Result push(int codePoint) throws ExpressionCheckerException {
+
+            return check(codePoint);
+        }
 
         public Node getNode() {
             return node;

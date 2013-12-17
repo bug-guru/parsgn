@@ -39,13 +39,18 @@ public class QuantifierExpression extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker() {
-        return new Checker();
+    public ExpressionChecker checker(int pos) {
+        return new Checker(pos);
     }
 
     private class Checker extends ExpressionChecker {
         private int round = 0;
-        private ExpressionChecker checker = expression.checker();
+        private ExpressionChecker checker;
+
+        private Checker(int pos) {
+            super(pos);
+            checker = expression.checker(pos);
+        }
 
         @Override
         protected Result check(int codePoint) throws ExpressionCheckerException {

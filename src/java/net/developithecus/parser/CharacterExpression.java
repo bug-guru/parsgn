@@ -18,20 +18,15 @@ public class CharacterExpression extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker() {
-        return new Checker();
+    public ExpressionChecker checker(int pos) {
+        return new Checker(pos);
     }
 
 
     private class Checker extends ExpressionChecker {
-        private Node node = new Node();
 
-        public Checker() {
-            super();
-        }
-
-        public Node getNode() {
-            return node;
+        public Checker(int pos) {
+            super(pos);
         }
 
         @Override
@@ -39,7 +34,7 @@ public class CharacterExpression extends Expression {
             StringBuilder builder = new StringBuilder(2);
             builder.appendCodePoint(codePoint);
             if (charType.apply(codePoint)) {
-                node.setValue(builder.toString());
+                getNode().setValue(builder.toString());
                 return Result.MATCH;
             } else {
                 return Result.MISMATCH;
