@@ -34,7 +34,7 @@ public class ReferenceExpression extends Expression {
 
         @Override
         protected Result check(int codePoint) throws ExpressionCheckerException {
-            Result result = checker.check(, codePoint);
+            Result result = checker.check(codePoint);
             if (result == Result.MATCH) {
                 getNode().addChild(checker.getNode());
             }

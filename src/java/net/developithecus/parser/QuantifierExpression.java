@@ -1,5 +1,8 @@
 package net.developithecus.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
  * @version 13.15.12
@@ -46,6 +49,7 @@ public class QuantifierExpression extends Expression {
     private class Checker extends ExpressionChecker {
         private int round = 0;
         private ExpressionChecker checker;
+        private List<Node> candidates = new ArrayList<>();
 
         private Checker(int pos) {
             super(pos);
@@ -68,7 +72,7 @@ public class QuantifierExpression extends Expression {
             if (result == Result.MATCH) {
                 getNode().addChild(checker.getNode());
                 if (round < maxRepeats) {
-                    checker = expression.checker();
+                    checker = expression.checker(getPosition());
                     return Result.MORE;
                 } else {
                     return Result.MATCH;
