@@ -49,11 +49,9 @@ public class ManyExpression extends Expression {
                     Node node = checker.getNode();
                     backlog.add(node);
                     processBacklog();
-                    continue;
-                }
-                if (result == Result.MISMATCH) {
+                } else if (result == Result.MISMATCH) {
                     checkerIterator.remove();
-                    return optional() && matched.size() > 0 ? Result.MATCH : Result.MISMATCH;
+                    return getNode().hasChild() ? Result.MATCH : Result.MISMATCH;
                 }
                 if (result == Result.MORE) {
                     return Result.MORE;
@@ -106,7 +104,7 @@ public class ManyExpression extends Expression {
 
         @Override
         protected boolean isOptional() {
-            return optional() || matched.size() > 0;
+            return optional() || getNode().hasChild();
         }
 
     }
