@@ -11,7 +11,7 @@ import java.util.List;
 public class Node {
     private List<Node> children = new ArrayList<>();
     private String value;
-    private int start = Integer.MAX_VALUE;
+    private int start;
     private int length = Integer.MIN_VALUE;
 
     public Node(int start) {
@@ -46,5 +46,13 @@ public class Node {
 
     public void setLength(int length) {
         this.length = length;
+    }
+
+    public boolean hasChild() {
+        return !children.isEmpty();
+    }
+
+    public Node lastChild() {
+        return children.isEmpty() ? null : children.get(children.size() - 1);
     }
 }

@@ -8,18 +8,15 @@ package net.developithecus.parser;
  */
 
 public abstract class Expression {
-    private boolean negative = false;
-    private boolean preserve = false;
+    private boolean optional = false;
 
-
-    public Expression negative() {
-        this.negative = true;
+    public Expression optional(boolean optional) {
+        this.optional = optional;
         return this;
     }
 
-    public Expression preserve() {
-        this.preserve = true;
-        return this;
+    public boolean optional() {
+        return optional;
     }
 
     public abstract ExpressionChecker checker(int pos);
@@ -36,7 +33,9 @@ public abstract class Expression {
 
         protected abstract Result check(int codePoint) throws ExpressionCheckerException;
 
-        protected abstract boolean isOptional();
+        protected boolean isOptional() {
+            return optional;
+        }
 
         public Result push(int codePoint) throws ExpressionCheckerException {
             length++;

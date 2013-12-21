@@ -10,15 +10,15 @@ import static org.junit.Assert.*;
  * @version 13.15.12
  * @since 1.0
  */
-public class QuantifierExpressionTest {
-    private QuantifierExpression expression;
+public class ManyExpressionTest {
+    private ManyExpression expression;
     private MockExpression mock;
     private Expression.ExpressionChecker checker;
 
     @Before
     public void init() {
         mock = new MockExpression();
-        expression = new QuantifierExpression().expression(mock);
+        expression = new ManyExpression().expression(mock);
         checker = expression.checker();
         assertNotNull(checker);
     }
