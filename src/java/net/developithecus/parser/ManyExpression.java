@@ -44,30 +44,19 @@ public class ManyExpression extends Expression {
                     continue;
                 }
                 Result result = checker.check(codePoint);
+                if (result == Result.MORE) {
+                    continue;
+                }
+                checkerIterator.remove();
                 if (result == Result.MATCH) {
-                    checkerIterator.remove();
                     Node node = checker.getNode();
                     backlog.add(node);
                     processBacklog();
-                } else if (result == Result.MISMATCH) {
-                    checkerIterator.remove();
-                    return getNode().hasChild() ? Result.MATCH : Result.MISMATCH;
                 }
-                if (result == Result.MORE) {
-                    return Result.MORE;
-                }
-                round++;
-                if (result == Result.MATCH) {
-                    getNode().addChild(checker.getNode());
-                    if (round < maxRepeats) {
-                        checker = expression.checker(getPosition());
-                        return Result.MORE;
-                    } else {
-                        return Result.MATCH;
-                    }
-                }
-                throw new IllegalStateException();
             }
+            processBacklog();
+
+
         }
 
         private void processBacklog() {
