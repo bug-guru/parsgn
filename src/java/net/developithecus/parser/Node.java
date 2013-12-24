@@ -11,12 +11,6 @@ import java.util.List;
 public class Node {
     private List<Node> children = new ArrayList<>();
     private String value;
-    private int start;
-    private int length = Integer.MIN_VALUE;
-
-    public Node(int start) {
-        this.start = start;
-    }
 
     public String getValue() {
         return value;
@@ -27,25 +21,11 @@ public class Node {
     }
 
     public void addChild(Node child) {
-        start = Math.min(child.getStart(), start);
-        length = Math.max(child.getLength(), length);
         children.add(child);
     }
 
     public List<Node> getChildren() {
         return children;
-    }
-
-    public int getStart() {
-        return start;
-    }
-
-    public int getLength() {
-        return length;
-    }
-
-    public void setLength(int length) {
-        this.length = length;
     }
 
     public boolean hasChild() {

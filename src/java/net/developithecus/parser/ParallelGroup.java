@@ -1,5 +1,7 @@
 package net.developithecus.parser;
 
+import net.developithecus.parser.expr.Group;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +36,6 @@ public class ParallelGroup extends Group<ParallelGroup> {
 
         @Override
         protected Result check(int codePoint) throws ExpressionCheckerException {
-            List<ExpressionChecker> newCheckers = new ArrayList<>();
             Iterator<ExpressionChecker> i = children.iterator();
             boolean hasMore = false;
             while (i.hasNext()) {
@@ -44,25 +45,19 @@ public class ParallelGroup extends Group<ParallelGroup> {
                     case MATCH:
                         Node node = checker.getNode();
                         candidates.add(node);
-                        if (node.getLength() == 1) {
-                            newCheckers.add(checker.getExpression().checker());
-                        }
                         i.remove();
                         break;
                     case MISMATCH:
-                        newCheckers.add(checker.getExpression().checker());
                         i.remove();
                         break;
                     case MORE:
                         hasMore = true;
-                        newCheckers.add(checker.getExpression().checker());
                         break;
                     default:
                         throw new IllegalStateException(String.valueOf(result));
                 }
             }
             if (hasMore) {
-                children.addAll(newCheckers);
                 return Result.MORE;
             }
             if (children.isEmpty() && candidates.isEmpty()) {

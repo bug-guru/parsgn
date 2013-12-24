@@ -1,5 +1,10 @@
 package net.developithecus.parser;
 
+import net.developithecus.parser.expr.ManyExpression;
+import net.developithecus.parser.expr.ReferenceExpression;
+import net.developithecus.parser.expr.SequentialGroup;
+import net.developithecus.parser.expr.StringExpression;
+
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
  * @version 13.6.12
@@ -26,36 +31,12 @@ public final class ExpressionBuilder {
         return new ReferenceExpression().reference(reference);
     }
 
-    public static ManyExpression optional(Expression expression) {
-        return repeat(expression, 0, 1);
+    public static ManyExpression many(Expression expression) {
+        return new ManyExpression().expression(expression);
     }
 
-    public static ManyExpression optional(Rule rule) {
-        return optional(ref(rule));
-    }
-
-    public static ManyExpression oneOrMore(Expression expression) {
-        return repeat(expression, 1, Integer.MAX_VALUE);
-    }
-
-    public static ManyExpression oneOrMore(Rule rule) {
-        return oneOrMore(ref(rule));
-    }
-
-    public static ManyExpression zeroOrMore(Expression expression) {
-        return repeat(expression, 0, Integer.MAX_VALUE);
-    }
-
-    public static ManyExpression zeroOrMore(Rule rule) {
-        return zeroOrMore(ref(rule));
-    }
-
-    public static ManyExpression repeat(Expression expression, int minRepeat, int maxRepeat) {
-        return new ManyExpression().expression(expression).minRepeats(minRepeat).maxRepeats(maxRepeat);
-    }
-
-    public static ManyExpression repeat(Rule rule, int minRepeat, int maxRepeat) {
-        return repeat(ref(rule), minRepeat, maxRepeat);
+    public static ManyExpression many(Rule rule) {
+        return many(ref(rule));
     }
 
 }

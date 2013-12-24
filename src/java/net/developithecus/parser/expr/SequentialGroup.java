@@ -1,4 +1,7 @@
-package net.developithecus.parser;
+package net.developithecus.parser.expr;
+
+import net.developithecus.parser.ExpressionCheckerException;
+import net.developithecus.parser.Result;
 
 import java.util.ArrayList;
 import java.util.List;

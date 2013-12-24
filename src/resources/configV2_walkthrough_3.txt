@@ -1,0 +1,132 @@
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <I> - OneOf - <WhiteSpace> - #WHITESPACE
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <I> - OneOf - <Comment> - OneOf - <SingleLineComment> - Sequence - "//"
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <I> - OneOf - <Comment> - OneOf - <MultiLineComment> - Sequence - "/*"
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Token> - Sequence - #UNICODE_IDENTIFIER_START
+
+> C
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Token> - Sequence - #UNICODE_IDENTIFIER_PART
+                                                                    #UNICODE_IDENTIFIER_START "C"
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <I> - OneOf - <WhiteSpace> - #WHITESPACE
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <I> - OneOf - <Comment> - OneOf - <SingleLineComment> - Sequence - "//"
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <I> - OneOf - <Comment> - OneOf - <MultiLineComment> - Sequence - "/*"
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - ":"
+
+> o
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Token> - Sequence - #UNICODE_IDENTIFIER_PART
+                                                                    #UNICODE_IDENTIFIER_START "C"
+                                                                    #UNICODE_IDENTIFIER_PART "o"
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <I> - OneOf - <WhiteSpace> - #WHITESPACE
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <I> - OneOf - <Comment> - OneOf - <SingleLineComment> - Sequence - "//"
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <I> - OneOf - <Comment> - OneOf - <MultiLineComment> - Sequence - "/*"
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - ":"
+
+> nfigFile
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Token> - Sequence - #UNICODE_IDENTIFIER_PART
+                                                                    #UNICODE_IDENTIFIER_START "C"
+                                                                    #UNICODE_IDENTIFIER_PART "o"
+                                                                    #UNICODE_IDENTIFIER_PART "n"
+                                                                    #UNICODE_IDENTIFIER_PART "f"
+                                                                    #UNICODE_IDENTIFIER_PART "i"
+                                                                    #UNICODE_IDENTIFIER_PART "g"
+                                                                    #UNICODE_IDENTIFIER_PART "F"
+                                                                    #UNICODE_IDENTIFIER_PART "i"
+                                                                    #UNICODE_IDENTIFIER_PART "l"
+                                                                    #UNICODE_IDENTIFIER_PART "e"
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <I> - OneOf - <WhiteSpace> - #WHITESPACE
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <I> - OneOf - <Comment> - OneOf - <SingleLineComment> - Sequence - "//"
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <I> - OneOf - <Comment> - OneOf - <MultiLineComment> - Sequence - "/*"
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - ":"
+
+> :
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - <I> - OneOf - <WhiteSpace> - #WHITESPACE
+                                              <Token>
+                                                 Sequence
+                                                    #UNICODE_IDENTIFIER_START "C"
+                                                    #UNICODE_IDENTIFIER_PART "o"
+                                                    #UNICODE_IDENTIFIER_PART "n"
+                                                    #UNICODE_IDENTIFIER_PART "f"
+                                                    #UNICODE_IDENTIFIER_PART "i"
+                                                    #UNICODE_IDENTIFIER_PART "g"
+                                                    #UNICODE_IDENTIFIER_PART "F"
+                                                    #UNICODE_IDENTIFIER_PART "i"
+                                                    #UNICODE_IDENTIFIER_PART "l"
+                                                    #UNICODE_IDENTIFIER_PART "e"
+                                              ":"
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - "-"
+                                              ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - "!"
+                                              ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - OneOf - <Token> - Sequence - #UNICODE_IDENTIFIER_START
+                                              ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - OneOf - <Sequence> - Sequence - "("
+                                              ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - OneOf - <OneOf> - Sequence - "["
+                                              ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - OneOf - <CharType> - Sequence - "#"
+                                              ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - OneOf - <String> - Sequence - "\""
+                                              ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - <I> - OneOf - <Comment> - OneOf - <SingleLineComment> - Sequence - "//"
+                                              ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - <I> - OneOf - <Comment> - OneOf - <MultiLineComment> - Sequence - "/*"
+                                              ***
+
+
+> **SPACE**
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - <I> - OneOf - <WhiteSpace> - #WHITESPACE
+                                              |                          <I>
+                                              |                            OneOf
+                                              |                              <WhiteSpace>
+                                              |                                #WHITESPACE
+                                              <Token>
+                                                 Sequence
+                                                    #UNICODE_IDENTIFIER_START "C"
+                                                    #UNICODE_IDENTIFIER_PART "o"
+                                                    #UNICODE_IDENTIFIER_PART "n"
+                                                    #UNICODE_IDENTIFIER_PART "f"
+                                                    #UNICODE_IDENTIFIER_PART "i"
+                                                    #UNICODE_IDENTIFIER_PART "g"
+                                                    #UNICODE_IDENTIFIER_PART "F"
+                                                    #UNICODE_IDENTIFIER_PART "i"
+                                                    #UNICODE_IDENTIFIER_PART "l"
+                                                    #UNICODE_IDENTIFIER_PART "e"
+                                              ":"
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - "-"
+                                              ***                      ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - "!"
+                                              ***                      ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - OneOf - <Token> - Sequence - #UNICODE_IDENTIFIER_START
+                                              ***                      ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - OneOf - <Sequence> - Sequence - "("
+                                              ***                      ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - OneOf - <OneOf> - Sequence - "["
+                                              ***                      ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - OneOf - <CharType> - Sequence - "#"
+                                              ***                      ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - OneOf - <String> - Sequence - "\""
+                                              ***                      ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - <I> - OneOf - <Comment> - OneOf - <SingleLineComment> - Sequence - "//"
+                                              ***                      ***
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - <I> - OneOf - <Comment> - OneOf - <MultiLineComment> - Sequence - "/*"
+                                              ***                      ***
+
+> (R
+
+ROOT - <ConfigFile> - Sequence - <Rule> - Sequence - <Expression> - Sequence - OneOf - <Sequence> - Sequence - <Expression> - Sequence - OneOf - Token - Sequence - #UNICODE_IDENTIFIER_PART
+                                              |                          <I>                            "("                                                 #UNICODE_IDENTIFIER_START "R"
+                                              |                            OneOf
+                                              |                              <WhiteSpace>
+                                              |                                #WHITESPACE
+                                              <Token>
+                                                 Sequence
+                                                    #UNICODE_IDENTIFIER_START "C"
+                                                    #UNICODE_IDENTIFIER_PART "o"
+                                                    #UNICODE_IDENTIFIER_PART "n"
+                                                    #UNICODE_IDENTIFIER_PART "f"
+                                                    #UNICODE_IDENTIFIER_PART "i"
+                                                    #UNICODE_IDENTIFIER_PART "g"
+                                                    #UNICODE_IDENTIFIER_PART "F"
+                                                    #UNICODE_IDENTIFIER_PART "i"
+                                                    #UNICODE_IDENTIFIER_PART "l"
+                                                    #UNICODE_IDENTIFIER_PART "e"
+                                              ":"

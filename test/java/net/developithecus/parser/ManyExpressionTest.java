@@ -1,5 +1,6 @@
 package net.developithecus.parser;
 
+import net.developithecus.parser.expr.ManyExpression;
 import org.junit.Before;
 import org.junit.Test;
 

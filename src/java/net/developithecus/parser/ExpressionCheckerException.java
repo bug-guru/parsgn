@@ -5,7 +5,7 @@ package net.developithecus.parser;
  * @version 13.16.12
  * @since 1.0
  */
-public class ExpressionCheckerException extends Exception {
+public class ExpressionCheckerException extends ParserException {
     public ExpressionCheckerException() {
     }
 

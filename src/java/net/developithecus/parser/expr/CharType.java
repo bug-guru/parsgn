@@ -1,4 +1,4 @@
-package net.developithecus.parser;
+package net.developithecus.parser.expr;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>

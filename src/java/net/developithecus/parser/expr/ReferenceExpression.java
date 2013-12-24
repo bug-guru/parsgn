@@ -1,4 +1,9 @@
-package net.developithecus.parser;
+package net.developithecus.parser.expr;
+
+import net.developithecus.parser.Expression;
+import net.developithecus.parser.ExpressionCheckerException;
+import net.developithecus.parser.Result;
+import net.developithecus.parser.Rule;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>

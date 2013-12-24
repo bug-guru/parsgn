@@ -1,4 +1,6 @@
-package net.developithecus.parser;
+package net.developithecus.parser.expr;
+
+import net.developithecus.parser.Expression;
 
 import java.util.ArrayList;
 import java.util.Arrays;

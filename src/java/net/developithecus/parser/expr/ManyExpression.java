@@ -1,4 +1,9 @@
-package net.developithecus.parser;
+package net.developithecus.parser.expr;
+
+import net.developithecus.parser.Expression;
+import net.developithecus.parser.ExpressionCheckerException;
+import net.developithecus.parser.Node;
+import net.developithecus.parser.Result;
 
 import java.util.*;
 
@@ -30,19 +35,15 @@ public class ManyExpression extends Expression {
 
         private Checker(int pos) {
             super(pos);
-            ExpressionChecker checker = expression.checker(pos);
-            checkers.add(checker);
         }
 
         @Override
         protected Result check(int codePoint) throws ExpressionCheckerException {
+            ExpressionChecker newChecker = expression.checker(getCurrentPosition());
+            checkers.add(newChecker);
             Iterator<ExpressionChecker> checkerIterator = checkers.iterator();
             while (checkerIterator.hasNext()) {
                 ExpressionChecker checker = checkerIterator.next();
-                if (checker.getPosition() < calcStartFrom()) {
-                    checkerIterator.remove();
-                    continue;
-                }
                 Result result = checker.check(codePoint);
                 if (result == Result.MORE) {
                     continue;
@@ -51,16 +52,29 @@ public class ManyExpression extends Expression {
                 if (result == Result.MATCH) {
                     Node node = checker.getNode();
                     backlog.add(node);
-                    processBacklog();
                 }
             }
             processBacklog();
+            if (chainIsBroken()) {
+                backlog.clear();
+                checkers.clear();
+                return getNode().hasChild() ? Result.MATCH : Result.MISMATCH;
+            } else {
+                return Result.MORE;
+            }
+        }
 
-
+        private boolean chainIsBroken() {
+            if (checkers.isEmpty()) {
+                return true;
+            }
+            ExpressionChecker firstChecker = checkers.get(0);
+            int startFrom = calcEffectivePosition();
+            return startFrom != firstChecker.getStartPosition();
         }
 
         private void processBacklog() {
-            int startFrom = calcStartFrom();
+            int startFrom = calcEffectivePosition();
             sortBacklog();
             Iterator<Node> iterator = backlog.iterator();
             while (iterator.hasNext()) {
@@ -77,9 +91,9 @@ public class ManyExpression extends Expression {
             }
         }
 
-        private int calcStartFrom() {
+        private int calcEffectivePosition() {
             Node node = getNode().lastChild();
-            return node == null ? getPosition() : node.getStart() + node.getLength();
+            return node == null ? getStartPosition() : node.getStart() + node.getLength();
         }
 
         private void sortBacklog() {

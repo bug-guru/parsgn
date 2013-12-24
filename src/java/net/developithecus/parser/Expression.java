@@ -42,7 +42,11 @@ public abstract class Expression {
             return check(codePoint);
         }
 
-        public int getPosition() {
+        public int getStartPosition() {
+            return startPosition;
+        }
+
+        public int getCurrentPosition() {
             return startPosition + length - 1;
         }
 
