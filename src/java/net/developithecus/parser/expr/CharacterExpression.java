@@ -41,7 +41,7 @@ public class CharacterExpression extends Expression {
                 getNode().setValue(builder.toString());
                 return Result.MATCH;
             } else {
-                return Result.MISMATCH;
+                return Result.MISMATCH_FROM_REQUIRED;
             }
         }
 

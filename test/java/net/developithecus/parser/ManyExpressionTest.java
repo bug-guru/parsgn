@@ -26,9 +26,9 @@ public class ManyExpressionTest {
 
     @Test
     public void testOneRequired_Mismatch() throws ExpressionCheckerException {
-        mock.result(Result.MISMATCH);
+        mock.result(Result.MISMATCH_FROM_REQUIRED);
         assertFalse(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(, 0));
+        assertSame(Result.MISMATCH_FROM_REQUIRED, checker.check(, 0));
     }
 
     @Test
@@ -42,11 +42,11 @@ public class ManyExpressionTest {
 
     @Test
     public void testOneRequired_MoreAndMatch() throws ExpressionCheckerException {
-        mock.result(Result.MORE);
+        mock.result(Result.MORE_FROM_REQUIRED);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(, 0));
+        assertSame(Result.MORE_FROM_REQUIRED, checker.check(, 0));
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(, 0));
+        assertSame(Result.MORE_FROM_REQUIRED, checker.check(, 0));
         mock.result(Result.MATCH);
         assertFalse(checker.isOptional());
         assertSame(Result.MATCH, checker.check(, 0));
@@ -56,14 +56,14 @@ public class ManyExpressionTest {
 
     @Test
     public void testOneRequired_MoreAndMismatch() throws ExpressionCheckerException {
-        mock.result(Result.MORE);
+        mock.result(Result.MORE_FROM_REQUIRED);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(, 0));
+        assertSame(Result.MORE_FROM_REQUIRED, checker.check(, 0));
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(, 0));
-        mock.result(Result.MISMATCH);
+        assertSame(Result.MORE_FROM_REQUIRED, checker.check(, 0));
+        mock.result(Result.MISMATCH_FROM_REQUIRED);
         assertFalse(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(, 0));
+        assertSame(Result.MISMATCH_FROM_REQUIRED, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(0, checker.getNode().getChildren().size());
     }
@@ -71,9 +71,9 @@ public class ManyExpressionTest {
     @Test
     public void testOneOptional_Mismatch() throws ExpressionCheckerException {
         expression.minRepeats(0);
-        mock.result(Result.MISMATCH);
+        mock.result(Result.MISMATCH_FROM_REQUIRED);
         assertTrue(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(, 0));
+        assertSame(Result.MISMATCH_FROM_REQUIRED, checker.check(, 0));
     }
 
     @Test
@@ -89,11 +89,11 @@ public class ManyExpressionTest {
     @Test
     public void testOneOptional_MoreAndMatch() throws ExpressionCheckerException {
         expression.minRepeats(0);
-        mock.result(Result.MORE);
+        mock.result(Result.MORE_FROM_REQUIRED);
         assertTrue(checker.isOptional());
-        assertSame(Result.MORE, checker.check(, 0));
+        assertSame(Result.MORE_FROM_REQUIRED, checker.check(, 0));
         assertTrue(checker.isOptional());
-        assertSame(Result.MORE, checker.check(, 0));
+        assertSame(Result.MORE_FROM_REQUIRED, checker.check(, 0));
         mock.result(Result.MATCH);
         assertTrue(checker.isOptional());
         assertSame(Result.MATCH, checker.check(, 0));
@@ -104,14 +104,14 @@ public class ManyExpressionTest {
     @Test
     public void testOneOptional_MoreAndMismatch() throws ExpressionCheckerException {
         expression.minRepeats(0);
-        mock.result(Result.MORE);
+        mock.result(Result.MORE_FROM_REQUIRED);
         assertTrue(checker.isOptional());
-        assertSame(Result.MORE, checker.check(, 0));
+        assertSame(Result.MORE_FROM_REQUIRED, checker.check(, 0));
         assertTrue(checker.isOptional());
-        assertSame(Result.MORE, checker.check(, 0));
-        mock.result(Result.MISMATCH);
+        assertSame(Result.MORE_FROM_REQUIRED, checker.check(, 0));
+        mock.result(Result.MISMATCH_FROM_REQUIRED);
         assertTrue(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(, 0));
+        assertSame(Result.MISMATCH_FROM_REQUIRED, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(0, checker.getNode().getChildren().size());
     }
@@ -119,9 +119,9 @@ public class ManyExpressionTest {
     @Test
     public void testOneOrTwo_Mismatch() throws ExpressionCheckerException {
         expression.maxRepeats(2);
-        mock.result(Result.MISMATCH);
+        mock.result(Result.MISMATCH_FROM_REQUIRED);
         assertFalse(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(, 0));
+        assertSame(Result.MISMATCH_FROM_REQUIRED, checker.check(, 0));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class ManyExpressionTest {
         expression.maxRepeats(2);
         mock.result(Result.MATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(, 0));
+        assertSame(Result.MORE_FROM_REQUIRED, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
 
@@ -144,11 +144,11 @@ public class ManyExpressionTest {
         expression.maxRepeats(2);
         mock.result(Result.MATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(, 0));
+        assertSame(Result.MORE_FROM_REQUIRED, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
 
-        mock.result(Result.MISMATCH);
+        mock.result(Result.MISMATCH_FROM_REQUIRED);
         assertTrue(checker.isOptional());
         assertSame(Result.MATCH, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
@@ -158,9 +158,9 @@ public class ManyExpressionTest {
     @Test
     public void testTwo_Mismatch() throws ExpressionCheckerException {
         expression.minRepeats(2).maxRepeats(2);
-        mock.result(Result.MISMATCH);
+        mock.result(Result.MISMATCH_FROM_REQUIRED);
         assertFalse(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(, 0));
+        assertSame(Result.MISMATCH_FROM_REQUIRED, checker.check(, 0));
     }
 
     @Test
@@ -168,7 +168,7 @@ public class ManyExpressionTest {
         expression.minRepeats(2).maxRepeats(2);
         mock.result(Result.MATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(, 0));
+        assertSame(Result.MORE_FROM_REQUIRED, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
 
@@ -183,13 +183,13 @@ public class ManyExpressionTest {
         expression.minRepeats(2).maxRepeats(2);
         mock.result(Result.MATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(, 0));
+        assertSame(Result.MORE_FROM_REQUIRED, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
 
-        mock.result(Result.MISMATCH);
+        mock.result(Result.MISMATCH_FROM_REQUIRED);
         assertFalse(checker.isOptional());
-        assertSame(Result.MISMATCH, checker.check(, 0));
+        assertSame(Result.MISMATCH_FROM_REQUIRED, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
     }
@@ -199,7 +199,7 @@ public class ManyExpressionTest {
         expression.minRepeats(2).maxRepeats(2);
         mock.result(Result.MATCH);
         assertFalse(checker.isOptional());
-        assertSame(Result.MORE, checker.check(, 0));
+        assertSame(Result.MORE_FROM_REQUIRED, checker.check(, 0));
         assertNotNull(checker.getNode().getChildren());
         assertEquals(1, checker.getNode().getChildren().size());
 

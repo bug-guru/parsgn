@@ -45,9 +45,9 @@ public class StringExpression extends Expression {
                 throw new IndexOutOfBoundsException(String.valueOf(offset));
             }
             if (codePoints[offset] != codePoint) {
-                return Result.MISMATCH;
+                return Result.MISMATCH_FROM_REQUIRED;
             }
-            return ++offset == len ? Result.MATCH : Result.MORE;
+            return ++offset == len ? Result.MATCH : Result.MORE_FROM_REQUIRED;
         }
 
         @Override

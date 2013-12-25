@@ -47,10 +47,10 @@ public class ParallelGroup extends Group<ParallelGroup> {
                         candidates.add(node);
                         i.remove();
                         break;
-                    case MISMATCH:
+                    case MISMATCH_FROM_REQUIRED:
                         i.remove();
                         break;
-                    case MORE:
+                    case MORE_FROM_REQUIRED:
                         hasMore = true;
                         break;
                     default:
@@ -58,10 +58,10 @@ public class ParallelGroup extends Group<ParallelGroup> {
                 }
             }
             if (hasMore) {
-                return Result.MORE;
+                return Result.MORE_FROM_REQUIRED;
             }
             if (children.isEmpty() && candidates.isEmpty()) {
-                return Result.MISMATCH;
+                return Result.MISMATCH_FROM_REQUIRED;
             }
             // TODO process candidates; which one should "win"?
         }

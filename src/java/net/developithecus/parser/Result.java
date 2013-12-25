@@ -6,7 +6,9 @@ package net.developithecus.parser;
  * @since 1.0
  */
 public enum Result {
-    MORE,
+    MORE_FROM_REQUIRED,
+    MORE_FROM_OPTIONAL,
     MATCH,
-    MISMATCH
+    MISMATCH_FROM_REQUIRED,
+    MISMATCH_FROM_OPTIONAL
 }

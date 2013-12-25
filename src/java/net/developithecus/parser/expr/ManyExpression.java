@@ -45,7 +45,7 @@ public class ManyExpression extends Expression {
             while (checkerIterator.hasNext()) {
                 ExpressionChecker checker = checkerIterator.next();
                 Result result = checker.check(codePoint);
-                if (result == Result.MORE) {
+                if (result == Result.MORE_FROM_REQUIRED) {
                     continue;
                 }
                 checkerIterator.remove();
@@ -58,9 +58,9 @@ public class ManyExpression extends Expression {
             if (chainIsBroken()) {
                 backlog.clear();
                 checkers.clear();
-                return getNode().hasChild() ? Result.MATCH : Result.MISMATCH;
+                return getNode().hasChild() ? Result.MATCH : Result.MISMATCH_FROM_REQUIRED;
             } else {
-                return Result.MORE;
+                return Result.MORE_FROM_REQUIRED;
             }
         }
 

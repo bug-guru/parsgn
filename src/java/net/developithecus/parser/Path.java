@@ -59,7 +59,7 @@ public class Path {
 
     public void push(int codePoint) throws ExpressionCheckerException {
         Result result = leaf().push(codePoint);
-        while (result != Result.MORE) {
+        while (result != Result.MORE_FROM_REQUIRED) {
             if (result == Result.MATCH) {
                 applyLeaf();
             } else {

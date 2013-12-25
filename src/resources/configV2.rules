@@ -1,29 +1,44 @@
-ConfigFile: (Rule+ I*);
+ConfigFile: Rule+ -I* -#EOF;
 
-Rule: (I* Token I* ":" Expression I* ";");
+Rule: -I* Token I* -":" -I* Expression+ -";";
 
 // Ignorable
-I: [WhiteSpace Comment ]+;
+I: [WhiteSpace Comment]+;
 
 WhiteSpace: #WHITESPACE+;
 
 Comment: [SingleLineComment MultiLineComment];
 
-SingleLineComment: ("//" #DEFINED* #LINE_SEPARATOR);
+SingleLineComment: -"//" #DEFINED* -#EOL;
 
-MultiLineComment: ("/*" #DEFINED* "*/");
+MultiLineComment: -"/*" #DEFINED* -"*/";
 
-Token: (#UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART*);
+Token: #UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART*;
 
-Expression: (I* "-"? I* "!"? I* [Token Sequence OneOf CharType String] Quantifier?)+;
+Expression: ("-" -I*)? [RuleRef OneOf CharType String Group] -I* (Quantifier -I*)?;
 
-Sequence: "(" Expression I* ")";
+RuleRef: Token;
 
-OneOf: ("[" Expression I* "]");
+OneOf: -"[" (-I* [RuleRef CharType String]){2,} -I* -"]";
 
-CharType: ("#" Token);
+CharType: -"#" Token; //TODO: list all possible char types
 
-String: ("\"" ["\\\"" "\\"" #DEFINED]* "\"");
+String: -"\"" ["\\\"" "\\"" #DEFINED]* -"\"";
 
-Quantifier: (I* ["?" "+" "*" ("{" I* #DIGIT+ I* ("," I* #DIGIT*)? I* "}")]);
+Group: -"(" -I* Expression -")";
 
+Quantifier: [ZeroOrOne OneOrMore ZeroOrMore ExactlyNTimes AtLeastNTimes AtLeastNButNotMoreThanMTimes];
+
+ZeroOrOne: -"?";
+
+OneOrMore: -"+";
+
+ZeroOrMore: -"*";
+
+ExactlyNTimes: -"{" -I* Number -I* -"}";
+
+AtLeastNTimes: -"{" -I* Number -I* -"," -I* -"}";
+
+AtLeastNButNotMoreThanMTimes: -"{" -I* Number -I* -"," -I* Number -I* -"}";
+
+Number: #DIGIT*;
