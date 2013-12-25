@@ -1,0 +1,34 @@
+ConfigFile: Rule {Rule} {I} #EOF;
+
+Rule: {I} Token {I} ":" ExpressionList ";";
+
+// Ignorable
+I: WhiteSpace | SingleLineComment | MultiLineComment;
+
+WhiteSpace: #WHITESPACE;
+
+SingleLineComment: "//" {#DEFINED} #EOL;
+
+MultiLineComment: "/*" {#DEFINED} "*/";
+
+Token: #UNICODE_IDENTIFIER_START {#UNICODE_IDENTIFIER_PART};
+
+Expression: RuleRef | OneOfGroup | CharType | String | Group | RepeatGroup | OptionalGroup;
+
+RuleRef: Token;
+
+OneOfGroup: OneOfGroupItem {I} "|" {I} OneOfGroupItem {{I} "|" {I} OneOfGroupItem};
+
+OneOfGroupItem: RuleRef | CharType | String | Group;
+
+CharType: "#" Token; //TODO: list all possible char types
+
+String: "\"" {"\\\"" | "\\"" | #DEFINED} "\"";
+
+Group: "(" ExpressionList ")";
+
+RepeatGroup: "{" ExpressionList "}";
+
+OptionalGroup: "[" ExpressionList "]";
+
+ExpressionList: {I} Expression {{I} Expression} {I};

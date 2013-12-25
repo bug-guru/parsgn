@@ -1,5 +1,8 @@
 package net.developithecus.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
  * @version 13.5.12
@@ -7,7 +10,7 @@ package net.developithecus.parser;
  */
 public class Rule {
     private String name;
-    private Expression expression;
+    private List<Expression> expressions = new ArrayList<>();
 
     public String name() {
         return name;
@@ -18,12 +21,7 @@ public class Rule {
         return this;
     }
 
-    public Expression expression() {
-        return expression;
-    }
-
-    public Rule expression(Expression expression) {
-        this.expression = expression;
-        return this;
+    public void addExpression(Expression expression) {
+        expressions.add(expression);
     }
 }

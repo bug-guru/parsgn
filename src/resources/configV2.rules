@@ -25,7 +25,7 @@ CharType: -"#" Token; //TODO: list all possible char types
 
 String: -"\"" ["\\\"" "\\"" #DEFINED]* -"\"";
 
-Group: -"(" -I* Expression -")";
+Group: -"(" -I* Expression+ -")";
 
 Quantifier: [ZeroOrOne OneOrMore ZeroOrMore ExactlyNTimes AtLeastNTimes AtLeastNButNotMoreThanMTimes];
 
