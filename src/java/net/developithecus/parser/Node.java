@@ -1,6 +1,7 @@
 package net.developithecus.parser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -9,30 +10,38 @@ import java.util.List;
  * @since 1.0
  */
 public class Node {
-    private List<Node> children = new ArrayList<>();
-    private String value;
+    private final List<Node> children;
+    private final String value;
+    private final int beginIndex;
+    private final int endIndex;
+
+    public Node(String value, int beginIndex, int endIndex, List<Node> children) {
+        this.children = Collections.unmodifiableList(new ArrayList<>(children));
+        this.value = value;
+        this.beginIndex = beginIndex;
+        this.endIndex = endIndex;
+    }
+
+    public Node(String value, int beginIndex, int endIndex) {
+        this.children = null;
+        this.value = value;
+        this.beginIndex = beginIndex;
+        this.endIndex = endIndex;
+    }
 
     public String getValue() {
         return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public void addChild(Node child) {
-        children.add(child);
     }
 
     public List<Node> getChildren() {
         return children;
     }
 
-    public boolean hasChild() {
-        return !children.isEmpty();
+    public int getBeginIndex() {
+        return beginIndex;
     }
 
-    public Node lastChild() {
-        return children.isEmpty() ? null : children.get(children.size() - 1);
+    public int getEndIndex() {
+        return endIndex;
     }
 }

@@ -1,8 +1,8 @@
 package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
-import net.developithecus.parser.ExpressionCheckerException;
-import net.developithecus.parser.Result;
+import net.developithecus.parser.ExpressionChecker;
+import net.developithecus.parser.ParsingContext;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -12,43 +12,40 @@ import net.developithecus.parser.Result;
 public class CharacterExpression extends Expression {
     private CharType charType;
 
-    public CharType type() {
+    @Override
+    public boolean isOptional() {
+        return false;
+    }
+
+    public CharType getCharType() {
         return charType;
     }
 
-    public CharacterExpression type(CharType charType) {
+    public void setCharType(CharType charType) {
         this.charType = charType;
-        return this;
     }
 
     @Override
-    public ExpressionChecker checker(int pos) {
-        return new Checker(pos);
+    public ExpressionChecker checker(ParsingContext ctx) {
+        return new Checker(ctx);
     }
-
 
     private class Checker extends ExpressionChecker {
 
-        public Checker(int pos) {
-            super(pos);
+        public Checker(ParsingContext ctx) {
+            super(ctx);
         }
 
         @Override
-        protected Result check(int codePoint) throws ExpressionCheckerException {
-            StringBuilder builder = new StringBuilder(2);
-            builder.appendCodePoint(codePoint);
+        public void check() {
+            int codePoint = getCtx().getCodePoint();
             if (charType.apply(codePoint)) {
-                getNode().setValue(builder.toString());
-                return Result.MATCH;
+                StringBuilder builder = new StringBuilder(2);
+                builder.appendCodePoint(codePoint);
+                commitLeafNode(builder.toString());
             } else {
-                return Result.MISMATCH_FROM_REQUIRED;
+                rollback();
             }
         }
-
-        @Override
-        protected boolean isOptional() {
-            return false;
-        }
-
     }
 }

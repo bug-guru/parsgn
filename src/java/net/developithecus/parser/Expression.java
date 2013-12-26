@@ -8,17 +8,7 @@ package net.developithecus.parser;
  */
 
 public abstract class Expression {
-    private boolean optional = false;
+    public abstract boolean isOptional();
 
-    public Expression optional(boolean optional) {
-        this.optional = optional;
-        return this;
-    }
-
-    public boolean optional() {
-        return optional;
-    }
-
-    public abstract ExpressionNode createNode();
-
+    public abstract ExpressionChecker checker(ParsingContext ctx);
 }

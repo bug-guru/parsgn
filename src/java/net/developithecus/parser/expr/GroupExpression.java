@@ -13,17 +13,15 @@ import java.util.List;
  * @since 1.0
  */
 
-public abstract class Group<T extends Group<T>> extends Expression {
+public abstract class GroupExpression extends Expression {
     private List<Expression> expressionList = new ArrayList<>();
 
-    public T addAll(Collection<Expression> expressionList) {
+    public void addAll(Collection<Expression> expressionList) {
         this.expressionList.addAll(expressionList);
-        return (T) this;
     }
 
-    public T addAll(Expression... expressionList) {
+    public void addAll(Expression... expressionList) {
         this.expressionList.addAll(Arrays.asList(expressionList));
-        return (T) this;
     }
 
     public void add(Expression expression) {

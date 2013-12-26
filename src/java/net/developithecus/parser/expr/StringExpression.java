@@ -1,8 +1,8 @@
 package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
-import net.developithecus.parser.ExpressionCheckerException;
-import net.developithecus.parser.Result;
+import net.developithecus.parser.ExpressionChecker;
+import net.developithecus.parser.ParsingContext;
 import net.developithecus.parser.StringUtils;
 
 /**
@@ -16,43 +16,49 @@ public class StringExpression extends Expression {
     private int[] codePoints;
     private int len;
 
-    public String value() {
+    @Override
+    public boolean isOptional() {
+        return false;
+    }
+
+    public String getValue() {
         return value;
     }
 
-    public StringExpression value(String value) {
+    public void setValue(String value) {
         this.value = value;
         this.codePoints = StringUtils.toCodePoints(value);
         this.len = codePoints.length;
-        return this;
     }
 
     @Override
-    public ExpressionChecker checker(int pos) {
-        return new Checker(pos);
+    public ExpressionChecker checker(ParsingContext ctx) {
+        return new Checker(ctx);
     }
 
     private class Checker extends ExpressionChecker {
         private int offset;
 
-        private Checker(int pos) {
-            super(pos);
+        private Checker(ParsingContext ctx) {
+            super(ctx);
         }
 
         @Override
-        protected Result check(int codePoint) throws ExpressionCheckerException {
+        public void check() {
             if (offset >= len) {
                 throw new IndexOutOfBoundsException(String.valueOf(offset));
             }
+            int codePoint = getCtx().getCodePoint();
             if (codePoints[offset] != codePoint) {
-                return Result.MISMATCH_FROM_REQUIRED;
+                rollback();
+            } else {
+                offset++;
+                if (offset == len) {
+                    commitLeafNode(value);
+                } else {
+                    continueProcessing();
+                }
             }
-            return ++offset == len ? Result.MATCH : Result.MORE_FROM_REQUIRED;
-        }
-
-        @Override
-        protected boolean isOptional() {
-            return false;
         }
     }
 }

@@ -1,9 +1,6 @@
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.Expression;
-import net.developithecus.parser.ExpressionCheckerException;
-import net.developithecus.parser.Result;
-import net.developithecus.parser.Rule;
+import net.developithecus.parser.*;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -14,41 +11,61 @@ import net.developithecus.parser.Rule;
 public class ReferenceExpression extends Expression {
     private Rule reference;
 
-    public Rule reference() {
-        return reference;
+    public ReferenceExpression(Rule reference) {
+        this.reference = reference;
     }
 
-    public ReferenceExpression reference(Rule reference) {
-        this.reference = reference;
-        return this;
+    public ReferenceExpression() {
     }
 
     @Override
-    public ExpressionChecker checker(int pos) {
-        return new Checker(pos);
+    public boolean isOptional() {
+        return false;
+    }
+
+    public Rule getReference() {
+        return reference;
+    }
+
+    public void setReference(Rule reference) {
+        this.reference = reference;
+    }
+
+    @Override
+    public ExpressionChecker checker(ParsingContext ctx) {
+        return new Checker(ctx);
     }
 
     private class Checker extends ExpressionChecker {
         private ExpressionChecker checker;
 
-        private Checker(int pos) {
-            super(pos);
-            checker = reference.expression().checker(pos);
-            getNode().setValue(reference.name());
+        private Checker(ParsingContext ctx) {
+            super(ctx);
+            checker = reference.checker(ctx);
         }
 
         @Override
-        protected Result check(int codePoint) throws ExpressionCheckerException {
-            Result result = checker.check(codePoint);
-            if (result == Result.MATCH) {
-                getNode().addChild(checker.getNode());
+        public void check() {
+            checker.check();
+            switch (getCtx().getResult()) {
+                case COMMIT:
+                    commitWrappingNodes(reference.getName());
+                    break;
+                case CONTINUE:
+                    continueProcessing();
+                    break;
+                case ROLLBACK:
+                    rollback();
+                    break;
+                default:
+                    throw new IllegalStateException("unknown result: " + getCtx().getResult());
             }
-            return result;
         }
 
-        @Override
-        protected boolean isOptional() {
-            return false;
+        protected void commitWrappingNodes(String value) {
+            Node node = new Node(value, getBeginIndex(), getCtx().getNextIndex(), getCtx().takeAndClearCommitted());
+            getCtx().commitSingleNode(node);
         }
+
     }
 }

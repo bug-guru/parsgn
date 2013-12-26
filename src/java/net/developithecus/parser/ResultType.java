@@ -5,8 +5,8 @@ package net.developithecus.parser;
  * @version 13.25.12
  * @since 1.0
  */
-public class ExpressionNode {
-    public ResultEvent push(SourceEvent event) {
-
-    }
+public enum ResultType {
+    CONTINUE,
+    COMMIT,
+    ROLLBACK
 }
