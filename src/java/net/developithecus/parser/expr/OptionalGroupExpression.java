@@ -2,6 +2,7 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.*;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -27,9 +28,14 @@ public class OptionalGroupExpression extends GroupExpression {
 
         @Override
         public Expression next() {
-            SequentialGroupExpression seq = new SequentialGroupExpression();
-            seq.addAll(getExpressions());
-            return seq;
+            List<Expression> expressions = getExpressions();
+            if (expressions.size() == 1) {
+                return expressions.get(0);
+            } else {
+                SequentialGroupExpression seq = new SequentialGroupExpression();
+                seq.addAll(getExpressions());
+                return seq;
+            }
         }
 
         @Override

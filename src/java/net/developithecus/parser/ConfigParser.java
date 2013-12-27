@@ -1,7 +1,6 @@
 package net.developithecus.parser;
 
 import net.developithecus.parser.expr.CharType;
-import net.developithecus.parser.expr.StringLiteralExpression;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -46,8 +45,10 @@ public class ConfigParser extends Parser {
         whiteSpace.addAll(charType(CharType.WHITESPACE));
         singleLineComment.addAll(
                 str("//"),
-                repeat(charType(CharType.DEFINED)),
-                charType(CharType.LINE_SEPARATOR));
+                repeat(
+                        new Expression[]{
+                                charType(CharType.DEFINED)},
+                        charType(CharType.LINE_SEPARATOR)));
         multiLineComment.addAll(
                 str("/*"),
                 repeat(new Expression[]{charType(CharType.DEFINED)}, str("*/")));
@@ -56,8 +57,8 @@ public class ConfigParser extends Parser {
                 repeat(charType(CharType.UNICODE_IDENTIFIER_PART)));
         expression.addAll(
                 alt(
-                        ref(ruleRef),
                         ref(altGroup),
+                        ref(ruleRef),
                         ref(charType),
                         ref(string),
                         ref(group),
@@ -84,7 +85,9 @@ public class ConfigParser extends Parser {
         charType.addAll(
                 str("#"),
                 ref(token));
-        string.addAll(new StringLiteralExpression());
+        string.addAll(
+                str("\""),
+                repeat(new Expression[]{charType(CharType.DEFINED)}, str("\"")));
         group.addAll(
                 str("("),
                 repeat(ref(expressionList)),

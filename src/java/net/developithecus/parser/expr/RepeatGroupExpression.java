@@ -2,6 +2,7 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.*;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -40,9 +41,14 @@ public class RepeatGroupExpression extends GroupExpression {
             if (checkingEndCondition) {
                 return endCondition;
             } else {
-                SequentialGroupExpression seq = new SequentialGroupExpression();
-                seq.addAll(getExpressions());
-                return seq;
+                List<Expression> expressions = getExpressions();
+                if (expressions.size() == 1) {
+                    return expressions.get(0);
+                } else {
+                    SequentialGroupExpression seq = new SequentialGroupExpression();
+                    seq.addAll(expressions);
+                    return seq;
+                }
             }
         }
 

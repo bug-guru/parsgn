@@ -1,5 +1,3 @@
-/*012345678901234567890123456789
-  012345678901234567890123456789012345678901234 */
 ConfigFile: Rule {Rule} {I};
 Rule: {I} Token {I} ":" ExpressionList ";";
 
@@ -8,28 +6,30 @@ I: WhiteSpace | SingleLineComment | MultiLineComment;
 
 WhiteSpace: #WHITESPACE;
 
-SingleLineComment: "//" {#DEFINED} #EOL;
+SingleLineComment: "//" {#DEFINED, #EOL};
 
-MultiLineComment: "/*" {#DEFINED} "*/";
+MultiLineComment: "/*" {#DEFINED, "*/"};
 
 Token: #UNICODE_IDENTIFIER_START {#UNICODE_IDENTIFIER_PART};
 
-Expression: RuleRef | AltGroup | CharType | String | Group | RepeatGroup | OptGroup;
+Expression: AltGroup | RuleRef | CharType | String | Group | Repeat | Optional | Replace;
 
 RuleRef: Token;
 
 AltGroup: AltGroupItem {I} "|" {I} AltGroupItem {{I} "|" {I} AltGroupItem};
 
-AltGroupItem: RuleRef | CharType | String | Group;
+AltGroupItem: RuleRef | CharType | String | Sequence | Replace;
 
 CharType: "#" Token; //TODO: list all possible char types
 
-String: STRING_LITERAL;
+String: "\"" {["\\\""->"\"" | "\\\\"->"\\" | #DEFINED], "\""};
 
-Group: "(" ExpressionList ")";
+Sequence: "(" ExpressionList ")";
 
-RepeatGroup: "{" ExpressionList "}";
+Repeat: "{" ExpressionList ["," {I} Expression {I}] "}";
 
-OptGroup: "[" ExpressionList "]";
+Optional: "[" ExpressionList "]";
 
 ExpressionList: {I} Expression {{I} Expression} {I};
+
+Replace: Expression "->" String;
