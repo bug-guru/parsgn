@@ -1,6 +1,6 @@
-012345678901234567890
+/*012345678901234567890123456789
+  012345678901234567890123456789012345678901234 */
 ConfigFile: Rule {Rule} {I};
-
 Rule: {I} Token {I} ":" ExpressionList ";";
 
 // Ignorable
@@ -24,7 +24,7 @@ AltGroupItem: RuleRef | CharType | String | Group;
 
 CharType: "#" Token; //TODO: list all possible char types
 
-String: "\"" {"\\\"" | "\\"" | #DEFINED} "\"";
+String: STRING_LITERAL;
 
 Group: "(" ExpressionList ")";
 

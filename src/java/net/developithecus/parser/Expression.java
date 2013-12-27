@@ -10,5 +10,5 @@ package net.developithecus.parser;
 public abstract class Expression {
     public abstract boolean isOptional();
 
-    public abstract ExpressionChecker checker(ParsingContext ctx);
+    public abstract ExpressionChecker checker();
 }

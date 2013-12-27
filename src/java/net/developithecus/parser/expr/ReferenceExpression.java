@@ -2,6 +2,8 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.*;
 
+import java.util.logging.Logger;
+
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
  * @version 13.5.12
@@ -9,6 +11,7 @@ import net.developithecus.parser.*;
  */
 
 public class ReferenceExpression extends Expression {
+    private static final Logger logger = Logger.getLogger(ReferenceExpression.class.getName());
     private Rule reference;
 
     public ReferenceExpression(Rule reference) {
@@ -32,39 +35,42 @@ public class ReferenceExpression extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker(ParsingContext ctx) {
-        return new Checker(ctx);
+    public ExpressionChecker checker() {
+        return new Checker();
     }
 
     private class Checker extends ExpressionChecker {
-        private ExpressionChecker checker;
 
-        private Checker(ParsingContext ctx) {
-            super(ctx);
-            checker = reference.checker(ctx);
+        @Override
+        public Expression next() {
+            return getReference();
         }
 
         @Override
-        public void check() {
-            checker.check();
-            switch (getCtx().getResult()) {
+        public void check() throws ParsingException {
+            ParsingContext ctx = getCtx();
+            logger.entering("ReferenceExpression.Checker", "check", ctx);
+            switch (ctx.getResult()) {
                 case COMMIT:
                     commitWrappingNodes(reference.getName());
-                    break;
-                case CONTINUE:
-                    continueProcessing();
                     break;
                 case ROLLBACK:
                     rollback();
                     break;
                 default:
-                    throw new IllegalStateException("unknown result: " + getCtx().getResult());
+                    throw new IllegalStateException("unknown result: " + ctx.getResult());
             }
+            logger.exiting("ReferenceExpression.Checker", "check", ctx);
         }
 
         protected void commitWrappingNodes(String value) {
             Node node = new Node(value, getBeginIndex(), getCtx().getNextIndex(), getCtx().takeAndClearCommitted());
             getCtx().commitSingleNode(node);
+        }
+
+        @Override
+        protected String getName() {
+            return "ref[" + getReference().getName() + "]";
         }
 
     }

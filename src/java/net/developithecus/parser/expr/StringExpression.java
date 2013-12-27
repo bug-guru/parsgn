@@ -1,9 +1,8 @@
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.Expression;
-import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.ParsingContext;
-import net.developithecus.parser.StringUtils;
+import net.developithecus.parser.*;
+
+import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -12,6 +11,7 @@ import net.developithecus.parser.StringUtils;
  */
 
 public class StringExpression extends Expression {
+    private static final Logger logger = Logger.getLogger(StringExpression.class.getName());
     private String value;
     private int[] codePoints;
     private int len;
@@ -32,23 +32,26 @@ public class StringExpression extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker(ParsingContext ctx) {
-        return new Checker(ctx);
+    public ExpressionChecker checker() {
+        return new Checker();
     }
 
     private class Checker extends ExpressionChecker {
         private int offset;
 
-        private Checker(ParsingContext ctx) {
-            super(ctx);
+        @Override
+        public Expression next() {
+            return null;
         }
 
         @Override
-        public void check() {
+        public void check() throws ParsingException {
+            ParsingContext ctx = getCtx();
+            logger.entering("StringExpression.Checker", "check", ctx);
             if (offset >= len) {
                 throw new IndexOutOfBoundsException(String.valueOf(offset));
             }
-            int codePoint = getCtx().getCodePoint();
+            int codePoint = ctx.getCodePoint();
             if (codePoints[offset] != codePoint) {
                 rollback();
             } else {
@@ -59,6 +62,12 @@ public class StringExpression extends Expression {
                     continueProcessing();
                 }
             }
+            logger.exiting("StringExpression.Checker", "check", ctx);
+        }
+
+        @Override
+        protected String getName() {
+            return "str[" + value + "]";
         }
     }
 }

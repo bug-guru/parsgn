@@ -1,11 +1,8 @@
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.Expression;
-import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.GroupExpressionChecker;
-import net.developithecus.parser.ParsingContext;
+import net.developithecus.parser.*;
 
-import java.util.Iterator;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -13,64 +10,72 @@ import java.util.Iterator;
  * @since 1.0
  */
 public class RepeatGroupExpression extends GroupExpression {
+    private static final Logger logger = Logger.getLogger(RepeatGroupExpression.class.getName());
+    private Expression endCondition;
 
     @Override
     public boolean isOptional() {
         return true;
     }
 
+    public Expression getEndCondition() {
+        return endCondition;
+    }
+
+    public void setEndCondition(Expression endCondition) {
+        this.endCondition = endCondition;
+    }
+
     @Override
-    public ExpressionChecker checker(ParsingContext ctx) {
-        return new Checker(ctx);
+    public ExpressionChecker checker() {
+        return new Checker();
     }
 
     private class Checker extends GroupExpressionChecker {
-        private int turnsPassed = -1;
-        private int turnBeginIndex;
-        private Iterator<Expression> expressions;
-        private Expression curExpr;
-        private ExpressionChecker curChecker;
-
-        protected Checker(ParsingContext ctx) {
-            super(ctx);
-            nextTurn();
-        }
-
-        private void nextTurn() {
-            turnsPassed++;
-            expressions = getExpressions().iterator();
-            turnBeginIndex = getCtx().getNextIndex();
-            nextExpr();
-        }
-
-        private void nextExpr() {
-            curExpr = expressions.next();
-            curChecker = curExpr.checker(getCtx());
-        }
+        private boolean checkingEndCondition = endCondition != null;
+        private int turnsPassed = 0;
 
         @Override
-        public void check() {
-            curChecker.check();
-            switch (getCtx().getResult()) {
-                case COMMIT:
-                    collectNodes();
-                    doContinue();
-                    break;
-                case ROLLBACK:
-                    doContinueCommitOrRollback();
-                    break;
-                case CONTINUE:
-                    break;
-                default:
-                    throw new IllegalStateException("unknown result: " + getCtx().getResult());
+        public Expression next() {
+            if (checkingEndCondition) {
+                return endCondition;
+            } else {
+                SequentialGroupExpression seq = new SequentialGroupExpression();
+                seq.addAll(getExpressions());
+                return seq;
             }
         }
 
-        private void doContinueCommitOrRollback() {
-            if (curExpr.isOptional()) {
-                doContinue();
-            } else if (turnsPassed > 0) {
-                getCtx().setNextIndex(turnBeginIndex);
+
+        @Override
+        public void check() throws ParsingException {
+            ParsingContext ctx = getCtx();
+            logger.entering("RepeatGroupExpression.Checker", "check", ctx);
+            switch (ctx.getResult()) {
+                case COMMIT:
+                    collectNodes();
+                    if (checkingEndCondition) {
+                        commitNodes();
+                    } else {
+                        doContinue();
+                    }
+                    break;
+                case ROLLBACK:
+                    if (checkingEndCondition) {
+                        checkingEndCondition = false;
+                        continueProcessing();
+                    } else {
+                        doCommitOrRollback();
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException("unknown result: " + ctx.getResult());
+            }
+            logger.exiting("RepeatGroupExpression.Checker", "check", ctx);
+        }
+
+        private void doCommitOrRollback() {
+            if (turnsPassed > 0) {
                 commitNodes();
             } else {
                 rollback();
@@ -78,14 +83,14 @@ public class RepeatGroupExpression extends GroupExpression {
         }
 
         private void doContinue() {
-            if (expressions.hasNext()) {
-                nextExpr();
-            } else if (getNodes().isEmpty()) {
-                throw new IllegalStateException("group without result");
-            } else {
-                nextTurn();
-            }
+            turnsPassed++;
             continueProcessing();
+            checkingEndCondition = endCondition != null;
+        }
+
+        @Override
+        protected String getName() {
+            return "repeat";
         }
 
     }

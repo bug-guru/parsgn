@@ -6,15 +6,19 @@ package net.developithecus.parser;
  * @since 1.0
  */
 public abstract class ExpressionChecker {
-    private final ParsingContext ctx;
-    private final int beginIndex;
+    private ParsingContext ctx;
+    private int beginIndex;
 
-    protected ExpressionChecker(ParsingContext ctx) {
-        this.beginIndex = ctx.getNextIndex();
+    void init(ParsingContext ctx) {
         this.ctx = ctx;
+        this.beginIndex = ctx.getIndex();
     }
 
-    public abstract void check();
+    public abstract Expression next();
+
+    public abstract void check() throws ParsingException;
+
+    protected abstract String getName();
 
     public ParsingContext getCtx() {
         return ctx;
@@ -39,4 +43,8 @@ public abstract class ExpressionChecker {
         ctx.clearCommitted();
     }
 
+    @Override
+    public String toString() {
+        return getName() + '{' + beginIndex + '}';
+    }
 }

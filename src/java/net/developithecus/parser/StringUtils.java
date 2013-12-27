@@ -26,4 +26,38 @@ public final class StringUtils {
         }
         return result;
     }
+
+    static void escape(StringBuilder result, String value) {
+        int offset = 0;
+        int len = value.length();
+        while (offset < len) {
+            int codePoint = value.codePointAt(offset);
+            offset += Character.charCount(codePoint);
+            switch (codePoint) {
+                case '\\':
+                    result.append("\\\\");
+                    break;
+                case '\t':
+                    result.append("\\t");
+                    break;
+                case '\b':
+                    result.append("\\b");
+                    break;
+                case '\n':
+                    result.append("\\n");
+                    break;
+                case '\r':
+                    result.append("\\r");
+                    break;
+                case '\f':
+                    result.append("\\f");
+                    break;
+                case '\"':
+                    result.append("\\\"");
+                    break;
+                default:
+                    result.appendCodePoint(codePoint);
+            }
+        }
+    }
 }

@@ -30,10 +30,11 @@ public class CharacterTest {
         isIdentifierIgnorable('\u001E');
         isIdentifierIgnorable('\n');
         isIdentifierIgnorable('\r');
+        isIdentifierIgnorable(-1);
     }
 
-    private void isIdentifierIgnorable(char c) {
-        System.out.println("char [" + c + "] [" + Integer.toHexString(c) + "]");
+    private void isIdentifierIgnorable(int c) {
+        System.out.println("char [" + (char) c + "] [" + Integer.toHexString(c) + "]");
         for (CharType t : CharType.values()) {
             System.out.println("\t" + t + " " + t.apply(c));
         }

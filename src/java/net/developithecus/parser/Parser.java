@@ -3,7 +3,11 @@ package net.developithecus.parser;
 import net.developithecus.parser.expr.*;
 
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -12,7 +16,10 @@ import java.util.List;
  */
 
 public class Parser {
+    private static final Logger logger = Logger.getLogger(Parser.class.getName());
     private final ReferenceExpression root;
+    private final Deque<ExpressionChecker> stack = new LinkedList<>();
+    private final ParsingContext ctx = new ParsingContext();
 
     public Parser() {
         this.root = new ReferenceExpression();
@@ -53,10 +60,15 @@ public class Parser {
         return result;
     }
 
-    public RepeatGroupExpression repeat(Expression... expressions) {
+    public RepeatGroupExpression repeat(Expression[] expressions, Expression endCondition) {
         RepeatGroupExpression result = new RepeatGroupExpression();
         result.addAll(expressions);
+        result.setEndCondition(endCondition);
         return result;
+    }
+
+    public RepeatGroupExpression repeat(Expression... expressions) {
+        return repeat(expressions, null);
     }
 
     public SequentialGroupExpression group(Expression... expressions) {
@@ -72,35 +84,72 @@ public class Parser {
     }
 
 
-    public Node parse(String input) {
-        ParsingContext ctx = new ParsingContext();
-        List<Integer> log = new ArrayList<>(input.length() * 3 / 2);
-        final int length = input.length();
-        ctx.reset(0, -1);
-        ctx.setNextIndex(0);
-        ExpressionChecker rootChecker = root.checker(ctx);
-        int index = 0;
-        for (int offset = 0; offset < length; ) {
-            int codePoint = input.codePointAt(offset);
-            offset += Character.charCount(codePoint);
-            log.add(codePoint);
-            do {
-                codePoint = log.get(index);
-                ctx.reset(index, codePoint);
-                rootChecker.check();
-                index = ctx.getNextIndex();
-                switch (ctx.getResult()) {
-                    case CONTINUE:
-                        break;
-                    case COMMIT:
-                        return ctx.getSingleCommittedNode();
-                    case ROLLBACK:
-                        throw new IllegalStateException("Syntax error");
-                    default:
-                        throw new IllegalStateException("unknown result: " + ctx.getResult());
+    public Node parse(String input) throws ParsingException {
+        try {
+            List<Integer> log = new ArrayList<>(input.length() * 3 / 2);
+            int length = input.length();
+            ctx.reset(0, -1);
+            ctx.setNextIndex(0);
+            int index = 0;
+            pushExpression(root);
+            for (int offset = 0; offset <= length; ) {
+                int codePoint;
+                if (offset == length) {
+                    codePoint = -1;
+                    offset++;
+                } else {
+                    codePoint = input.codePointAt(offset);
+                    offset += Character.charCount(codePoint);
                 }
-            } while (index < log.size());
+                log.add(codePoint);
+                do {
+                    codePoint = log.get(index);
+                    ctx.reset(index, codePoint);
+                    finishPath();
+                    do {
+                        ExpressionChecker currentChecker = stack.peek();
+                        currentChecker.check();
+                        index = ctx.getNextIndex();
+                        switch (ctx.getResult()) {
+                            case CONTINUE:
+                                break;
+                            case COMMIT:
+                                stack.pop();
+                                if (stack.isEmpty()) {
+                                    return ctx.getSingleCommittedNode();
+                                }
+                                break;
+                            case ROLLBACK:
+                                stack.pop();
+                                if (stack.isEmpty()) {
+                                    throw new ParsingException("Syntax error");
+                                }
+                                break;
+                            default:
+                                throw new ParsingException("unknown result: " + ctx.getResult());
+                        }
+                    } while (ctx.getResult() != ResultType.CONTINUE);
+                } while (index < log.size());
+            }
+            throw new ParsingException("Parsing error");
+        } catch (ParsingException e) {
+            logger.log(Level.SEVERE, "Exception when processing " + stack, e);
+            throw e;
         }
-        throw new IllegalStateException("Parsing error");
+    }
+
+    private void finishPath() {
+        Expression nextExpr;
+        logger.log(Level.FINER, "updating stack {0}", stack);
+        while ((nextExpr = stack.peek().next()) != null) {
+            pushExpression(nextExpr);
+        }
+        logger.log(Level.FINER, "Stack updated {0}", stack);
+    }
+
+    private void pushExpression(Expression nextExpr) {
+        ExpressionChecker nextChecker = nextExpr.checker();
+        nextChecker.init(ctx);
+        stack.push(nextChecker);
     }
 }

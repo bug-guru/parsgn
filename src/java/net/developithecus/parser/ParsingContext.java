@@ -78,4 +78,15 @@ public class ParsingContext {
         this.nextIndex = nextIndex;
         clearCommitted();
     }
+
+    @Override
+    public String toString() {
+        return "ParsingContext{" +
+                "index=" + index +
+                ", codePoint=" + codePoint +
+                ", nextIndex=" + nextIndex +
+                ", result=" + result +
+                ", committed=" + committed +
+                '}';
+    }
 }

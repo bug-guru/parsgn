@@ -11,10 +11,6 @@ import java.util.List;
 public abstract class GroupExpressionChecker extends ExpressionChecker {
     private final List<Node> nodes = new ArrayList<>();
 
-    protected GroupExpressionChecker(ParsingContext ctx) {
-        super(ctx);
-    }
-
     protected void collectNodes() {
         nodes.addAll(getCtx().takeAndClearCommitted());
     }
@@ -27,4 +23,11 @@ public abstract class GroupExpressionChecker extends ExpressionChecker {
         getCtx().commitNodes(nodes);
     }
 
+    @Override
+    public String toString() {
+        return getName() + "{" +
+                getBeginIndex() +
+                (nodes.isEmpty() ? "" : ", nodes=" + nodes) +
+                '}';
+    }
 }

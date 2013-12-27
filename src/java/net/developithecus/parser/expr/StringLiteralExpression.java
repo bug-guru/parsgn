@@ -5,28 +5,18 @@ import net.developithecus.parser.ExpressionChecker;
 import net.developithecus.parser.ParsingContext;
 import net.developithecus.parser.ParsingException;
 
-import java.util.logging.Logger;
-
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
- * @version 13.5.12
+ * @version 13.27.12
  * @since 1.0
  */
-public class CharacterExpression extends Expression {
-    private static final Logger logger = Logger.getLogger(CharacterExpression.class.getName());
-    private CharType charType;
+public class StringLiteralExpression extends Expression {
+    private static final int QUOTE_CP = '"';
+    private static final int ESCAPE_CP = '\\';
 
     @Override
     public boolean isOptional() {
         return false;
-    }
-
-    public CharType getCharType() {
-        return charType;
-    }
-
-    public void setCharType(CharType charType) {
-        this.charType = charType;
     }
 
     @Override
@@ -35,6 +25,9 @@ public class CharacterExpression extends Expression {
     }
 
     private class Checker extends ExpressionChecker {
+        private boolean started;
+        private boolean escaped;
+        private StringBuilder result = new StringBuilder();
 
         @Override
         public Expression next() {
@@ -44,23 +37,27 @@ public class CharacterExpression extends Expression {
         @Override
         public void check() throws ParsingException {
             ParsingContext ctx = getCtx();
-            logger.entering("CharacterExpression.Checker", "check", ctx);
             int codePoint = ctx.getCodePoint();
-            if (charType.apply(codePoint)) {
-                StringBuilder builder = new StringBuilder(2);
-                builder.appendCodePoint(codePoint);
-                commitLeafNode(builder.toString());
+            if (started) {
+                if (escaped) {
+                    result.appendCodePoint(codePoint);
+                    escaped = false;
+                } else if (codePoint == QUOTE_CP) {
+                    commitLeafNode(result.toString());
+                } else if (codePoint == ESCAPE_CP) {
+                    escaped = true;
+                }
+            } else if (codePoint == QUOTE_CP) {
+                continueProcessing();
+                started = true;
             } else {
                 rollback();
             }
-            logger.exiting("CharacterExpression.Checker", "check", ctx);
         }
 
         @Override
         protected String getName() {
-            return "char[" + charType + "]";
+            return "StrLit";
         }
     }
-
-
 }
