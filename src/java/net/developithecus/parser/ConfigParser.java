@@ -42,7 +42,9 @@ public class ConfigParser extends Parser {
                         ref(whiteSpace),
                         ref(singleLineComment),
                         ref(multiLineComment)));
-        whiteSpace.addAll(charType(CharType.WHITESPACE));
+        whiteSpace.addAll(compact(
+                charType(CharType.WHITESPACE),
+                repeat(charType(CharType.WHITESPACE))));
         singleLineComment.addAll(
                 str("//"),
                 repeat(
@@ -52,9 +54,9 @@ public class ConfigParser extends Parser {
         multiLineComment.addAll(
                 str("/*"),
                 repeat(new Expression[]{charType(CharType.DEFINED)}, str("*/")));
-        token.addAll(
+        token.addAll(compact(
                 charType(CharType.UNICODE_IDENTIFIER_START),
-                repeat(charType(CharType.UNICODE_IDENTIFIER_PART)));
+                repeat(charType(CharType.UNICODE_IDENTIFIER_PART))));
         expression.addAll(
                 alt(
                         ref(altGroup),

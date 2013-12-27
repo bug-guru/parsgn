@@ -4,13 +4,13 @@ Rule: {I} Token {I} ":" ExpressionList ";";
 // Ignorable
 I: WhiteSpace | SingleLineComment | MultiLineComment;
 
-WhiteSpace: #WHITESPACE;
+WhiteSpace: <#WHITESPACE {#WHITESPACE}>;
 
 SingleLineComment: "//" {#DEFINED, #EOL};
 
 MultiLineComment: "/*" {#DEFINED, "*/"};
 
-Token: #UNICODE_IDENTIFIER_START {#UNICODE_IDENTIFIER_PART};
+Token: <#UNICODE_IDENTIFIER_START {#UNICODE_IDENTIFIER_PART}>;
 
 Expression: AltGroup | RuleRef | CharType | String | Group | Repeat | Optional | Replace;
 
@@ -22,7 +22,7 @@ AltGroupItem: RuleRef | CharType | String | Sequence | Replace;
 
 CharType: "#" Token; //TODO: list all possible char types
 
-String: "\"" {["\\\""->"\"" | "\\\\"->"\\" | #DEFINED], "\""};
+String: "\"" {<["\\\""->"\"" | "\\\\"->"\\" | #DEFINED]>, "\""};
 
 Sequence: "(" ExpressionList ")";
 

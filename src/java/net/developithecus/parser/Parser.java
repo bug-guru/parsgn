@@ -83,6 +83,11 @@ public class Parser {
         return result;
     }
 
+    public CompactNodeExpression compact(Expression... expressions) {
+        CompactNodeExpression result = new CompactNodeExpression();
+        result.addAll(expressions);
+        return result;
+    }
 
     public Node parse(String input) throws ParsingException {
         try {
