@@ -15,9 +15,8 @@ public class ConfigParser extends Parser {
         Rule whiteSpace = rule("WhiteSpace");
         Rule singleLineComment = rule("SingleLineComment");
         Rule multiLineComment = rule("MultiLineComment");
-        Rule token = rule("Token");
+        Rule name = rule("Name");
         Rule expression = rule("Expression");
-        Rule ruleRef = rule("RuleRef");
         Rule altGroup = rule("AltGroup");
         Rule altGroupItem = rule("AltGroupItem");
         Rule charType = rule("CharType");
@@ -30,90 +29,89 @@ public class ConfigParser extends Parser {
         configFile.addAll(
                 ref(rule),
                 repeat(ref(rule)),
-                repeat(ref(i)));
+                repeat(ref(i)).silent());
         rule.addAll(
-                repeat(ref(i)),
-                ref(token),
-                str(":"),
+                repeat(ref(i)).silent(),
+                ref(name),
+                str(":").silent(),
                 ref(expressionList),
-                str(";"));
+                str(";").silent());
         i.addAll(
                 alt(
                         ref(whiteSpace),
                         ref(singleLineComment),
                         ref(multiLineComment)));
-        whiteSpace.addAll(compact(
+        whiteSpace.addAll(
                 charType(CharType.WHITESPACE),
-                repeat(charType(CharType.WHITESPACE))));
-        singleLineComment.addAll(compact(
+                repeat(charType(CharType.WHITESPACE)));
+        singleLineComment.addAll(
                 str("//"),
-                repeat(
-                        new Expression[]{
-                                charType(CharType.DEFINED)},
-                        charType(CharType.LINE_SEPARATOR))));
-        multiLineComment.addAll(compact(
+                repeat(charType(CharType.DEFINED))
+                        .endCondition(charType(CharType.LINE_SEPARATOR)));
+        multiLineComment.addAll(
                 str("/*"),
-                repeat(new Expression[]{charType(CharType.DEFINED)}, str("*/"))));
-        token.addAll(compact(
+                repeat(charType(CharType.DEFINED)).endCondition(str("*/")));
+        name.addAll(group(
                 charType(CharType.UNICODE_IDENTIFIER_START),
-                repeat(charType(CharType.UNICODE_IDENTIFIER_PART))));
+                repeat(charType(CharType.UNICODE_IDENTIFIER_PART)))
+                .compact());
         expression.addAll(
                 alt(
                         ref(altGroup),
-                        ref(ruleRef),
+                        ref(name),
                         ref(charType),
                         ref(string),
                         ref(group),
                         ref(repeatGroup),
                         ref(optGroup)));
-        ruleRef.addAll(ref(token));
         altGroup.addAll(
                 ref(altGroupItem),
-                repeat(ref(i)),
-                str("|"),
-                repeat(ref(i)),
+                repeat(ref(i)).silent(),
+                str("|").silent(),
+                repeat(ref(i)).silent(),
                 ref(altGroupItem),
                 repeat(
-                        repeat(ref(i)),
-                        str("|"),
-                        repeat(ref(i)),
+                        repeat(ref(i)).silent(),
+                        str("|").silent(),
+                        repeat(ref(i)).silent(),
                         ref(altGroupItem)));
         altGroupItem.addAll(
                 alt(
-                        ref(ruleRef),
+                        ref(name),
                         ref(charType),
                         ref(string),
                         ref(group)));
         charType.addAll(
-                str("#"),
-                ref(token));
-        string.addAll(compact(
-                str("\""),
-                repeat(new Expression[]{
+                str("#").silent(),
+                ref(name));
+        string.addAll(
+                str("\"").silent(),
+                repeat(
                         alt(
                                 str("\\\""),
                                 str("\\\\"),
-                                charType(CharType.DEFINED))},
-                        str("\""))));
+                                charType(CharType.DEFINED)))
+                        .endCondition(str("\"").silent())
+                        .compact());
         group.addAll(
-                str("("),
+                str("(").silent(),
                 repeat(ref(expressionList)),
-                str(")"));
+                str(")").silent());
         repeatGroup.addAll(
-                str("{"),
+                str("{").silent(),
                 repeat(ref(expressionList)),
-                str("}"));
+                str("}").silent());
         optGroup.addAll(
-                str("["),
+                str("[").silent(),
                 repeat(ref(expressionList)),
-                str("]"));
+                str("]").silent());
         expressionList.addAll(
-                repeat(ref(i)),
+                repeat(ref(i)).silent(),
                 ref(expression),
                 repeat(
-                        repeat(ref(i)),
+                        repeat(ref(i)).silent(),
                         ref(expression)),
-                repeat(ref(i)));
+                repeat(ref(i)).silent());
         root(configFile);
     }
 }

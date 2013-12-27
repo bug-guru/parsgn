@@ -1,6 +1,9 @@
 package net.developithecus.parser;
 
-import java.util.*;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -14,7 +17,7 @@ public class Node {
     private final List<Node> children;
 
     public Node(String value, int beginIndex, int endIndex, List<Node> children) {
-        this.children = Collections.unmodifiableList(new ArrayList<>(children));
+        this.children = children;
         this.value = value;
         this.beginIndex = beginIndex;
         this.endIndex = endIndex;

@@ -21,11 +21,6 @@ public class ReferenceExpression extends Expression {
     public ReferenceExpression() {
     }
 
-    @Override
-    public boolean isOptional() {
-        return false;
-    }
-
     public Rule getReference() {
         return reference;
     }
@@ -52,20 +47,16 @@ public class ReferenceExpression extends Expression {
             logger.entering("ReferenceExpression.Checker", "check", ctx);
             switch (ctx.getResult()) {
                 case COMMIT:
-                    commitWrappingNodes(reference.getName());
+                    ctx.markForCommitGroup(reference.getName());
                     break;
                 case ROLLBACK:
-                    rollback();
+                case ROLLBACK_OPTIONAL:
+                    ctx.markForRollback();
                     break;
                 default:
                     throw new IllegalStateException("unknown result: " + ctx.getResult());
             }
             logger.exiting("ReferenceExpression.Checker", "check", ctx);
-        }
-
-        protected void commitWrappingNodes(String value) {
-            Node node = new Node(value, getBeginIndex(), getCtx().getNextIndex(), getCtx().takeAndClearCommitted());
-            getCtx().commitSingleNode(node);
         }
 
         @Override

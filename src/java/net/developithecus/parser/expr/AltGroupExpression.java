@@ -1,6 +1,9 @@
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.*;
+import net.developithecus.parser.Expression;
+import net.developithecus.parser.ExpressionChecker;
+import net.developithecus.parser.ParsingContext;
+import net.developithecus.parser.ParsingException;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -15,16 +18,11 @@ public class AltGroupExpression extends GroupExpression {
     private static final Logger logger = Logger.getLogger(AltGroupExpression.class.getName());
 
     @Override
-    public boolean isOptional() {
-        return false;
-    }
-
-    @Override
     public ExpressionChecker checker() {
         return new Checker();
     }
 
-    private class Checker extends GroupExpressionChecker {
+    private class Checker extends ExpressionChecker {
         private Iterator<Expression> expressions = getExpressions().iterator();
         private Expression curExpr;
 
@@ -40,10 +38,10 @@ public class AltGroupExpression extends GroupExpression {
             logger.entering("AltGroupExpression.Checker", "check", ctx);
             switch (ctx.getResult()) {
                 case COMMIT:
-                    collectNodes();
-                    commitNodes();
+                    ctx.markForCommit();
                     break;
                 case ROLLBACK:
+                case ROLLBACK_OPTIONAL:
                     doRollbackOrContinue();
                     break;
                 default:
@@ -54,9 +52,9 @@ public class AltGroupExpression extends GroupExpression {
 
         private void doRollbackOrContinue() {
             if (expressions.hasNext()) {
-                continueProcessing();
+                getCtx().markForContinue();
             } else {
-                rollback();
+                getCtx().markForRollback();
             }
         }
 

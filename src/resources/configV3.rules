@@ -1,35 +1,33 @@
-ConfigFile: Rule {Rule} {I};
-Rule: {I} Token {I} ":" ExpressionList ";";
+ConfigFile: Rule {Rule} ^{I};
+Rule: ^{I} Name ^{I} ^":" ExpressionList ^";";
 
 // Ignorable
 I: WhiteSpace | SingleLineComment | MultiLineComment;
 
-WhiteSpace: <#WHITESPACE {#WHITESPACE}>;
+WhiteSpace: #WHITESPACE {#WHITESPACE};
 
-SingleLineComment: <"//" {#DEFINED, #EOL}>;
+SingleLineComment: "//" {#DEFINED, #EOL};
 
-MultiLineComment: <"/*" {#DEFINED, "*/"}>;
+MultiLineComment: "/*" {#DEFINED, "*/"};
 
-Token: <#UNICODE_IDENTIFIER_START {#UNICODE_IDENTIFIER_PART}>;
+Name: ~(#UNICODE_IDENTIFIER_START {#UNICODE_IDENTIFIER_PART});
 
-Expression: AltGroup | RuleRef | CharType | String | Group | Repeat | Optional | Replace;
+Expression: AltGroup | Name | CharType | String | Group | Repeat | Optional | Replace;
 
-RuleRef: Token;
+AltGroup: AltGroupItem ^{I} ^"|" ^{I} AltGroupItem {^{I} ^"|" ^{I} AltGroupItem};
 
-AltGroup: AltGroupItem {I} "|" {I} AltGroupItem {{I} "|" {I} AltGroupItem};
+AltGroupItem: Name | CharType | String | Sequence | Replace;
 
-AltGroupItem: RuleRef | CharType | String | Sequence | Replace;
+CharType: ^"#" Name; //TODO: list all possible char types
 
-CharType: "#" Token; //TODO: list all possible char types
-
-String: <"\"" {"\\\""->"\"" | "\\\\"->"\\" | #DEFINED, "\""}>;
+String: ^"\"" ~{"\\\""->"\"" | "\\\\"->"\\" | #DEFINED, ^"\""};
 
 Sequence: "(" ExpressionList ")";
 
-Repeat: "{" ExpressionList ["," {I} Expression {I}] "}";
+Repeat: ^"{" ExpressionList ["," ^{I} Expression ^{I}] ^"}";
 
-Optional: "[" ExpressionList "]";
+Optional: ^"[" ExpressionList ^"]";
 
-ExpressionList: {I} Expression {{I} Expression} {I};
+ExpressionList: ^{I} Expression {^{I} Expression} ^{I};
 
-Replace: Expression "->" String;
+Replace: Expression ^"->" String;

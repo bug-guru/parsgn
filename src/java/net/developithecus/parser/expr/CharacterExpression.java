@@ -16,11 +16,6 @@ public class CharacterExpression extends Expression {
     private static final Logger logger = Logger.getLogger(CharacterExpression.class.getName());
     private CharType charType;
 
-    @Override
-    public boolean isOptional() {
-        return false;
-    }
-
     public CharType getCharType() {
         return charType;
     }
@@ -49,9 +44,9 @@ public class CharacterExpression extends Expression {
             if (charType.apply(codePoint)) {
                 StringBuilder builder = new StringBuilder(2);
                 builder.appendCodePoint(codePoint);
-                commitLeafNode(builder.toString());
+                ctx.markForCommit(builder.toString());
             } else {
-                rollback();
+                ctx.markForRollback();
             }
             logger.exiting("CharacterExpression.Checker", "check", ctx);
         }

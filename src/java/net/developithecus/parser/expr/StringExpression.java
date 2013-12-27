@@ -16,11 +16,6 @@ public class StringExpression extends Expression {
     private int[] codePoints;
     private int len;
 
-    @Override
-    public boolean isOptional() {
-        return false;
-    }
-
     public String getValue() {
         return value;
     }
@@ -53,13 +48,13 @@ public class StringExpression extends Expression {
             }
             int codePoint = ctx.getCodePoint();
             if (codePoints[offset] != codePoint) {
-                rollback();
+                ctx.markForRollback();
             } else {
                 offset++;
                 if (offset == len) {
-                    commitLeafNode(value);
+                    ctx.markForCommit(value);
                 } else {
-                    continueProcessing();
+                    ctx.markForContinue();
                 }
             }
             logger.exiting("StringExpression.Checker", "check", ctx);

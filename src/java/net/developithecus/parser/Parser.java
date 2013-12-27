@@ -3,10 +3,7 @@ package net.developithecus.parser;
 import net.developithecus.parser.expr.*;
 
 import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -18,8 +15,6 @@ import java.util.logging.Logger;
 public class Parser {
     private static final Logger logger = Logger.getLogger(Parser.class.getName());
     private final ReferenceExpression root;
-    private final Deque<ExpressionChecker> stack = new LinkedList<>();
-    private final ParsingContext ctx = new ParsingContext();
 
     public Parser() {
         this.root = new ReferenceExpression();
@@ -60,15 +55,10 @@ public class Parser {
         return result;
     }
 
-    public RepeatGroupExpression repeat(Expression[] expressions, Expression endCondition) {
+    public RepeatGroupExpression repeat(Expression... expressions) {
         RepeatGroupExpression result = new RepeatGroupExpression();
         result.addAll(expressions);
-        result.setEndCondition(endCondition);
         return result;
-    }
-
-    public RepeatGroupExpression repeat(Expression... expressions) {
-        return repeat(expressions, null);
     }
 
     public SequentialGroupExpression group(Expression... expressions) {
@@ -83,78 +73,29 @@ public class Parser {
         return result;
     }
 
-    public CompactNodeExpression compact(Expression... expressions) {
-        CompactNodeExpression result = new CompactNodeExpression();
-        result.addAll(expressions);
-        return result;
-    }
-
     public Node parse(String input) throws ParsingException {
-        try {
-            List<Integer> log = new ArrayList<>(input.length() * 3 / 2);
-            int length = input.length();
-            ctx.reset(0, -1);
-            ctx.setNextIndex(0);
-            int index = 0;
-            pushExpression(root);
-            for (int offset = 0; offset <= length; ) {
-                int codePoint;
-                if (offset == length) {
-                    codePoint = -1;
-                    offset++;
-                } else {
-                    codePoint = input.codePointAt(offset);
-                    offset += Character.charCount(codePoint);
-                }
-                log.add(codePoint);
-                do {
-                    codePoint = log.get(index);
-                    ctx.reset(index, codePoint);
-                    finishPath();
-                    do {
-                        ExpressionChecker currentChecker = stack.peek();
-                        currentChecker.check();
-                        index = ctx.getNextIndex();
-                        switch (ctx.getResult()) {
-                            case CONTINUE:
-                                break;
-                            case COMMIT:
-                                stack.pop();
-                                if (stack.isEmpty()) {
-                                    return ctx.getSingleCommittedNode();
-                                }
-                                break;
-                            case ROLLBACK:
-                                stack.pop();
-                                if (stack.isEmpty()) {
-                                    throw new ParsingException("Syntax error");
-                                }
-                                break;
-                            default:
-                                throw new ParsingException("unknown result: " + ctx.getResult());
-                        }
-                    } while (ctx.getResult() != ResultType.CONTINUE);
-                } while (index < log.size());
+        List<Integer> log = new ArrayList<>(input.length() * 3 / 2);
+        int length = input.length();
+        ParsingContext ctx = new ParsingContext(root);
+        for (int offset = 0; offset <= length; ) {
+            int codePoint;
+            if (offset == length) {
+                codePoint = -1;
+                offset++;
+            } else {
+                codePoint = input.codePointAt(offset);
+                offset += Character.charCount(codePoint);
             }
-            throw new ParsingException("Parsing error");
-        } catch (ParsingException e) {
-            logger.log(Level.SEVERE, "Exception when processing " + stack, e);
-            throw e;
+            log.add(codePoint);
+            do {
+                codePoint = log.get(ctx.getNextIndex());
+                ctx.next(codePoint);
+                if (ctx.getResultTree() != null) {
+                    return ctx.getResultTree();
+                }
+            } while (ctx.getNextIndex() < log.size());
         }
+        throw new ParsingException("Parsing error");
     }
 
-    private void finishPath() {
-        Expression nextExpr;
-        logger.log(Level.FINER, "updating stack {0}", stack);
-        while ((nextExpr = stack.peek().next()) != null) {
-            pushExpression(nextExpr);
-        }
-        logger.log(Level.FINER, "Stack updated {0}", stack);
-    }
-
-    private void pushExpression(Expression nextExpr) {
-        ExpressionChecker nextChecker = nextExpr.checker();
-        nextChecker.init(ctx);
-        stack.push(nextChecker);
-    }
 }

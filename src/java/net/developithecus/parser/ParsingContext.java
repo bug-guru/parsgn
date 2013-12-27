@@ -1,30 +1,35 @@
 package net.developithecus.parser;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
  * @version 13.25.12
  * @since 1.0
  */
-public class ParsingContext {
+public class ParsingContext implements CheckerContext {
+    private static final Logger logger = Logger.getLogger(ParsingContext.class.getName());
     private int index;
     private int codePoint;
     private int nextIndex;
     private ResultType result;
-    private List<Node> committed;
+    private Deque<Holder> stack = new LinkedList<>();
+    private Node resultTree;
 
-    void reset(int index, int codePoint) {
-        this.index = index;
+    public ParsingContext(Expression root) {
+        pushExpression(root);
+    }
+
+    private void reset(int codePoint) {
+        this.index = nextIndex;
         this.codePoint = codePoint;
         this.nextIndex = index + 1;
         this.result = ResultType.CONTINUE;
-        clearCommitted();
-    }
-
-    public int getIndex() {
-        return index;
     }
 
     public int getCodePoint() {
@@ -35,58 +40,241 @@ public class ParsingContext {
         return nextIndex;
     }
 
-    public void setNextIndex(int nextIndex) {
-        this.nextIndex = nextIndex;
-    }
-
     public ResultType getResult() {
         return result;
     }
 
-    public void setResult(ResultType result) {
-        this.result = result;
+    public void markForCommit(String nodeValue) {
+        Holder holder = stack.peek();
+        holder.commit(nodeValue);
+        result = ResultType.COMMIT;
     }
 
-    public Node getSingleCommittedNode() {
-        if (committed.size() != 1) {
-            throw new IllegalStateException("Unexpected number of roots: " + committed.size());
+    public void markForCommitGroup(String groupNodeValue) {
+        Holder holder = stack.peek();
+        holder.commitGroup(groupNodeValue);
+        result = ResultType.COMMIT;
+    }
+
+    public void markForCommit() {
+        result = ResultType.COMMIT;
+    }
+
+    public void markForRollback() {
+        markForRollback(false);
+    }
+
+    public void markForRollbackOptional() {
+        markForRollback(true);
+    }
+
+    private void markForRollback(boolean optional) {
+        this.result = optional ? ResultType.ROLLBACK_OPTIONAL : ResultType.ROLLBACK;
+        Holder holder = stack.peek();
+        this.nextIndex = holder.beginIndex;
+        holder.committedNodes = null;
+        holder.committed = false;
+    }
+
+    public void markForContinue() {
+        this.result = ResultType.CONTINUE;
+    }
+
+    public ExpressionChecker peekChecker() {
+        Holder holder = stack.peek();
+        return holder == null ? null : holder.checker;
+    }
+
+    public boolean hasCommitted() {
+        Holder holder = stack.peek();
+        return holder.committed;
+    }
+
+    public void next(int codePoint) throws ParsingException {
+        reset(codePoint);
+        completePath();
+        process();
+    }
+
+    private void completePath() {
+        Expression nextExpr;
+        logger.log(Level.FINER, "updating stack {0}", stack);
+        while ((nextExpr = peekChecker().next()) != null) {
+            pushExpression(nextExpr);
         }
-        return committed.get(0);
+        logger.log(Level.FINER, "Stack updated {0}", stack);
     }
 
-    public void commitSingleNode(Node node) {
-        committed = Collections.singletonList(node);
+    private void process() throws ParsingException {
+        boolean cont = true;
+        while (cont) {
+            Holder holder = stack.peek();
+            ExpressionChecker currentChecker = holder.checker;
+            currentChecker.check();
+            switch (getResult()) {
+                case CONTINUE:
+                    cont = false;
+                    break;
+                case COMMIT:
+                    if (!popChecker()) {
+                        resultTree = holder.committedNodes.get(0);
+                        return;
+                    }
+                    Holder parent = stack.peek();
+                    parent.addCommitted(holder);
+                    break;
+                case ROLLBACK:
+                case ROLLBACK_OPTIONAL:
+                    if (!popChecker()) {
+                        throw new ParsingException("Syntax error");
+                    }
+                    break;
+                default:
+                    throw new ParsingException("unknown result: " + getResult());
+            }
+        }
     }
 
-    public void commitNodes(List<Node> nodes) {
-        committed = nodes;
-        this.result = ResultType.COMMIT;
+    private void pushExpression(Expression nextExpr) {
+        Holder top = stack.peek();
+        ExpressionChecker nextChecker = nextExpr.checker();
+        nextChecker.init(this);
+        Holder holder = new Holder();
+        holder.beginIndex = index;
+        holder.checker = nextChecker;
+        holder.silent = nextExpr.isSilent() || top != null && top.silent;
+        holder.compact = nextExpr.isCompact() || top != null && top.compact;
+        stack.push(holder);
     }
 
-    public void clearCommitted() {
-        committed = Collections.emptyList();
+    public boolean popChecker() {
+        stack.pop();
+        return !stack.isEmpty();
     }
 
-    public List<Node> takeAndClearCommitted() {
-        List<Node> result = committed;
-        clearCommitted();
-        return result;
-    }
-
-    public void rollback(int nextIndex) {
-        this.result = ResultType.ROLLBACK;
-        this.nextIndex = nextIndex;
-        clearCommitted();
+    public Node getResultTree() {
+        return resultTree;
     }
 
     @Override
     public String toString() {
         return "ParsingContext{" +
-                "index=" + index +
-                ", codePoint=" + codePoint +
+                "result=" + result +
                 ", nextIndex=" + nextIndex +
-                ", result=" + result +
-                ", committed=" + committed +
+                ", codePoint=" + codePoint +
+                ", index=" + index +
+                ", stack=" + stack +
                 '}';
+    }
+
+    private class Holder {
+        ExpressionChecker checker;
+        int beginIndex;
+        boolean committed;
+        boolean silent;
+        boolean compact;
+        List<Node> committedNodes;
+        StringBuilder compactValue;
+
+        void commit(String nodeValue) {
+            committed = true;
+            if (silent) {
+                return;
+            }
+            if (compact) {
+                compactCommit(nodeValue);
+            } else {
+                nodeCommit(nodeValue);
+            }
+        }
+
+        private void compactCommit(String nodeValue) {
+            if (compactValue == null) {
+                compactValue = new StringBuilder(nodeValue);
+            } else {
+                compactValue.append(nodeValue);
+            }
+        }
+
+        private void nodeCommit(String nodeValue) {
+            if (committedNodes == null) {
+                committedNodes = new ArrayList<>();
+            }
+            Node node = new Node(nodeValue, beginIndex, nextIndex);
+            committedNodes.add(node);
+        }
+
+        void commitGroup(String nodeValue) {
+            committed = true;
+            if (silent) {
+                return;
+            }
+            if (compact) {
+                compactCommitGroup(nodeValue);
+            } else {
+                nodeCommitGroup(nodeValue);
+            }
+        }
+
+        private void compactCommitGroup(String nodeValue) {
+            if (compactValue == null) {
+                compactCommit(nodeValue);
+            } else {
+                compactValue.insert(0, nodeValue);
+            }
+        }
+
+        private void nodeCommitGroup(String nodeValue) {
+            if (committedNodes == null) {
+                nodeCommit(nodeValue);
+            } else {
+                Node node = new Node(nodeValue, beginIndex, nextIndex, committedNodes);
+                committedNodes = new ArrayList<>();
+                committedNodes.add(node);
+            }
+        }
+
+        void addCommitted(Holder another) {
+            committed = true;
+            if (silent ||
+                    (another.committedNodes == null || another.committedNodes.isEmpty())
+                            && (another.compactValue == null || another.compactValue.length() == 0)) {
+                return;
+            }
+            if (compact) {
+                compactAddCommitted(another);
+            } else {
+                nodeAddCommitted(another);
+            }
+        }
+
+        private void compactAddCommitted(Holder another) {
+            if (compactValue == null) {
+                compactValue = another.compactValue;
+            } else {
+                compactValue.append(another.compactValue);
+            }
+        }
+
+        private void nodeAddCommitted(Holder another) {
+            if (another.compact) {
+                commit(another.compactValue.toString());
+            } else if (committedNodes == null) {
+                committedNodes = another.committedNodes;
+            } else {
+                committedNodes.addAll(another.committedNodes);
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "Holder{" +
+                    "checker=" + checker +
+                    ", beginIndex=" + beginIndex +
+                    ", committed=" + committed +
+                    ", silent=" + silent +
+                    ", committedNodes=" + committedNodes +
+                    '}';
+        }
     }
 }

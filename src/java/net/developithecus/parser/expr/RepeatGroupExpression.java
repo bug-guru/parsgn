@@ -1,6 +1,9 @@
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.*;
+import net.developithecus.parser.Expression;
+import net.developithecus.parser.ExpressionChecker;
+import net.developithecus.parser.ParsingContext;
+import net.developithecus.parser.ParsingException;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -14,11 +17,6 @@ public class RepeatGroupExpression extends GroupExpression {
     private static final Logger logger = Logger.getLogger(RepeatGroupExpression.class.getName());
     private Expression endCondition;
 
-    @Override
-    public boolean isOptional() {
-        return true;
-    }
-
     public Expression getEndCondition() {
         return endCondition;
     }
@@ -27,12 +25,17 @@ public class RepeatGroupExpression extends GroupExpression {
         this.endCondition = endCondition;
     }
 
+    public RepeatGroupExpression endCondition(Expression endCondition) {
+        setEndCondition(endCondition);
+        return this;
+    }
+
     @Override
     public ExpressionChecker checker() {
         return new Checker();
     }
 
-    private class Checker extends GroupExpressionChecker {
+    private class Checker extends ExpressionChecker {
         private boolean checkingEndCondition = endCondition != null;
         private int turnsPassed = 0;
 
@@ -59,17 +62,17 @@ public class RepeatGroupExpression extends GroupExpression {
             logger.entering("RepeatGroupExpression.Checker", "check", ctx);
             switch (ctx.getResult()) {
                 case COMMIT:
-                    collectNodes();
                     if (checkingEndCondition) {
-                        commitNodes();
+                        ctx.markForCommit();
                     } else {
                         doContinue();
                     }
                     break;
                 case ROLLBACK:
+                case ROLLBACK_OPTIONAL:
                     if (checkingEndCondition) {
                         checkingEndCondition = false;
-                        continueProcessing();
+                        ctx.markForContinue();
                     } else {
                         doCommitOrRollback();
                     }
@@ -82,15 +85,15 @@ public class RepeatGroupExpression extends GroupExpression {
 
         private void doCommitOrRollback() {
             if (turnsPassed > 0) {
-                commitNodes();
+                getCtx().markForCommit();
             } else {
-                rollback();
+                getCtx().markForRollbackOptional();
             }
         }
 
         private void doContinue() {
             turnsPassed++;
-            continueProcessing();
+            getCtx().markForContinue();
             checkingEndCondition = endCondition != null;
         }
 
