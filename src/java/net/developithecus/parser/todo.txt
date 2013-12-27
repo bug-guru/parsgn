@@ -1,0 +1,4 @@
+RepeatGroup should eliminated.
+Quantifiers on expression instead of RepeatGroup.
+counter should be added to ParsingContext.Holder
+but repetition logic should be in ParsingContext.process

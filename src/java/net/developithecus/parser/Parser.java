@@ -41,12 +41,6 @@ public class Parser {
         return result;
     }
 
-    public OptionalGroupExpression opt(Expression... expressions) {
-        OptionalGroupExpression result = new OptionalGroupExpression();
-        result.addAll(expressions);
-        return result;
-    }
-
     public ReferenceExpression ref(Rule rule) {
         ReferenceExpression result = new ReferenceExpression();
         result.setReference(rule);
