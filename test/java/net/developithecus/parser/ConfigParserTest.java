@@ -1,9 +1,6 @@
 package net.developithecus.parser;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.io.IOException;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -43,11 +40,6 @@ public class ConfigParserTest {
             "OptGroup: \"[\" ExpressionList \"]\";\n" +
             "\n" +
             "ExpressionList: {I} Expression {{I} Expression} {I};";
-
-    @BeforeClass
-    public static void init() throws IOException {
-//        LogManager.getLogManager().readConfiguration(new FileInputStream("C:\\Users\\Dimitry\\logging.properties"));
-    }
 
     @Test
     public void testConfigFile() throws Exception {

@@ -6,9 +6,9 @@ package net.developithecus.parser;
  * @since 1.0
  */
 public abstract class ExpressionChecker {
-    private ParsingContext ctx;
+    private CheckerContext ctx;
 
-    void init(ParsingContext ctx) {
+    void init(CheckerContext ctx) {
         this.ctx = ctx;
     }
 
@@ -18,7 +18,7 @@ public abstract class ExpressionChecker {
 
     protected abstract String getName();
 
-    public ParsingContext getCtx() {
+    protected final CheckerContext ctx() {
         return ctx;
     }
 

@@ -1,8 +1,9 @@
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.*;
-
-import java.util.logging.Logger;
+import net.developithecus.parser.Expression;
+import net.developithecus.parser.ExpressionChecker;
+import net.developithecus.parser.ParsingException;
+import net.developithecus.parser.Rule;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -11,7 +12,6 @@ import java.util.logging.Logger;
  */
 
 public class ReferenceExpression extends Expression {
-    private static final Logger logger = Logger.getLogger(ReferenceExpression.class.getName());
     private Rule reference;
 
     public ReferenceExpression(Rule reference) {
@@ -43,20 +43,17 @@ public class ReferenceExpression extends Expression {
 
         @Override
         public void check() throws ParsingException {
-            ParsingContext ctx = getCtx();
-            logger.entering("ReferenceExpression.Checker", "check", ctx);
-            switch (ctx.getResult()) {
+            switch (ctx().getResult()) {
                 case COMMIT:
-                    ctx.markForCommitGroup(reference.getName());
+                    ctx().markForCommitGroup(reference.getName());
                     break;
                 case ROLLBACK:
                 case ROLLBACK_OPTIONAL:
-                    ctx.markForRollback();
+                    ctx().markForRollback();
                     break;
                 default:
-                    throw new IllegalStateException("unknown result: " + ctx.getResult());
+                    throw new IllegalStateException("unknown result: " + ctx().getResult());
             }
-            logger.exiting("ReferenceExpression.Checker", "check", ctx);
         }
 
         @Override

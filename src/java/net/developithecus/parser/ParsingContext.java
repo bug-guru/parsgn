@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -13,7 +11,6 @@ import java.util.logging.Logger;
  * @since 1.0
  */
 public class ParsingContext implements CheckerContext {
-    private static final Logger logger = Logger.getLogger(ParsingContext.class.getName());
     private int index;
     private int codePoint;
     private int nextIndex;
@@ -98,11 +95,9 @@ public class ParsingContext implements CheckerContext {
 
     private void completePath() {
         Expression nextExpr;
-        logger.log(Level.FINER, "updating stack {0}", stack);
         while ((nextExpr = peekChecker().next()) != null) {
             pushExpression(nextExpr);
         }
-        logger.log(Level.FINER, "Stack updated {0}", stack);
     }
 
     private void process() throws ParsingException {

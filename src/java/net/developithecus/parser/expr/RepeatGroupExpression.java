@@ -2,11 +2,9 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.ParsingContext;
 import net.developithecus.parser.ParsingException;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -14,7 +12,6 @@ import java.util.logging.Logger;
  * @since 1.0
  */
 public class RepeatGroupExpression extends GroupExpression {
-    private static final Logger logger = Logger.getLogger(RepeatGroupExpression.class.getName());
     private Expression endCondition;
 
     public Expression getEndCondition() {
@@ -58,12 +55,10 @@ public class RepeatGroupExpression extends GroupExpression {
 
         @Override
         public void check() throws ParsingException {
-            ParsingContext ctx = getCtx();
-            logger.entering("RepeatGroupExpression.Checker", "check", ctx);
-            switch (ctx.getResult()) {
+            switch (ctx().getResult()) {
                 case COMMIT:
                     if (checkingEndCondition) {
-                        ctx.markForCommit();
+                        ctx().markForCommit();
                     } else {
                         doContinue();
                     }
@@ -72,28 +67,27 @@ public class RepeatGroupExpression extends GroupExpression {
                 case ROLLBACK_OPTIONAL:
                     if (checkingEndCondition) {
                         checkingEndCondition = false;
-                        ctx.markForContinue();
+                        ctx().markForContinue();
                     } else {
                         doCommitOrRollback();
                     }
                     break;
                 default:
-                    throw new IllegalStateException("unknown result: " + ctx.getResult());
+                    throw new IllegalStateException("unknown result: " + ctx().getResult());
             }
-            logger.exiting("RepeatGroupExpression.Checker", "check", ctx);
         }
 
         private void doCommitOrRollback() {
             if (turnsPassed > 0) {
-                getCtx().markForCommit();
+                ctx().markForCommit();
             } else {
-                getCtx().markForRollbackOptional();
+                ctx().markForRollbackOptional();
             }
         }
 
         private void doContinue() {
             turnsPassed++;
-            getCtx().markForContinue();
+            ctx().markForContinue();
             checkingEndCondition = endCondition != null;
         }
 

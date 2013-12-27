@@ -2,11 +2,9 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.ParsingContext;
 import net.developithecus.parser.ParsingException;
 
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -15,7 +13,6 @@ import java.util.logging.Logger;
  */
 
 public class SequentialGroupExpression extends GroupExpression {
-    private static final Logger logger = Logger.getLogger(SequentialGroupExpression.class.getName());
 
     @Override
     public ExpressionChecker checker() {
@@ -34,32 +31,29 @@ public class SequentialGroupExpression extends GroupExpression {
 
         @Override
         public void check() throws ParsingException {
-            ParsingContext ctx = getCtx();
-            logger.entering("SequentialGroupExpression.Checker", "check", ctx);
-            switch (ctx.getResult()) {
+            switch (ctx().getResult()) {
                 case COMMIT:
                 case ROLLBACK_OPTIONAL:
                     doCommitOrContinue();
                     break;
                 case ROLLBACK:
-                    ctx.markForRollback();
+                    ctx().markForRollback();
                     break;
                 case CONTINUE:
-                    ctx.markForContinue();
+                    ctx().markForContinue();
                     break;
                 default:
-                    throw new IllegalStateException("unknown result: " + ctx.getResult());
+                    throw new IllegalStateException("unknown result: " + ctx().getResult());
             }
-            logger.exiting("SequentialGroupExpression.Checker", "check", ctx);
         }
 
         private void doCommitOrContinue() throws ParsingException {
             if (expressions.hasNext()) {
-                getCtx().markForContinue();
-            } else if (!getCtx().hasCommitted()) {
+                ctx().markForContinue();
+            } else if (!ctx().hasCommitted()) {
                 throw new ParsingException("group without result");
             } else {
-                getCtx().markForCommit();
+                ctx().markForCommit();
             }
         }
 

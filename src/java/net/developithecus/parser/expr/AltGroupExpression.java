@@ -2,11 +2,9 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.ParsingContext;
 import net.developithecus.parser.ParsingException;
 
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -15,7 +13,6 @@ import java.util.logging.Logger;
  */
 
 public class AltGroupExpression extends GroupExpression {
-    private static final Logger logger = Logger.getLogger(AltGroupExpression.class.getName());
 
     @Override
     public ExpressionChecker checker() {
@@ -34,27 +31,24 @@ public class AltGroupExpression extends GroupExpression {
 
         @Override
         public void check() throws ParsingException {
-            ParsingContext ctx = getCtx();
-            logger.entering("AltGroupExpression.Checker", "check", ctx);
-            switch (ctx.getResult()) {
+            switch (ctx().getResult()) {
                 case COMMIT:
-                    ctx.markForCommit();
+                    ctx().markForCommit();
                     break;
                 case ROLLBACK:
                 case ROLLBACK_OPTIONAL:
                     doRollbackOrContinue();
                     break;
                 default:
-                    throw new IllegalStateException("unknown result: " + ctx.getResult());
+                    throw new IllegalStateException("unknown result: " + ctx().getResult());
             }
-            logger.exiting("AltGroupExpression.Checker", "check", ctx);
         }
 
         private void doRollbackOrContinue() {
             if (expressions.hasNext()) {
-                getCtx().markForContinue();
+                ctx().markForContinue();
             } else {
-                getCtx().markForRollback();
+                ctx().markForRollback();
             }
         }
 

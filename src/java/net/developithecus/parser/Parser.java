@@ -4,7 +4,6 @@ import net.developithecus.parser.expr.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -13,7 +12,6 @@ import java.util.logging.Logger;
  */
 
 public class Parser {
-    private static final Logger logger = Logger.getLogger(Parser.class.getName());
     private final ReferenceExpression root;
 
     public Parser() {

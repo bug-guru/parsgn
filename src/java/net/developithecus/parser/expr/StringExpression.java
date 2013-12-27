@@ -1,8 +1,9 @@
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.*;
-
-import java.util.logging.Logger;
+import net.developithecus.parser.Expression;
+import net.developithecus.parser.ExpressionChecker;
+import net.developithecus.parser.ParsingException;
+import net.developithecus.parser.StringUtils;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -11,7 +12,6 @@ import java.util.logging.Logger;
  */
 
 public class StringExpression extends Expression {
-    private static final Logger logger = Logger.getLogger(StringExpression.class.getName());
     private String value;
     private int[] codePoints;
     private int len;
@@ -41,23 +41,20 @@ public class StringExpression extends Expression {
 
         @Override
         public void check() throws ParsingException {
-            ParsingContext ctx = getCtx();
-            logger.entering("StringExpression.Checker", "check", ctx);
             if (offset >= len) {
                 throw new IndexOutOfBoundsException(String.valueOf(offset));
             }
-            int codePoint = ctx.getCodePoint();
+            int codePoint = ctx().getCodePoint();
             if (codePoints[offset] != codePoint) {
-                ctx.markForRollback();
+                ctx().markForRollback();
             } else {
                 offset++;
                 if (offset == len) {
-                    ctx.markForCommit(value);
+                    ctx().markForCommit(value);
                 } else {
-                    ctx.markForContinue();
+                    ctx().markForContinue();
                 }
             }
-            logger.exiting("StringExpression.Checker", "check", ctx);
         }
 
         @Override

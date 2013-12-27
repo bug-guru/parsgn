@@ -2,11 +2,9 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.ParsingContext;
 import net.developithecus.parser.ParsingException;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -15,7 +13,6 @@ import java.util.logging.Logger;
  */
 
 public class OptionalGroupExpression extends GroupExpression {
-    private static final Logger logger = Logger.getLogger(OptionalGroupExpression.class.getName());
 
     @Override
     public ExpressionChecker checker() {
@@ -38,20 +35,17 @@ public class OptionalGroupExpression extends GroupExpression {
 
         @Override
         public void check() throws ParsingException {
-            ParsingContext ctx = getCtx();
-            logger.entering("OptionalGroupExpression.Checker", "check", ctx);
-            switch (ctx.getResult()) {
+            switch (ctx().getResult()) {
                 case COMMIT:
-                    ctx.markForCommit();
+                    ctx().markForCommit();
                     break;
                 case ROLLBACK:
                 case ROLLBACK_OPTIONAL:
-                    ctx.markForRollbackOptional();
+                    ctx().markForRollbackOptional();
                     break;
                 default:
-                    throw new IllegalStateException("unknown result: " + getCtx().getResult());
+                    throw new IllegalStateException("unknown result: " + ctx().getResult());
             }
-            logger.exiting("OptionalGroupExpression.Checker", "check", ctx);
         }
 
         @Override
