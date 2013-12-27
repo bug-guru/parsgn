@@ -31,10 +31,10 @@ public class ConfigParserTest {
             "AltGroup: AltGroupItem {I} \"|\" {I} AltGroupItem {{I} \"|\" {I} AltGroupItem};\n" +
             "\n" +
             "AltGroupItem: RuleRef | CharType | String | Group;\n" +
+            "//TODO: list all possible char types\n" +
+            "CharType: \"#\" Token;" +
             "\n" +
-            "CharType: \"#\" Token; //TODO: list all possible char types\n" +
-            "\n" +
-            "String: STRING_LITERAL;\n" +
+            "String: \"\\\"\" {\"\\\\\\\"\" | \"\\\\\\\\\" | #DEFINED} \"\\\"\"; \n" +
             "\n" +
             "Group: \"(\" ExpressionList \")\";\n" +
             "\n" +

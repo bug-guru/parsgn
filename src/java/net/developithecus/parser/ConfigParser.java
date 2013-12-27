@@ -45,15 +45,15 @@ public class ConfigParser extends Parser {
         whiteSpace.addAll(compact(
                 charType(CharType.WHITESPACE),
                 repeat(charType(CharType.WHITESPACE))));
-        singleLineComment.addAll(
+        singleLineComment.addAll(compact(
                 str("//"),
                 repeat(
                         new Expression[]{
                                 charType(CharType.DEFINED)},
-                        charType(CharType.LINE_SEPARATOR)));
-        multiLineComment.addAll(
+                        charType(CharType.LINE_SEPARATOR))));
+        multiLineComment.addAll(compact(
                 str("/*"),
-                repeat(new Expression[]{charType(CharType.DEFINED)}, str("*/")));
+                repeat(new Expression[]{charType(CharType.DEFINED)}, str("*/"))));
         token.addAll(compact(
                 charType(CharType.UNICODE_IDENTIFIER_START),
                 repeat(charType(CharType.UNICODE_IDENTIFIER_PART))));
@@ -87,9 +87,14 @@ public class ConfigParser extends Parser {
         charType.addAll(
                 str("#"),
                 ref(token));
-        string.addAll(
+        string.addAll(compact(
                 str("\""),
-                repeat(new Expression[]{charType(CharType.DEFINED)}, str("\"")));
+                repeat(new Expression[]{
+                        alt(
+                                str("\\\""),
+                                str("\\\\"),
+                                charType(CharType.DEFINED))},
+                        str("\""))));
         group.addAll(
                 str("("),
                 repeat(ref(expressionList)),
