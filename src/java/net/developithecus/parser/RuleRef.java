@@ -9,20 +9,35 @@ import java.util.Map;
  */
 public class RuleRef extends Rule {
     private final Map<String, RuleDef> definitions;
+    private RuleDef rule;
     private Expression expression;
 
     public RuleRef(String name, Map<String, RuleDef> definitions) {
         super(name);
         this.definitions = definitions;
-        getExpression();
+        init();
+    }
+
+    private void init() {
+        if (rule == null) {
+            rule = definitions.get(getName());
+            if (rule != null) {
+                setCompact(rule.isCompact());
+            }
+        }
+        if (expression == null) {
+            expression = rule == null ? null : rule.getExpression();
+        }
     }
 
     public Expression getExpression() {
-        if (expression == null) {
-            RuleDef def = definitions.get(getName());
-            expression = def == null ? null : def.getExpression();
-        }
+        init();
         return expression;
     }
 
+    @Override
+    public boolean isCompact() {
+        init();
+        return super.isCompact();
+    }
 }

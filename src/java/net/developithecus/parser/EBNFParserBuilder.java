@@ -9,7 +9,9 @@ import net.developithecus.parser.expr.CharType;
  */
 public class EBNFParserBuilder extends ParserBuilder {
     public static final String CONFIG_FILE = "ConfigFile";
-    public static final String RULE = "RULE";
+    public static final String RULE = "Rule";
+    public static final String NORMAL_NODE = "NormalNode";
+    public static final String COMPACT_NODE = "Compact";
     public static final String I = "I";
     public static final String WHITE_SPACE = "WhiteSpace";
     public static final String COMMENT = "Comment";
@@ -18,8 +20,6 @@ public class EBNFParserBuilder extends ParserBuilder {
     public static final String NAME = "Name";
     public static final String EXPRESSION = "Expression";
     public static final String EXPRESSION_LIST = "ExpressionList";
-    public static final String PREFIX = "Prefix";
-    public static final String MAKE_VALUE = "MakeValue";
     public static final String SILENT = "Silent";
     public static final String QUANTIFIER = "Quantifier";
     public static final String ZERO_OR_ONE = "ZeroOrOne";
@@ -52,18 +52,28 @@ public class EBNFParserBuilder extends ParserBuilder {
                         ignorable,
                         ref(RULE)
                 ),
-                ignorable
+                ignorable,
+                charType(CharType.EOF)
         );
         rule(RULE,
                 zeroOrMore(
-                        ref(PREFIX),
+                        ref(SILENT),
                         ignorable
                 ),
                 ref(NAME),
                 ignorable,
-                str(":").silent(),
+                oneOf(
+                        ref(NORMAL_NODE),
+                        ref(COMPACT_NODE)
+                ),
                 ref(EXPRESSION_LIST),
                 str(";").silent()
+        );
+        rule(NORMAL_NODE,
+                str(":").silent()
+        );
+        rule(COMPACT_NODE,
+                str("=").silent()
         );
         rule(I,
                 oneOf(
@@ -72,14 +82,14 @@ public class EBNFParserBuilder extends ParserBuilder {
                 )
         );
         rule(WHITE_SPACE,
-                oneOrMore(charType(CharType.VALID)).silent()
+                oneOrMore(charType(CharType.WHITESPACE)).silent()
         );
         rule(COMMENT,
                 oneOf(
                         ref(SINGLE_LINE_COMMENT),
                         ref(MULTI_LINE_COMMENT)
-                ).makeValue()
-        );
+                )
+        ).makeValue();
         rule(SINGLE_LINE_COMMENT,
                 str("//").silent(),
                 repeatUntil(
@@ -100,11 +110,11 @@ public class EBNFParserBuilder extends ParserBuilder {
                         zeroOrMore(
                                 charType(CharType.UNICODE_IDENTIFIER_PART)
                         )
-                ).makeValue()
-        );
+                )
+        ).makeValue();
         rule(EXPRESSION,
                 zeroOrMore(
-                        ref(PREFIX),
+                        ref(SILENT),
                         ignorable
                 ),
                 oneOf(
@@ -129,18 +139,117 @@ public class EBNFParserBuilder extends ParserBuilder {
                         ref(EXPRESSION)
                 )
         );
-        rule(PREFIX,
-                oneOf(
-                        ref(MAKE_VALUE),
-                        ref(SILENT)
-                )
-        );
-        rule(MAKE_VALUE,
-                str("=").silent()
-        );
         rule(SILENT,
                 str("^").silent()
         );
+        rule(QUANTIFIER,
+                oneOf(
+                        ref(ZERO_OR_ONE),
+                        ref(ZERO_OR_MORE),
+                        ref(ONE_OR_MORE),
+                        ref(EXACTLY_N_TIMES),
+                        ref(AT_LEAST_MIN_TIMES),
+                        ref(AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES)
+                )
+        );
+        rule(ZERO_OR_ONE,
+                str("?").silent()
+        );
+        rule(ONE_OR_MORE,
+                str("+").silent()
+        );
+        rule(ZERO_OR_MORE,
+                str("*").silent()
+        );
+        rule(UNTIL,
+                str("{").silent(),
+                ignorable,
+                ref(EXPRESSION),
+                ignorable,
+                str("}").silent()
+        );
+        rule(EXACTLY_N_TIMES,
+                str("{").silent(),
+                ignorable,
+                ref(NUMBER),
+                ignorable,
+                str("}").silent()
+        ).makeValue();
+        rule(AT_LEAST_MIN_TIMES,
+                str("{").silent(),
+                ignorable,
+                ref(NUMBER),
+                ignorable,
+                str(",").silent(),
+                ignorable,
+                str("}").silent()
+        ).makeValue();
+        rule(AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES,
+                str("{").silent(),
+                ignorable,
+                ref(MIN),
+                ignorable,
+                str(",").silent(),
+                ignorable,
+                ref(MAX),
+                ignorable,
+                str("}").silent()
+        );
+        rule(NUMBER,
+                oneOrMore(
+                        charType(CharType.DIGIT)
+                )
+        );
+        rule(MIN,
+                ref(NUMBER)
+        ).makeValue();
+        rule(MAX,
+                ref(NUMBER)
+        ).makeValue();
+        rule(ONE_OF,
+                ref(ONE_OF_ITEM),
+                oneOrMore(
+                        ignorable,
+                        str("|").silent(),
+                        ignorable,
+                        ref(ONE_OF_ITEM)
+                )
+        );
+        rule(ONE_OF_ITEM,
+                oneOf(
+                        ref(REFERENCE),
+                        ref(CHAR_TYPE),
+                        ref(STRING),
+                        ref(SEQUENCE)
+                )
+        );
+        rule(REFERENCE,
+                ref(NAME)
+        );
+        rule(CHAR_TYPE,
+                str("#").silent(),
+                ref(NAME)
+        ).makeValue();
+        rule(STRING,
+                str("\"").silent(),
+                repeatUntil(
+                        str("\"").silent(),
+                        oneOf(
+                                str("\\\""),
+                                str("\\\\"),
+                                charType(CharType.VALID)
+                        )
+                )
+        ).makeValue();
+        rule(SEQUENCE,
+                str("(").silent(),
+                ref(EXPRESSION_LIST),
+                str(")").silent()
+        );
         return result;
+    }
+
+    public Parser createParser() {
+        return createParser(root);
     }
 }

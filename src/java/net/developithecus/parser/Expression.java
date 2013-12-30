@@ -9,7 +9,7 @@ package net.developithecus.parser;
 
 public abstract class Expression {
     private boolean silent;
-    private boolean compact;
+
 
     public abstract ExpressionChecker checker();
 
@@ -28,16 +28,6 @@ public abstract class Expression {
     }
 
     public boolean isCompact() {
-        return compact;
+        return false;
     }
-
-    public void setCompact(boolean compact) {
-        this.compact = compact;
-    }
-
-    public Expression makeValue() {
-        compact = true;
-        return this;
-    }
-
 }

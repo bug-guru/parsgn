@@ -36,9 +36,13 @@ public class CharacterExpression extends Expression {
         public void check() throws ParsingException {
             int codePoint = ctx().getCodePoint();
             if (charType.apply(codePoint)) {
-                StringBuilder builder = new StringBuilder(2);
-                builder.appendCodePoint(codePoint);
-                ctx().markForCommit(builder.toString());
+                if (Character.isValidCodePoint(codePoint)) {
+                    StringBuilder builder = new StringBuilder(2);
+                    builder.appendCodePoint(codePoint);
+                    ctx().markForCommit(builder.toString());
+                } else {
+                    ctx().markForCommit("");
+                }
             } else {
                 ctx().markForRollback();
             }

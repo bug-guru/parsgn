@@ -34,6 +34,11 @@ public class ReferenceExpression extends Expression {
         return new Checker();
     }
 
+    @Override
+    public boolean isCompact() {
+        return reference.isCompact();
+    }
+
     private class Checker extends ExpressionChecker {
 
         @Override

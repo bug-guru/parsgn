@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class ParsingContext implements CheckerContext {
     private int index;
-    private int codePoint;
+    private ParsingEntry entry;
     private int nextIndex;
     private ResultType result;
     private Deque<Holder> stack = new LinkedList<>();
@@ -22,15 +22,15 @@ public class ParsingContext implements CheckerContext {
         pushExpression(root);
     }
 
-    private void reset(int codePoint) {
+    private void reset(ParsingEntry entry) {
         this.index = nextIndex;
-        this.codePoint = codePoint;
+        this.entry = entry;
         this.nextIndex = index + 1;
         this.result = ResultType.CONTINUE;
     }
 
     public int getCodePoint() {
-        return codePoint;
+        return entry.getCodePoint();
     }
 
     public int getNextIndex() {
@@ -87,8 +87,8 @@ public class ParsingContext implements CheckerContext {
         return holder.committed;
     }
 
-    public void next(int codePoint) throws ParsingException {
-        reset(codePoint);
+    public void next(ParsingEntry entry) throws ParsingException {
+        reset(entry);
         completePath();
         process();
     }
@@ -102,6 +102,7 @@ public class ParsingContext implements CheckerContext {
 
     private void process() throws ParsingException {
         boolean loop = true;
+        Deque<ExpressionChecker> rollbackPath = new LinkedList<>();
         while (loop) {
             Holder holder = stack.peek();
             ExpressionChecker currentChecker = holder.checker;
@@ -121,8 +122,9 @@ public class ParsingContext implements CheckerContext {
                     break;
                 case ROLLBACK:
                 case ROLLBACK_OPTIONAL:
+                    rollbackPath.push(currentChecker);
                     if (!popChecker()) {
-                        throw new ParsingException("Syntax error");
+                        throw new ParsingException("Syntax error in path [" + rollbackPath + "] at " + entry);
                     }
                     break;
                 default:
@@ -141,6 +143,7 @@ public class ParsingContext implements CheckerContext {
         holder.checker = nextChecker;
         holder.silent = nextExpr.isSilent() || top != null && top.silent;
         holder.compact = nextExpr.isCompact() || top != null && top.compact;
+        holder.valueRoot = holder.compact && (top == null || !top.compact);
         stack.push(holder);
     }
 
@@ -158,7 +161,7 @@ public class ParsingContext implements CheckerContext {
         return "ParsingContext{" +
                 "result=" + result +
                 ", nextIndex=" + nextIndex +
-                ", codePoint=" + codePoint +
+                ", entry=" + entry +
                 ", index=" + index +
                 ", stack=" + stack +
                 '}';
@@ -172,13 +175,17 @@ public class ParsingContext implements CheckerContext {
         boolean committed;
         boolean silent;
         boolean compact;
+        boolean valueRoot;
         List<Node> committedNodes;
-        StringBuilder compactValue;
+        StringBuilder committedValue;
 
         void commit(String nodeValue) {
             committed = true;
             if (silent) {
                 return;
+            }
+            if (valueRoot) {
+                throw new IllegalStateException("valueRoot is set");
             }
             if (compact) {
                 compactCommit(nodeValue);
@@ -188,10 +195,10 @@ public class ParsingContext implements CheckerContext {
         }
 
         private void compactCommit(String nodeValue) {
-            if (compactValue == null) {
-                compactValue = new StringBuilder(nodeValue);
+            if (committedValue == null) {
+                committedValue = new StringBuilder(nodeValue);
             } else {
-                compactValue.append(nodeValue);
+                committedValue.append(nodeValue);
             }
         }
 
@@ -208,18 +215,21 @@ public class ParsingContext implements CheckerContext {
             if (silent) {
                 return;
             }
-            if (compact) {
-                compactCommitGroup(nodeValue);
-            } else {
+            if (valueRoot) {
+                valueRootCommitGroup(nodeValue);
+            } else if (!compact) {
                 nodeCommitGroup(nodeValue);
             }
         }
 
-        private void compactCommitGroup(String nodeValue) {
-            if (compactValue == null) {
-                compactCommit(nodeValue);
+        private void valueRootCommitGroup(String nodeValue) {
+            if (committedValue == null || committedValue.length() == 0) {
+                nodeCommit(nodeValue);
             } else {
-                compactValue.insert(0, nodeValue);
+                Node node = new Node(nodeValue, beginIndex, nextIndex, committedValue.toString());
+                committedValue = null;
+                committedNodes = new ArrayList<>();
+                committedNodes.add(node);
             }
         }
 
@@ -237,7 +247,7 @@ public class ParsingContext implements CheckerContext {
             committed = true;
             if (silent ||
                     (another.committedNodes == null || another.committedNodes.isEmpty())
-                            && (another.compactValue == null || another.compactValue.length() == 0)) {
+                            && (another.committedValue == null || another.committedValue.length() == 0)) {
                 return;
             }
             if (compact) {
@@ -248,16 +258,16 @@ public class ParsingContext implements CheckerContext {
         }
 
         private void compactAddCommitted(Holder another) {
-            if (compactValue == null) {
-                compactValue = another.compactValue;
+            if (committedValue == null) {
+                committedValue = another.committedValue;
             } else {
-                compactValue.append(another.compactValue);
+                committedValue.append(another.committedValue);
             }
         }
 
         private void nodeAddCommitted(Holder another) {
-            if (another.compact) {
-                commit(another.compactValue.toString());
+            if (another.compact && !another.valueRoot) {
+                commit(another.committedValue.toString());
             } else if (committedNodes == null) {
                 committedNodes = another.committedNodes;
             } else {
