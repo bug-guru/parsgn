@@ -43,7 +43,7 @@ public class ConfigParserTest {
 
     @Test
     public void testConfigFile() throws Exception {
-        ConfigParser parser = new ConfigParser();
+        EBNFParserBuilder parser = new EBNFParserBuilder();
         long t1 = System.currentTimeMillis();
         Node root = parser.parse(rules);
         long t2 = System.currentTimeMillis();

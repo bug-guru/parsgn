@@ -38,7 +38,7 @@ public class ReferenceExpression extends Expression {
 
         @Override
         public Expression next() {
-            return getReference();
+            return getReference().getExpression();
         }
 
         @Override

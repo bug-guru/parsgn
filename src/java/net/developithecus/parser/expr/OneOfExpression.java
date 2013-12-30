@@ -4,7 +4,9 @@ import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
 import net.developithecus.parser.ParsingException;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -12,7 +14,21 @@ import java.util.Iterator;
  * @since 1.0
  */
 
-public class AltGroupExpression extends GroupExpression {
+public class OneOfExpression extends Expression {
+    private List<Expression> expressions;
+
+    public void setExpressions(Expression... expressions) {
+        this.expressions = Arrays.asList(expressions);
+    }
+
+    public List<Expression> getExpressions() {
+        return expressions;
+    }
+
+    public OneOfExpression expressions(Expression... expressions) {
+        setExpressions(expressions);
+        return this;
+    }
 
     @Override
     public ExpressionChecker checker() {
@@ -20,12 +36,12 @@ public class AltGroupExpression extends GroupExpression {
     }
 
     private class Checker extends ExpressionChecker {
-        private Iterator<Expression> expressions = getExpressions().iterator();
+        private Iterator<Expression> exprIterator = expressions.iterator();
         private Expression curExpr;
 
         @Override
         public Expression next() {
-            curExpr = expressions.next();
+            curExpr = exprIterator.next();
             return curExpr;
         }
 
@@ -45,7 +61,7 @@ public class AltGroupExpression extends GroupExpression {
         }
 
         private void doRollbackOrContinue() {
-            if (expressions.hasNext()) {
+            if (exprIterator.hasNext()) {
                 ctx().markForContinue();
             } else {
                 ctx().markForRollback();
@@ -54,7 +70,7 @@ public class AltGroupExpression extends GroupExpression {
 
         @Override
         protected String getName() {
-            return "alt";
+            return "oneOf";
         }
     }
 }

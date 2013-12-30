@@ -10,7 +10,6 @@ package net.developithecus.parser;
 public abstract class Expression {
     private boolean silent;
     private boolean compact;
-    private boolean optional;
 
     public abstract ExpressionChecker checker();
 
@@ -36,21 +35,9 @@ public abstract class Expression {
         this.compact = compact;
     }
 
-    public Expression compact() {
+    public Expression makeValue() {
         compact = true;
         return this;
     }
 
-    public boolean isOptional() {
-        return optional;
-    }
-
-    public void setOptional(boolean optional) {
-        this.optional = optional;
-    }
-
-    public Expression optional() {
-        this.optional = true;
-        return this;
-    }
 }

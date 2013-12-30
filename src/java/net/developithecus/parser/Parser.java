@@ -1,6 +1,6 @@
 package net.developithecus.parser;
 
-import net.developithecus.parser.expr.*;
+import net.developithecus.parser.expr.ReferenceExpression;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,55 +14,9 @@ import java.util.List;
 public class Parser {
     private final ReferenceExpression root;
 
-    public Parser() {
+    public Parser(Rule root) {
         this.root = new ReferenceExpression();
-    }
-
-    public void root(Rule rule) {
-        root.setReference(rule);
-    }
-
-    public Rule rule(String name, Expression... expressions) {
-        Rule result = new Rule();
-        result.setName(name);
-        result.addAll(expressions);
-        return result;
-    }
-
-    public AltGroupExpression alt(Expression... expressions) {
-        AltGroupExpression result = new AltGroupExpression();
-        result.addAll(expressions);
-        return result;
-    }
-
-    public CharacterExpression charType(CharType charType) {
-        CharacterExpression result = new CharacterExpression();
-        result.setCharType(charType);
-        return result;
-    }
-
-    public ReferenceExpression ref(Rule rule) {
-        ReferenceExpression result = new ReferenceExpression();
-        result.setReference(rule);
-        return result;
-    }
-
-    public RepeatGroupExpression repeat(Expression... expressions) {
-        RepeatGroupExpression result = new RepeatGroupExpression();
-        result.addAll(expressions);
-        return result;
-    }
-
-    public SequentialGroupExpression group(Expression... expressions) {
-        SequentialGroupExpression result = new SequentialGroupExpression();
-        result.addAll(expressions);
-        return result;
-    }
-
-    public StringExpression str(String str) {
-        StringExpression result = new StringExpression();
-        result.setValue(str);
-        return result;
+        this.root.setReference(root);
     }
 
     public Node parse(String input) throws ParsingException {

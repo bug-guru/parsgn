@@ -4,7 +4,9 @@ import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
 import net.developithecus.parser.ParsingException;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -12,7 +14,21 @@ import java.util.Iterator;
  * @since 1.0
  */
 
-public class SequentialGroupExpression extends GroupExpression {
+public class SequentialExpression extends Expression {
+    private List<Expression> expressions;
+
+    public void setExpressions(Expression... expressions) {
+        this.expressions = Arrays.asList(expressions);
+    }
+
+    public List<Expression> getExpressions() {
+        return expressions;
+    }
+
+    public SequentialExpression expressions(Expression... expressions) {
+        setExpressions(expressions);
+        return this;
+    }
 
     @Override
     public ExpressionChecker checker() {
@@ -51,7 +67,7 @@ public class SequentialGroupExpression extends GroupExpression {
             if (expressions.hasNext()) {
                 ctx().markForContinue();
             } else if (!ctx().hasCommitted()) {
-                throw new ParsingException("group without result");
+                throw new ParsingException("sequence without result");
             } else {
                 ctx().markForCommit();
             }
@@ -59,7 +75,7 @@ public class SequentialGroupExpression extends GroupExpression {
 
         @Override
         protected String getName() {
-            return "group";
+            return "sequence";
         }
     }
 }

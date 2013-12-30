@@ -101,16 +101,17 @@ public class ParsingContext implements CheckerContext {
     }
 
     private void process() throws ParsingException {
-        boolean cont = true;
-        while (cont) {
+        boolean loop = true;
+        while (loop) {
             Holder holder = stack.peek();
             ExpressionChecker currentChecker = holder.checker;
             currentChecker.check();
             switch (getResult()) {
                 case CONTINUE:
-                    cont = false;
+                    loop = false;
                     break;
                 case COMMIT:
+                    holder.turn++;
                     if (!popChecker()) {
                         resultTree = holder.committedNodes.get(0);
                         return;
@@ -136,6 +137,7 @@ public class ParsingContext implements CheckerContext {
         nextChecker.init(this);
         Holder holder = new Holder();
         holder.beginIndex = index;
+        holder.expression = nextExpr;
         holder.checker = nextChecker;
         holder.silent = nextExpr.isSilent() || top != null && top.silent;
         holder.compact = nextExpr.isCompact() || top != null && top.compact;
@@ -163,7 +165,9 @@ public class ParsingContext implements CheckerContext {
     }
 
     private class Holder {
+        Expression expression;
         ExpressionChecker checker;
+        int turn;
         int beginIndex;
         boolean committed;
         boolean silent;

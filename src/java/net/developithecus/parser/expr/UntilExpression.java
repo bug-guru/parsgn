@@ -4,26 +4,52 @@ import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
 import net.developithecus.parser.ParsingException;
 
-import java.util.List;
-
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
  * @version 13.15.12
  * @since 1.0
  */
-public class RepeatGroupExpression extends GroupExpression {
-    private Expression endCondition;
+public class UntilExpression extends Expression {
+    private Expression loopExpression;
+    private Expression conditionExpression;
+    private int minOccurrences;
 
-    public Expression getEndCondition() {
-        return endCondition;
+    public Expression getLoopExpression() {
+        return loopExpression;
     }
 
-    public void setEndCondition(Expression endCondition) {
-        this.endCondition = endCondition;
+    public void setLoopExpression(Expression loopExpression) {
+        this.loopExpression = loopExpression;
     }
 
-    public RepeatGroupExpression endCondition(Expression endCondition) {
-        setEndCondition(endCondition);
+    public UntilExpression loop(Expression loopExpression) {
+        setLoopExpression(loopExpression);
+        return this;
+    }
+
+    public Expression getConditionExpression() {
+        return conditionExpression;
+    }
+
+    public void setConditionExpression(Expression conditionExpression) {
+        this.conditionExpression = conditionExpression;
+    }
+
+    public UntilExpression condition(Expression conditionExpression) {
+        setConditionExpression(conditionExpression);
+        return this;
+    }
+
+    public int getMinOccurrences() {
+        return minOccurrences;
+    }
+
+    public void setMinOccurrences(int minOccurrences) {
+        this.minOccurrences = minOccurrences;
+    }
+
+    public UntilExpression min(int minOccurrences) {
+        setMinOccurrences(minOccurrences);
         return this;
     }
 
@@ -33,22 +59,15 @@ public class RepeatGroupExpression extends GroupExpression {
     }
 
     private class Checker extends ExpressionChecker {
-        private boolean checkingEndCondition = endCondition != null;
+        private boolean checkingEndCondition = true;
         private int turnsPassed = 0;
 
         @Override
         public Expression next() {
             if (checkingEndCondition) {
-                return endCondition;
+                return conditionExpression;
             } else {
-                List<Expression> expressions = getExpressions();
-                if (expressions.size() == 1) {
-                    return expressions.get(0);
-                } else {
-                    SequentialGroupExpression seq = new SequentialGroupExpression();
-                    seq.addAll(expressions);
-                    return seq;
-                }
+                return loopExpression;
             }
         }
 
@@ -61,6 +80,7 @@ public class RepeatGroupExpression extends GroupExpression {
                         ctx().markForCommit();
                     } else {
                         doContinue();
+                        checkingEndCondition = true;
                     }
                     break;
                 case ROLLBACK:
@@ -78,22 +98,23 @@ public class RepeatGroupExpression extends GroupExpression {
         }
 
         private void doCommitOrRollback() {
-            if (turnsPassed > 0) {
+            if (minOccurrences == 0 && turnsPassed == 0) {
+                ctx().markForRollbackOptional();
+            } else if (turnsPassed >= minOccurrences) {
                 ctx().markForCommit();
             } else {
-                ctx().markForRollbackOptional();
+                ctx().markForRollback();
             }
         }
 
         private void doContinue() {
             turnsPassed++;
             ctx().markForContinue();
-            checkingEndCondition = endCondition != null;
         }
 
         @Override
         protected String getName() {
-            return "repeat";
+            return "until";
         }
 
     }
