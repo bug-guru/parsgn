@@ -38,6 +38,7 @@ public class Parser {
                 int col = 0;
                 for (int offset = 0; offset <= length; ) {
                     col++;
+                    Position pos = new Position(row, col);
                     int codePoint;
                     if (line == null) {
                         codePoint = -1;
@@ -49,7 +50,7 @@ public class Parser {
                         codePoint = line.codePointAt(offset);
                         offset += Character.charCount(codePoint);
                     }
-                    log.add(new ParsingEntry(row, col, codePoint));
+                    log.add(new ParsingEntry(pos, codePoint));
                     do {
                         ParsingEntry entry = log.get(ctx.getNextIndex());
                         ctx.next(entry);

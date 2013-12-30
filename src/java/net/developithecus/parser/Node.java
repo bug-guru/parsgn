@@ -9,33 +9,37 @@ import java.util.*;
  */
 public class Node {
     private final String name;
-    private final int beginIndex;
-    private final int endIndex;
+    private final Position beginPosition;
+    private final int length;
     private final List<Node> children;
     private final String value;
 
-    public Node(String name, int beginIndex, int endIndex) {
+    public Node(String name, Position beginPosition, int length) {
         this.name = name;
-        this.beginIndex = beginIndex;
-        this.endIndex = endIndex;
+        this.beginPosition = beginPosition;
+        this.length = length;
         this.value = null;
         this.children = null;
     }
 
-    public Node(String name, int beginIndex, int endIndex, String value) {
+    public Node(String name, Position beginPosition, int length, String value) {
         this.name = name;
-        this.beginIndex = beginIndex;
-        this.endIndex = endIndex;
+        this.beginPosition = beginPosition;
+        this.length = length;
         this.value = value;
         this.children = null;
     }
 
-    public Node(String name, int beginIndex, int endIndex, List<Node> children) {
+    public Node(String name, Position beginPosition, int length, List<Node> children) {
         this.name = name;
-        this.beginIndex = beginIndex;
-        this.endIndex = endIndex;
+        this.beginPosition = beginPosition;
+        this.length = length;
         this.value = null;
         this.children = Collections.unmodifiableList(children);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getValue() {
@@ -46,12 +50,12 @@ public class Node {
         return children;
     }
 
-    public int getBeginIndex() {
-        return beginIndex;
+    public Position getBeginPosition() {
+        return beginPosition;
     }
 
-    public int getEndIndex() {
-        return endIndex;
+    public int getLength() {
+        return length;
     }
 
     @Override
@@ -92,14 +96,18 @@ public class Node {
         for (int i = 0; i < indent; i++) {
             result.append("    ");
         }
-        result.append('[');
         StringUtils.escape(result, node.name);
         if (node.value != null) {
             result.append("=\"");
             StringUtils.escape(result, node.value);
             result.append("\"");
         }
-        result.append("]\n");
+        result
+                .append(" {")
+                .append(node.beginPosition)
+                .append("-")
+                .append(node.length)
+                .append("}\n");
     }
 
 }

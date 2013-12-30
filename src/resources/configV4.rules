@@ -64,9 +64,7 @@ Min = Number;
 
 Max = Number;
 
-OneOf: OneOfItem (^I* ^"|" ^I* OneOfItem)+;
-
-OneOfItem: Reference | CharType | String | Sequence;
+OneOf: Reference | CharType | String | Sequence (^I* ^"|" ^I* Reference | CharType | String | Sequence)+;
 
 Reference: Name;
 

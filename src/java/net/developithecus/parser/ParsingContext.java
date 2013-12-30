@@ -19,6 +19,7 @@ public class ParsingContext implements CheckerContext {
     private Node resultTree;
 
     public ParsingContext(Expression root) {
+        entry = new ParsingEntry(new Position(1, 1), 0);
         pushExpression(root);
     }
 
@@ -139,6 +140,7 @@ public class ParsingContext implements CheckerContext {
         nextChecker.init(this);
         Holder holder = new Holder();
         holder.beginIndex = index;
+        holder.beginPosition = entry.getPosition();
         holder.expression = nextExpr;
         holder.checker = nextChecker;
         holder.silent = nextExpr.isSilent() || top != null && top.silent;
@@ -172,6 +174,7 @@ public class ParsingContext implements CheckerContext {
         ExpressionChecker checker;
         int turn;
         int beginIndex;
+        Position beginPosition;
         boolean committed;
         boolean silent;
         boolean compact;
@@ -206,8 +209,12 @@ public class ParsingContext implements CheckerContext {
             if (committedNodes == null) {
                 committedNodes = new ArrayList<>();
             }
-            Node node = new Node(nodeValue, beginIndex, nextIndex);
+            Node node = new Node(nodeValue, beginPosition, length());
             committedNodes.add(node);
+        }
+
+        private int length() {
+            return nextIndex - beginIndex;
         }
 
         void commitGroup(String nodeValue) {
@@ -226,7 +233,7 @@ public class ParsingContext implements CheckerContext {
             if (committedValue == null || committedValue.length() == 0) {
                 nodeCommit(nodeValue);
             } else {
-                Node node = new Node(nodeValue, beginIndex, nextIndex, committedValue.toString());
+                Node node = new Node(nodeValue, beginPosition, length(), committedValue.toString());
                 committedValue = null;
                 committedNodes = new ArrayList<>();
                 committedNodes.add(node);
@@ -237,7 +244,7 @@ public class ParsingContext implements CheckerContext {
             if (committedNodes == null) {
                 nodeCommit(nodeValue);
             } else {
-                Node node = new Node(nodeValue, beginIndex, nextIndex, committedNodes);
+                Node node = new Node(nodeValue, beginPosition, length(), committedNodes);
                 committedNodes = new ArrayList<>();
                 committedNodes.add(node);
             }

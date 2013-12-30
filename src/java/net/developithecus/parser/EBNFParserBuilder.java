@@ -33,7 +33,6 @@ public class EBNFParserBuilder extends ParserBuilder {
     public static final String MIN = "Min";
     public static final String MAX = "Max";
     public static final String ONE_OF = "oneOf";
-    public static final String ONE_OF_ITEM = "OneOfItem";
     public static final String REFERENCE = "Reference";
     public static final String CHAR_TYPE = "CharType";
     public static final String STRING = "String";
@@ -53,7 +52,7 @@ public class EBNFParserBuilder extends ParserBuilder {
                         ref(RULE)
                 ),
                 ignorable,
-                charType(CharType.EOF)
+                charType(CharType.EOF).silent()
         );
         rule(RULE,
                 zeroOrMore(
@@ -207,25 +206,27 @@ public class EBNFParserBuilder extends ParserBuilder {
                 ref(NUMBER)
         ).makeValue();
         rule(ONE_OF,
-                ref(ONE_OF_ITEM),
-                oneOrMore(
-                        ignorable,
-                        str("|").silent(),
-                        ignorable,
-                        ref(ONE_OF_ITEM)
-                )
-        );
-        rule(ONE_OF_ITEM,
                 oneOf(
                         ref(REFERENCE),
                         ref(CHAR_TYPE),
                         ref(STRING),
                         ref(SEQUENCE)
+                ),
+                oneOrMore(
+                        ignorable,
+                        str("|").silent(),
+                        ignorable,
+                        oneOf(
+                                ref(REFERENCE),
+                                ref(CHAR_TYPE),
+                                ref(STRING),
+                                ref(SEQUENCE)
+                        )
                 )
         );
         rule(REFERENCE,
                 ref(NAME)
-        );
+        ).makeValue();
         rule(CHAR_TYPE,
                 str("#").silent(),
                 ref(NAME)
