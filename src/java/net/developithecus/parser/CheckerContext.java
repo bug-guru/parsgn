@@ -1,5 +1,7 @@
 package net.developithecus.parser;
 
+import net.developithecus.parser.exceptions.ParsingException;
+
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
  * @version 13.27.12
@@ -10,17 +12,17 @@ public interface CheckerContext {
 
     public ResultType getResult();
 
-    public void markForContinue();
+    public void markForContinue() throws ParsingException;
 
-    public void markForRollbackOptional();
+    public void markForRollbackOptional() throws ParsingException;
 
-    public void markForRollback();
+    public void markForRollback() throws ParsingException;
 
-    public void markForCommit();
+    public void markForCommit() throws ParsingException;
 
-    public void markForCommitGroup(String groupNodeValue);
+    public void markForCommitGroup(String groupNodeValue) throws ParsingException;
 
-    public void markForCommit(String nodeValue);
+    public void markForCommit(String nodeValue) throws ParsingException;
 
     public boolean hasCommitted();
 }

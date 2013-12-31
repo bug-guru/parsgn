@@ -2,7 +2,8 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.ParsingException;
+import net.developithecus.parser.exceptions.InternalParsingException;
+import net.developithecus.parser.exceptions.ParsingException;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -93,11 +94,11 @@ public class UntilExpression extends Expression {
                     }
                     break;
                 default:
-                    throw new IllegalStateException("unknown result: " + ctx().getResult());
+                    throw new InternalParsingException("unknown result: " + ctx().getResult());
             }
         }
 
-        private void doCommitOrRollback() {
+        private void doCommitOrRollback() throws ParsingException {
             if (minOccurrences == 0 && turnsPassed == 0) {
                 ctx().markForRollbackOptional();
             } else if (turnsPassed >= minOccurrences) {
@@ -107,7 +108,7 @@ public class UntilExpression extends Expression {
             }
         }
 
-        private void doContinue() {
+        private void doContinue() throws ParsingException {
             turnsPassed++;
             ctx().markForContinue();
         }

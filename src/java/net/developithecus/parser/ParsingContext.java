@@ -1,5 +1,9 @@
 package net.developithecus.parser;
 
+import net.developithecus.parser.exceptions.InternalParsingException;
+import net.developithecus.parser.exceptions.ParsingException;
+import net.developithecus.parser.exceptions.SyntaxErrorException;
+
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -17,9 +21,11 @@ public class ParsingContext implements CheckerContext {
     private ResultType result;
     private Deque<Holder> stack = new LinkedList<>();
     private Node resultTree;
+    private Position maxPos;
 
     public ParsingContext(Expression root) {
-        entry = new ParsingEntry(new Position(1, 1), 0);
+        maxPos = new Position(1, 1);
+        entry = new ParsingEntry(maxPos, 0);
         pushExpression(root);
     }
 
@@ -42,27 +48,32 @@ public class ParsingContext implements CheckerContext {
         return result;
     }
 
-    public void markForCommit(String nodeValue) {
+    @Override
+    public void markForCommit(String nodeValue) throws ParsingException {
         Holder holder = stack.peek();
         holder.commit(nodeValue);
         result = ResultType.COMMIT;
     }
 
-    public void markForCommitGroup(String groupNodeValue) {
+    @Override
+    public void markForCommitGroup(String groupNodeValue) throws ParsingException {
         Holder holder = stack.peek();
         holder.commitGroup(groupNodeValue);
         result = ResultType.COMMIT;
     }
 
-    public void markForCommit() {
+    @Override
+    public void markForCommit() throws ParsingException {
         result = ResultType.COMMIT;
     }
 
-    public void markForRollback() {
+    @Override
+    public void markForRollback() throws ParsingException {
         markForRollback(false);
     }
 
-    public void markForRollbackOptional() {
+    @Override
+    public void markForRollbackOptional() throws ParsingException {
         markForRollback(true);
     }
 
@@ -74,7 +85,8 @@ public class ParsingContext implements CheckerContext {
         holder.committed = false;
     }
 
-    public void markForContinue() {
+    @Override
+    public void markForContinue() throws ParsingException {
         this.result = ResultType.CONTINUE;
     }
 
@@ -103,7 +115,6 @@ public class ParsingContext implements CheckerContext {
 
     private void process() throws ParsingException {
         boolean loop = true;
-        Deque<ExpressionChecker> rollbackPath = new LinkedList<>();
         while (loop) {
             Holder holder = stack.peek();
             ExpressionChecker currentChecker = holder.checker;
@@ -113,6 +124,9 @@ public class ParsingContext implements CheckerContext {
                     loop = false;
                     break;
                 case COMMIT:
+                    if (maxPos == null || maxPos.compareTo(holder.beginPosition) < 0) {
+                        maxPos = holder.beginPosition;
+                    }
                     holder.turn++;
                     if (!popChecker()) {
                         resultTree = holder.committedNodes.get(0);
@@ -123,9 +137,8 @@ public class ParsingContext implements CheckerContext {
                     break;
                 case ROLLBACK:
                 case ROLLBACK_OPTIONAL:
-                    rollbackPath.push(currentChecker);
                     if (!popChecker()) {
-                        throw new ParsingException("Syntax error in path [" + rollbackPath + "] at " + entry);
+                        throw new SyntaxErrorException(maxPos);
                     }
                     break;
                 default:
@@ -182,13 +195,13 @@ public class ParsingContext implements CheckerContext {
         List<Node> committedNodes;
         StringBuilder committedValue;
 
-        void commit(String nodeValue) {
+        void commit(String nodeValue) throws InternalParsingException {
             committed = true;
             if (silent) {
                 return;
             }
             if (valueRoot) {
-                throw new IllegalStateException("valueRoot is set");
+                throw new InternalParsingException("valueRoot is set");
             }
             if (compact) {
                 compactCommit(nodeValue);
@@ -250,7 +263,7 @@ public class ParsingContext implements CheckerContext {
             }
         }
 
-        void addCommitted(Holder another) {
+        void addCommitted(Holder another) throws InternalParsingException {
             committed = true;
             if (silent ||
                     (another.committedNodes == null || another.committedNodes.isEmpty())
@@ -272,7 +285,7 @@ public class ParsingContext implements CheckerContext {
             }
         }
 
-        private void nodeAddCommitted(Holder another) {
+        private void nodeAddCommitted(Holder another) throws InternalParsingException {
             if (another.compact && !another.valueRoot) {
                 commit(another.committedValue.toString());
             } else if (committedNodes == null) {

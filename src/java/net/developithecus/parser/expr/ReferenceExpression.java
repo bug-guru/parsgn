@@ -2,8 +2,9 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.ParsingException;
 import net.developithecus.parser.Rule;
+import net.developithecus.parser.exceptions.InternalParsingException;
+import net.developithecus.parser.exceptions.ParsingException;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -57,7 +58,7 @@ public class ReferenceExpression extends Expression {
                     ctx().markForRollback();
                     break;
                 default:
-                    throw new IllegalStateException("unknown result: " + ctx().getResult());
+                    throw new InternalParsingException("unknown result: " + ctx().getResult());
             }
         }
 

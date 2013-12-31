@@ -2,8 +2,8 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.ParsingException;
 import net.developithecus.parser.StringUtils;
+import net.developithecus.parser.exceptions.ParsingException;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -41,9 +41,6 @@ public class StringExpression extends Expression {
 
         @Override
         public void check() throws ParsingException {
-            if (offset >= len) {
-                throw new IndexOutOfBoundsException(String.valueOf(offset));
-            }
             int codePoint = ctx().getCodePoint();
             if (codePoints[offset] != codePoint) {
                 ctx().markForRollback();

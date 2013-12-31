@@ -2,7 +2,8 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.ParsingException;
+import net.developithecus.parser.exceptions.InternalParsingException;
+import net.developithecus.parser.exceptions.ParsingException;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -56,11 +57,11 @@ public class OneOfExpression extends Expression {
                     doRollbackOrContinue();
                     break;
                 default:
-                    throw new IllegalStateException("unknown result: " + ctx().getResult());
+                    throw new InternalParsingException("unknown result: " + ctx().getResult());
             }
         }
 
-        private void doRollbackOrContinue() {
+        private void doRollbackOrContinue() throws ParsingException {
             if (exprIterator.hasNext()) {
                 ctx().markForContinue();
             } else {

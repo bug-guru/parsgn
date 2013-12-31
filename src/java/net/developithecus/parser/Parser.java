@@ -1,5 +1,7 @@
 package net.developithecus.parser;
 
+import net.developithecus.parser.exceptions.ParsingException;
+import net.developithecus.parser.exceptions.UnexpectedEOFException;
 import net.developithecus.parser.expr.ReferenceExpression;
 
 import java.io.BufferedReader;
@@ -63,7 +65,7 @@ public class Parser {
                     break;
                 }
             }
-            throw new ParsingException("Parsing error");
+            throw new UnexpectedEOFException();
         }
     }
 

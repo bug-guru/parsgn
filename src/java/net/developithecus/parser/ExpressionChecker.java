@@ -1,5 +1,7 @@
 package net.developithecus.parser;
 
+import net.developithecus.parser.exceptions.ParsingException;
+
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
  * @version 13.25.12

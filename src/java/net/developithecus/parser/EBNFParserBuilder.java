@@ -112,7 +112,7 @@ public class EBNFParserBuilder extends ParserBuilder {
                 )
         ).makeValue();
         rule(EXPRESSION,
-                zeroOrMore(
+                zeroOrOne(
                         ref(SILENT),
                         ignorable
                 ),
