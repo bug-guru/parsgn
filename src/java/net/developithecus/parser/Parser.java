@@ -8,8 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -24,6 +23,41 @@ public class Parser {
     public Parser(Rule root) {
         this.root = new ReferenceExpression();
         this.root.setReference(root);
+    }
+
+    public void parse(InputStream input, NodeTreeVisitor visitor) throws ParsingException, IOException {
+        Node root = parse(input);
+        class NodeHolder {
+            final Node node;
+            final Iterator<Node> iterator;
+
+            NodeHolder(Node node) {
+                this.node = node;
+                this.iterator = node.getChildren().iterator();
+            }
+        }
+        Deque<NodeHolder> stack = new LinkedList<>();
+        if (root.isLeaf()) {
+            visitor.leafNode(root);
+        } else {
+            visitor.startNode(root);
+            stack.push(new NodeHolder(root));
+        }
+        while (!stack.isEmpty()) {
+            NodeHolder current = stack.peek();
+            if (current.iterator.hasNext()) {
+                Node node = current.iterator.next();
+                if (node.isLeaf()) {
+                    visitor.leafNode(node);
+                } else {
+                    visitor.startNode(node);
+                    stack.push(new NodeHolder(node));
+                }
+            } else {
+                stack.pop();
+                visitor.endNode(current.node);
+            }
+        }
     }
 
     public Node parse(InputStream input) throws ParsingException, IOException {

@@ -1,6 +1,7 @@
 package net.developithecus.parser;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -71,43 +72,7 @@ public class Node {
         return result.toString();
     }
 
-    public String toTreeString() {
-        StringBuilder result = new StringBuilder();
-        Deque<Iterator<Node>> stack = new LinkedList<>();
-        formatNode(result, 0, this);
-        stack.push(children.iterator());
-
-        while (!stack.isEmpty()) {
-            Iterator<Node> current = stack.peek();
-            if (current.hasNext()) {
-                Node node = current.next();
-                formatNode(result, stack.size(), node);
-                if (node.children != null && !node.children.isEmpty()) {
-                    stack.push(node.children.iterator());
-                }
-            } else {
-                stack.pop();
-            }
-        }
-        return result.toString();
+    public boolean isLeaf() {
+        return children == null || children.isEmpty();
     }
-
-    private void formatNode(StringBuilder result, int indent, Node node) {
-        for (int i = 0; i < indent; i++) {
-            result.append("    ");
-        }
-        StringUtils.escape(result, node.name);
-        if (node.value != null) {
-            result.append("=\"");
-            StringUtils.escape(result, node.value);
-            result.append("\"");
-        }
-        result
-                .append(" {")
-                .append(node.beginPosition)
-                .append("-")
-                .append(node.length)
-                .append("}\n");
-    }
-
 }

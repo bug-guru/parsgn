@@ -1,5 +1,6 @@
 package net.developithecus.parser;
 
+import java.io.PrintStream;
 import java.util.Arrays;
 
 /**
@@ -27,7 +28,7 @@ public final class StringUtils {
         return result;
     }
 
-    static void escape(StringBuilder result, String value) {
+    static void escape(PrintStream result, String value) {
         int offset = 0;
         int len = value.length();
         while (offset < len) {
@@ -56,7 +57,7 @@ public final class StringUtils {
                     result.append("\\\"");
                     break;
                 default:
-                    result.appendCodePoint(codePoint);
+                    result.append((char) codePoint);
             }
         }
     }
