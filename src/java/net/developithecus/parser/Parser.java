@@ -26,7 +26,9 @@ public class Parser {
     }
 
     public void parse(InputStream input, NodeTreeVisitor visitor) throws ParsingException, IOException {
-        Node root = parse(input);
+        NodeResultBuilder builder = new NodeResultBuilder();
+        parse(input, builder);
+        Node root = builder.getRoot();
         class NodeHolder {
             final Node node;
             final Iterator<Node> iterator;
@@ -60,12 +62,12 @@ public class Parser {
         }
     }
 
-    public Node parse(InputStream input) throws ParsingException, IOException {
+    public void parse(InputStream input, ResultBuilder<?> builder) throws ParsingException, IOException {
         try (
                 BufferedReader reader = new BufferedReader(new InputStreamReader(input))
         ) {
             List<ParsingEntry> log = new ArrayList<>(INITIAL_LOG_CAPACITY);
-            ParsingContext ctx = new ParsingContext(root);
+            ParsingContext ctx = new ParsingContext(root, builder);
             int row = 0;
             while (true) {
                 row++;
@@ -90,8 +92,8 @@ public class Parser {
                     do {
                         ParsingEntry entry = log.get(ctx.getNextIndex());
                         ctx.next(entry);
-                        if (ctx.getResultTree() != null) {
-                            return ctx.getResultTree();
+                        if (builder.isFinished()) {
+                            return;
                         }
                     } while (ctx.getNextIndex() < log.size());
                 }

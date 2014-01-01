@@ -37,9 +37,7 @@ public class CharacterExpression extends Expression {
             int codePoint = ctx().getCodePoint();
             if (charType.apply(codePoint)) {
                 if (Character.isValidCodePoint(codePoint)) {
-                    StringBuilder builder = new StringBuilder(2);
-                    builder.appendCodePoint(codePoint);
-                    ctx().markForCommit(builder.toString());
+                    ctx().markForCommit(codePoint);
                 } else {
                     ctx().markForCommit("");
                 }

@@ -4,10 +4,8 @@ import net.developithecus.parser.exceptions.InternalParsingException;
 import net.developithecus.parser.exceptions.ParsingException;
 import net.developithecus.parser.exceptions.SyntaxErrorException;
 
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -20,10 +18,11 @@ public class ParsingContext implements CheckerContext {
     private int nextIndex;
     private ResultType result;
     private Deque<Holder> stack = new LinkedList<>();
-    private Node resultTree;
     private Position maxPos;
+    private ResultBuilder<?> builder;
 
-    public ParsingContext(Expression root) {
+    public ParsingContext(Expression root, ResultBuilder<?> builder) {
+        this.builder = builder;
         maxPos = new Position(1, 1);
         entry = new ParsingEntry(maxPos, 0);
         pushExpression(root);
@@ -56,6 +55,13 @@ public class ParsingContext implements CheckerContext {
     }
 
     @Override
+    public void markForCommit(int codePoint) throws ParsingException {
+        Holder holder = stack.peek();
+        holder.commit(codePoint);
+        result = ResultType.COMMIT;
+    }
+
+    @Override
     public void markForCommitGroup(String groupNodeValue) throws ParsingException {
         Holder holder = stack.peek();
         holder.commitGroup(groupNodeValue);
@@ -81,7 +87,6 @@ public class ParsingContext implements CheckerContext {
         this.result = optional ? ResultType.ROLLBACK_OPTIONAL : ResultType.ROLLBACK;
         Holder holder = stack.peek();
         this.nextIndex = holder.beginIndex;
-        holder.committedNodes = null;
         holder.committed = false;
     }
 
@@ -128,18 +133,21 @@ public class ParsingContext implements CheckerContext {
                         maxPos = holder.beginPosition;
                     }
                     holder.turn++;
-                    if (!popChecker()) {
-                        resultTree = holder.committedNodes.get(0);
-                        return;
-                    }
+                    popChecker();
                     Holder parent = stack.peek();
-                    parent.addCommitted(holder);
+                    if (parent == null) {
+                        builder.mergeNodes();
+                        return;
+                    } else {
+                        parent.addCommitted();
+                    }
                     break;
                 case ROLLBACK:
                 case ROLLBACK_OPTIONAL:
                     if (!popChecker()) {
                         throw new SyntaxErrorException(maxPos);
                     }
+                    builder.removeHead();
                     break;
                 default:
                     throw new ParsingException("unknown result: " + getResult());
@@ -167,10 +175,6 @@ public class ParsingContext implements CheckerContext {
         return !stack.isEmpty();
     }
 
-    public Node getResultTree() {
-        return resultTree;
-    }
-
     @Override
     public String toString() {
         return "ParsingContext{" +
@@ -192,10 +196,16 @@ public class ParsingContext implements CheckerContext {
         boolean silent;
         boolean compact;
         boolean valueRoot;
-        List<Node> committedNodes;
-        StringBuilder committedValue;
 
-        void commit(String nodeValue) throws InternalParsingException {
+        private Holder() {
+            builder.push();
+        }
+
+        private int length() {
+            return nextIndex - beginIndex;
+        }
+
+        void commit(String value) throws InternalParsingException {
             committed = true;
             if (silent) {
                 return;
@@ -204,94 +214,50 @@ public class ParsingContext implements CheckerContext {
                 throw new InternalParsingException("valueRoot is set");
             }
             if (compact) {
-                compactCommit(nodeValue);
+                builder.appendValue(value);
             } else {
-                nodeCommit(nodeValue);
+                builder.addNode(value, beginPosition, length());
             }
         }
 
-        private void compactCommit(String nodeValue) {
-            if (committedValue == null) {
-                committedValue = new StringBuilder(nodeValue);
-            } else {
-                committedValue.append(nodeValue);
-            }
-        }
-
-        private void nodeCommit(String nodeValue) {
-            if (committedNodes == null) {
-                committedNodes = new ArrayList<>();
-            }
-            Node node = new Node(nodeValue, beginPosition, length());
-            committedNodes.add(node);
-        }
-
-        private int length() {
-            return nextIndex - beginIndex;
-        }
-
-        void commitGroup(String nodeValue) {
+        public void commit(int codePoint) throws InternalParsingException {
             committed = true;
             if (silent) {
                 return;
             }
             if (valueRoot) {
-                valueRootCommitGroup(nodeValue);
-            } else if (!compact) {
-                nodeCommitGroup(nodeValue);
+                throw new InternalParsingException("valueRoot is set");
             }
-        }
-
-        private void valueRootCommitGroup(String nodeValue) {
-            if (committedValue == null || committedValue.length() == 0) {
-                nodeCommit(nodeValue);
+            if (compact) {
+                builder.appendValue(codePoint);
             } else {
-                Node node = new Node(nodeValue, beginPosition, length(), committedValue.toString());
-                committedValue = null;
-                committedNodes = new ArrayList<>();
-                committedNodes.add(node);
+                String nodeName = new StringBuilder().appendCodePoint(codePoint).toString();
+                builder.addNode(nodeName, beginPosition, length());
             }
         }
 
-        private void nodeCommitGroup(String nodeValue) {
-            if (committedNodes == null) {
-                nodeCommit(nodeValue);
-            } else {
-                Node node = new Node(nodeValue, beginPosition, length(), committedNodes);
-                committedNodes = new ArrayList<>();
-                committedNodes.add(node);
-            }
-        }
-
-        void addCommitted(Holder another) throws InternalParsingException {
+        void commitGroup(String nodeName) {
             committed = true;
-            if (silent ||
-                    (another.committedNodes == null || another.committedNodes.isEmpty())
-                            && (another.committedValue == null || another.committedValue.length() == 0)) {
+            if (silent) {
+                return;
+            }
+            if (valueRoot) {
+                builder.addNodeWithValue(nodeName, beginPosition, length());
+            } else if (!compact) {
+                builder.addNodeWithChildren(nodeName, beginPosition, length());
+            }
+        }
+
+        void addCommitted() throws InternalParsingException {
+            committed = true;
+            if (silent) {
+                builder.removeHead();
                 return;
             }
             if (compact) {
-                compactAddCommitted(another);
+                builder.mergeValue();
             } else {
-                nodeAddCommitted(another);
-            }
-        }
-
-        private void compactAddCommitted(Holder another) {
-            if (committedValue == null) {
-                committedValue = another.committedValue;
-            } else {
-                committedValue.append(another.committedValue);
-            }
-        }
-
-        private void nodeAddCommitted(Holder another) throws InternalParsingException {
-            if (another.compact && !another.valueRoot) {
-                commit(another.committedValue.toString());
-            } else if (committedNodes == null) {
-                committedNodes = another.committedNodes;
-            } else {
-                committedNodes.addAll(another.committedNodes);
+                builder.mergeNodes();
             }
         }
 
@@ -302,8 +268,8 @@ public class ParsingContext implements CheckerContext {
                     ", beginIndex=" + beginIndex +
                     ", committed=" + committed +
                     ", silent=" + silent +
-                    ", committedNodes=" + committedNodes +
                     '}';
         }
+
     }
 }

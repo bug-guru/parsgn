@@ -24,5 +24,7 @@ public interface CheckerContext {
 
     public void markForCommit(String nodeValue) throws ParsingException;
 
+    public void markForCommit(int codePoint) throws ParsingException;
+
     public boolean hasCommitted();
 }
