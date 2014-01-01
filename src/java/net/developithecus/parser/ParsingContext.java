@@ -132,7 +132,6 @@ public class ParsingContext implements CheckerContext {
                     if (maxPos == null || maxPos.compareTo(holder.beginPosition) < 0) {
                         maxPos = holder.beginPosition;
                     }
-                    holder.turn++;
                     popChecker();
                     Holder parent = stack.peek();
                     if (parent == null) {
@@ -159,15 +158,24 @@ public class ParsingContext implements CheckerContext {
         Holder top = stack.peek();
         ExpressionChecker nextChecker = nextExpr.checker();
         nextChecker.init(this);
-        Holder holder = new Holder();
+        Holder holder = newHolder(nextExpr, top);
         holder.beginIndex = index;
         holder.beginPosition = entry.getPosition();
         holder.expression = nextExpr;
         holder.checker = nextChecker;
-        holder.silent = nextExpr.isSilent() || top != null && top.silent;
-        holder.compact = nextExpr.isCompact() || top != null && top.compact;
-        holder.valueRoot = holder.compact && (top == null || !top.compact);
         stack.push(holder);
+    }
+
+    private Holder newHolder(Expression nextExpression, Holder topHolder) {
+        if (nextExpression.isSilent() || topHolder != null && topHolder instanceof SilentHolder) {
+            return new SilentHolder();
+        } else if (nextExpression.isCompact() && !(topHolder instanceof CompactHolder)) {
+            return new ValueRootHolder();
+        } else if (nextExpression.isCompact() || topHolder instanceof CompactHolder || topHolder instanceof ValueRootHolder) {
+            return new CompactHolder();
+        } else {
+            return new DefaultHolder();
+        }
     }
 
     public boolean popChecker() {
@@ -186,90 +194,123 @@ public class ParsingContext implements CheckerContext {
                 '}';
     }
 
-    private class Holder {
+    private abstract class Holder {
         Expression expression;
         ExpressionChecker checker;
-        int turn;
         int beginIndex;
         Position beginPosition;
         boolean committed;
-        boolean silent;
-        boolean compact;
-        boolean valueRoot;
 
         private Holder() {
             builder.push();
         }
 
-        private int length() {
+        protected void committed() {
+            this.committed = true;
+        }
+
+        protected int length() {
             return nextIndex - beginIndex;
         }
 
+        abstract void commit(String value) throws InternalParsingException;
+
+        abstract void commit(int codePoint) throws InternalParsingException;
+
+        abstract void commitGroup(String nodeName);
+
+        abstract void addCommitted() throws InternalParsingException;
+
+    }
+
+    private class DefaultHolder extends Holder {
+        @Override
         void commit(String value) throws InternalParsingException {
-            committed = true;
-            if (silent) {
-                return;
-            }
-            if (valueRoot) {
-                throw new InternalParsingException("valueRoot is set");
-            }
-            if (compact) {
-                builder.appendValue(value);
-            } else {
-                builder.addNode(value, beginPosition, length());
-            }
-        }
-
-        public void commit(int codePoint) throws InternalParsingException {
-            committed = true;
-            if (silent) {
-                return;
-            }
-            if (valueRoot) {
-                throw new InternalParsingException("valueRoot is set");
-            }
-            if (compact) {
-                builder.appendValue(codePoint);
-            } else {
-                String nodeName = new StringBuilder().appendCodePoint(codePoint).toString();
-                builder.addNode(nodeName, beginPosition, length());
-            }
-        }
-
-        void commitGroup(String nodeName) {
-            committed = true;
-            if (silent) {
-                return;
-            }
-            if (valueRoot) {
-                builder.addNodeWithValue(nodeName, beginPosition, length());
-            } else if (!compact) {
-                builder.addNodeWithChildren(nodeName, beginPosition, length());
-            }
-        }
-
-        void addCommitted() throws InternalParsingException {
-            committed = true;
-            if (silent) {
-                builder.removeHead();
-                return;
-            }
-            if (compact) {
-                builder.mergeValue();
-            } else {
-                builder.mergeNodes();
-            }
+            committed();
+            builder.addNode(value, beginPosition, length());
         }
 
         @Override
-        public String toString() {
-            return "Holder{" +
-                    "checker=" + checker +
-                    ", beginIndex=" + beginIndex +
-                    ", committed=" + committed +
-                    ", silent=" + silent +
-                    '}';
+        void commit(int codePoint) throws InternalParsingException {
+            committed();
+            builder.addNode(StringUtils.fromCodePoint(codePoint), beginPosition, length());
         }
 
+        @Override
+        void commitGroup(String nodeName) {
+            committed();
+            builder.addNodeWithChildren(nodeName, beginPosition, length());
+        }
+
+        @Override
+        void addCommitted() throws InternalParsingException {
+            committed();
+            builder.mergeNodes();
+        }
+    }
+
+    private class SilentHolder extends Holder {
+
+        void commit(String value) throws InternalParsingException {
+            committed();
+        }
+
+        public void commit(int codePoint) throws InternalParsingException {
+            committed();
+        }
+
+        void commitGroup(String nodeName) {
+            committed();
+        }
+
+        void addCommitted() throws InternalParsingException {
+            committed();
+            builder.removeHead();
+        }
+    }
+
+    private class CompactHolder extends Holder {
+
+        void commit(String value) throws InternalParsingException {
+            committed();
+            builder.appendValue(value);
+        }
+
+        public void commit(int codePoint) throws InternalParsingException {
+            committed();
+            builder.appendValue(codePoint);
+        }
+
+        void commitGroup(String nodeName) {
+            committed();
+        }
+
+        void addCommitted() throws InternalParsingException {
+            committed();
+            builder.mergeValue();
+        }
+    }
+
+    private class ValueRootHolder extends Holder {
+
+        void commit(String value) throws InternalParsingException {
+            committed();
+            throw new InternalParsingException("valueRoot is set");
+        }
+
+        public void commit(int codePoint) throws InternalParsingException {
+            committed();
+            throw new InternalParsingException("valueRoot is set");
+        }
+
+        void commitGroup(String nodeName) {
+            committed();
+            builder.addNodeWithValue(nodeName, beginPosition, length());
+        }
+
+        void addCommitted() throws InternalParsingException {
+            committed();
+            builder.mergeValue();
+        }
     }
 }
