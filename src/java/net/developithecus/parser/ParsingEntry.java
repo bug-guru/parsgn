@@ -5,8 +5,8 @@ package net.developithecus.parser;
  * @version 13.30.12
  * @since 1.0
  */
-public class ParsingEntry {
-    private Position position;
+class ParsingEntry {
+    private final Position position;
     private final int codePoint;
 
     public ParsingEntry(Position position, int codePoint) {

@@ -11,7 +11,7 @@ import java.io.InputStream;
  * @since 1.0
  */
 public class DefaultParserBuilder extends ParserBuilder {
-    public static final Parser EBNF_PARSER = new EBNFParserBuilder().createParser();
+    private static final Parser EBNF_PARSER = new EBNFParserBuilder().createParser();
 
     public DefaultParserBuilder(InputStream input) throws IOException, ParsingException {
         NodeResultBuilder builder = new NodeResultBuilder();

@@ -6,7 +6,7 @@ package net.developithecus.parser;
  * @since 1.0
  */
 public abstract class Rule {
-    private String name;
+    private final String name;
 
     protected Rule(String name) {
         this.name = name;

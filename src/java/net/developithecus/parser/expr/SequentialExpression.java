@@ -38,7 +38,7 @@ public class SequentialExpression extends Expression {
     }
 
     private class Checker extends TransparentExpressionChecker {
-        private Iterator<Expression> expressions = getExpressions().iterator();
+        private final Iterator<Expression> expressions = getExpressions().iterator();
         private Expression curExpr;
         private boolean hasCommitted;
 

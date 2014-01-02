@@ -62,7 +62,4 @@ public final class StringUtils {
         }
     }
 
-    public static String fromCodePoint(int codePoint) {
-        return new StringBuilder(2).appendCodePoint(codePoint).toString();
-    }
 }

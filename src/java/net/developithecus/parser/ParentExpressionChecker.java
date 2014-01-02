@@ -16,7 +16,7 @@ public abstract class ParentExpressionChecker implements ExpressionChecker {
 
     public abstract ResultType checkChildRollback() throws ParsingException;
 
-    public abstract CheckResult check(ResultType childResult) throws ParsingException;
+    protected abstract CheckResult check(ResultType childResult) throws ParsingException;
 
     @Override
     public CheckResult check(int codePoint, ResultType prevResult) throws ParsingException {

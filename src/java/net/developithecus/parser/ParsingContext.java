@@ -18,9 +18,9 @@ public class ParsingContext<T> {
     private int index;
     private ParsingEntry entry;
     private int nextIndex;
-    private Deque<Holder> stack = new LinkedList<>();
+    private final Deque<Holder> stack = new LinkedList<>();
     private Position maxPos;
-    private ResultBuilder<T> builder;
+    private final ResultBuilder<T> builder;
 
     public ParsingContext(Expression root, ResultBuilder<T> builder) {
         this.builder = builder;
@@ -86,7 +86,6 @@ public class ParsingContext<T> {
         Holder holder = new Holder();
         holder.beginIndex = index;
         holder.beginPosition = entry.getPosition();
-        holder.expression = nextExpr;
         holder.checker = nextChecker;
         stack.push(holder);
     }
@@ -104,7 +103,6 @@ public class ParsingContext<T> {
     }
 
     public class Holder {
-        Expression expression;
         ExpressionChecker checker;
         int beginIndex;
         Position beginPosition;

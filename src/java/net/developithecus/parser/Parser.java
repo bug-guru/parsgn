@@ -17,7 +17,7 @@ import java.util.*;
  */
 
 public class Parser {
-    public static final int INITIAL_LOG_CAPACITY = 2048;
+    private static final int INITIAL_LOG_CAPACITY = 2048;
     private final ReferenceExpression root;
 
     public Parser(Rule root) {

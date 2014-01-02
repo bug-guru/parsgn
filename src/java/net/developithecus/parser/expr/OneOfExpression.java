@@ -38,7 +38,7 @@ public class OneOfExpression extends Expression {
     }
 
     private class Checker extends TransparentExpressionChecker {
-        private Iterator<Expression> exprIterator = expressions.iterator();
+        private final Iterator<Expression> exprIterator = expressions.iterator();
         private Expression curExpr;
 
         @Override

@@ -8,7 +8,7 @@ import net.developithecus.parser.Position;
  * @since 1.0
  */
 public class SyntaxErrorException extends ParsingException {
-    private Position position;
+    private final Position position;
 
     public SyntaxErrorException(Position position) {
         super(String.format("Line %d: syntax error at or near col %d", position.getRow(), position.getCol()));
