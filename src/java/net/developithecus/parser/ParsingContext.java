@@ -31,6 +31,9 @@ public class ParsingContext<T> {
     }
 
     private void reset(ParsingEntry entry) {
+        if (maxPos == null || maxPos.compareTo(entry.getPosition()) < 0) {
+            maxPos = entry.getPosition();
+        }
         this.index = nextIndex;
         this.entry = entry;
         this.nextIndex = index + 1;
@@ -54,25 +57,21 @@ public class ParsingContext<T> {
     }
 
     private void process() throws ParsingException {
-        boolean loop = true;
         ResultType prevResult = null;
-        while (loop && !builder.isFinished()) {
+        loop:
+        while (!builder.isFinished()) {
             Holder holder = stack.peek();
             ExpressionChecker currentChecker = holder.checker;
             CheckResult checkResult = currentChecker.check(entry.getCodePoint(), prevResult);
             prevResult = checkResult.doAction(this);
             switch (prevResult) {
                 case CONTINUE:
-                    loop = false;
-                    break;
+                    break loop;
                 case COMMIT:
-                    if (maxPos == null || maxPos.compareTo(holder.beginPosition) < 0) {
-                        maxPos = holder.beginPosition;
-                    }
                     break;
                 case ROLLBACK:
                 case ROLLBACK_OPTIONAL:
-                    if (stack.isEmpty()) {
+                    if (stack.size() == 1) {
                         throw new SyntaxErrorException(maxPos);
                     }
                     break;

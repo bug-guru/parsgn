@@ -63,6 +63,7 @@ public class Parser {
     }
 
     public <T> void parse(InputStream input, ResultBuilder<T> builder) throws ParsingException, IOException {
+        long t1 = System.nanoTime();
         try (
                 BufferedReader reader = new BufferedReader(new InputStreamReader(input))
         ) {
@@ -102,6 +103,9 @@ public class Parser {
                 }
             }
             throw new UnexpectedEOFException();
+        } finally {
+            long t2 = System.nanoTime();
+            System.out.println("parsed in: " + (t2 - t1) / 1000000.0 + " ms");
         }
     }
 
