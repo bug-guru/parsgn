@@ -2,7 +2,8 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.exceptions.InternalParsingException;
+import net.developithecus.parser.ResultType;
+import net.developithecus.parser.TransparentExpressionChecker;
 import net.developithecus.parser.exceptions.ParsingException;
 
 /**
@@ -59,7 +60,7 @@ public class UntilExpression extends Expression {
         return new Checker();
     }
 
-    private class Checker extends ExpressionChecker {
+    private class Checker extends TransparentExpressionChecker {
         private boolean checkingEndCondition = true;
         private int turnsPassed = 0;
 
@@ -72,50 +73,40 @@ public class UntilExpression extends Expression {
             }
         }
 
-
         @Override
-        public void check() throws ParsingException {
-            switch (ctx().getResult()) {
-                case COMMIT:
-                    if (checkingEndCondition) {
-                        ctx().markForCommit();
-                    } else {
-                        doContinue();
-                        checkingEndCondition = true;
-                    }
-                    break;
-                case ROLLBACK:
-                case ROLLBACK_OPTIONAL:
-                    if (checkingEndCondition) {
-                        checkingEndCondition = false;
-                        ctx().markForContinue();
-                    } else {
-                        doCommitOrRollback();
-                    }
-                    break;
-                default:
-                    throw new InternalParsingException("unknown result: " + ctx().getResult());
-            }
-        }
-
-        private void doCommitOrRollback() throws ParsingException {
-            if (minOccurrences == 0 && turnsPassed == 0) {
-                ctx().markForRollbackOptional();
-            } else if (turnsPassed >= minOccurrences) {
-                ctx().markForCommit();
+        public ResultType checkChildCommit() throws ParsingException {
+            if (checkingEndCondition) {
+                return ResultType.COMMIT;
             } else {
-                ctx().markForRollback();
+                checkingEndCondition = true;
+                turnsPassed++;
+                return ResultType.CONTINUE;
             }
         }
 
-        private void doContinue() throws ParsingException {
-            turnsPassed++;
-            ctx().markForContinue();
+        @Override
+        public ResultType checkChildOptionalRollback() throws ParsingException {
+            return checkChildRollback();
         }
 
         @Override
-        protected String getName() {
-            return "until";
+        public ResultType checkChildRollback() throws ParsingException {
+            if (checkingEndCondition) {
+                checkingEndCondition = false;
+                return ResultType.CONTINUE;
+            } else {
+                return doCommitOrRollback();
+            }
+        }
+
+        private ResultType doCommitOrRollback() throws ParsingException {
+            if (minOccurrences == 0 && turnsPassed == 0) {
+                return ResultType.ROLLBACK_OPTIONAL;
+            } else if (turnsPassed >= minOccurrences) {
+                return ResultType.COMMIT;
+            } else {
+                return ResultType.ROLLBACK;
+            }
         }
 
     }

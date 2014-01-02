@@ -10,8 +10,6 @@ import net.developithecus.parser.expr.CharType;
 public class EBNFParserBuilder extends ParserBuilder {
     public static final String CONFIG_FILE = "ConfigFile";
     public static final String RULE = "Rule";
-    public static final String NORMAL_NODE = "NormalNode";
-    public static final String COMPACT_NODE = "Compact";
     public static final String I = "I";
     public static final String WHITE_SPACE = "WhiteSpace";
     public static final String COMMENT = "Comment";
@@ -20,7 +18,6 @@ public class EBNFParserBuilder extends ParserBuilder {
     public static final String NAME = "Name";
     public static final String EXPRESSION = "Expression";
     public static final String EXPRESSION_LIST = "ExpressionList";
-    public static final String SILENT = "Silent";
     public static final String QUANTIFIER = "Quantifier";
     public static final String ZERO_OR_ONE = "ZeroOrOne";
     public static final String ONE_OR_MORE = "OneOrMore";
@@ -45,61 +42,48 @@ public class EBNFParserBuilder extends ParserBuilder {
     }
 
     private Rule generateRules() {
-        Expression ignorable = zeroOrMore(ref(I)).silent();
+        Expression ignorable = zeroOrMore(ref(I));
         Rule result = rule(CONFIG_FILE,
                 oneOrMore(
                         ignorable,
                         ref(RULE)
                 ),
                 ignorable,
-                charType(CharType.EOF).silent()
+                charType(CharType.EOF)
         );
         rule(RULE,
-                zeroOrMore(
-                        ref(SILENT),
-                        ignorable
-                ),
                 ref(NAME),
                 ignorable,
-                oneOf(
-                        ref(NORMAL_NODE),
-                        ref(COMPACT_NODE)
-                ),
+                str(":"),
                 ref(EXPRESSION_LIST),
-                str(";").silent()
-        );
-        rule(NORMAL_NODE,
-                str(":").silent()
-        );
-        rule(COMPACT_NODE,
-                str("=").silent()
+                str(";")
         );
         rule(I,
                 oneOf(
-                        ref(WHITE_SPACE).silent(),
+                        ref(WHITE_SPACE),
                         ref(COMMENT)
                 )
         );
         rule(WHITE_SPACE,
-                oneOrMore(charType(CharType.WHITESPACE)).silent()
+                oneOrMore(charType(CharType.WHITESPACE))
         );
         rule(COMMENT,
                 oneOf(
                         ref(SINGLE_LINE_COMMENT),
                         ref(MULTI_LINE_COMMENT)
                 )
-        ).makeValue();
+        );
         rule(SINGLE_LINE_COMMENT,
-                str("//").silent(),
+                str("//"),
                 repeatUntil(
-                        charType(CharType.LINE_SEPARATOR).silent(),
+                        charType(CharType.LINE_SEPARATOR),
                         charType(CharType.VALID)
                 )
         );
         rule(MULTI_LINE_COMMENT,
-                str("/*").silent(),
+                str("/*"),
                 repeatUntil(
-                        str("*/").silent(),
+                        str("*/"),
                         charType(CharType.VALID)
                 )
         );
@@ -110,12 +94,8 @@ public class EBNFParserBuilder extends ParserBuilder {
                                 charType(CharType.UNICODE_IDENTIFIER_PART)
                         )
                 )
-        ).makeValue();
+        );
         rule(EXPRESSION,
-                zeroOrOne(
-                        ref(SILENT),
-                        ignorable
-                ),
                 oneOf(
                         ref(ONE_OF),
                         ref(REFERENCE),
@@ -138,9 +118,6 @@ public class EBNFParserBuilder extends ParserBuilder {
                         ref(EXPRESSION)
                 )
         );
-        rule(SILENT,
-                str("^").silent()
-        );
         rule(QUANTIFIER,
                 oneOf(
                         ref(ZERO_OR_ONE),
@@ -152,47 +129,47 @@ public class EBNFParserBuilder extends ParserBuilder {
                 )
         );
         rule(ZERO_OR_ONE,
-                str("?").silent()
+                str("?")
         );
         rule(ONE_OR_MORE,
-                str("+").silent()
+                str("+")
         );
         rule(ZERO_OR_MORE,
-                str("*").silent()
+                str("*")
         );
         rule(UNTIL,
-                str("{").silent(),
+                str("{"),
                 ignorable,
                 ref(EXPRESSION),
                 ignorable,
-                str("}").silent()
+                str("}")
         );
         rule(EXACTLY_N_TIMES,
-                str("{").silent(),
+                str("{"),
                 ignorable,
                 ref(NUMBER),
                 ignorable,
-                str("}").silent()
-        ).makeValue();
+                str("}")
+        );
         rule(AT_LEAST_MIN_TIMES,
-                str("{").silent(),
+                str("{"),
                 ignorable,
                 ref(NUMBER),
                 ignorable,
-                str(",").silent(),
+                str(","),
                 ignorable,
-                str("}").silent()
-        ).makeValue();
+                str("}")
+        );
         rule(AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES,
-                str("{").silent(),
+                str("{"),
                 ignorable,
                 ref(MIN),
                 ignorable,
-                str(",").silent(),
+                str(","),
                 ignorable,
                 ref(MAX),
                 ignorable,
-                str("}").silent()
+                str("}")
         );
         rule(NUMBER,
                 oneOrMore(
@@ -201,10 +178,10 @@ public class EBNFParserBuilder extends ParserBuilder {
         );
         rule(MIN,
                 ref(NUMBER)
-        ).makeValue();
+        );
         rule(MAX,
                 ref(NUMBER)
-        ).makeValue();
+        );
         rule(ONE_OF,
                 oneOf(
                         ref(REFERENCE),
@@ -214,7 +191,7 @@ public class EBNFParserBuilder extends ParserBuilder {
                 ),
                 oneOrMore(
                         ignorable,
-                        str("|").silent(),
+                        str("|"),
                         ignorable,
                         oneOf(
                                 ref(REFERENCE),
@@ -226,26 +203,26 @@ public class EBNFParserBuilder extends ParserBuilder {
         );
         rule(REFERENCE,
                 ref(NAME)
-        ).makeValue();
+        );
         rule(CHAR_TYPE,
-                str("#").silent(),
+                str("#"),
                 ref(NAME)
-        ).makeValue();
+        );
         rule(STRING,
-                str("\"").silent(),
+                str("\""),
                 repeatUntil(
-                        str("\"").silent(),
+                        str("\""),
                         oneOf(
                                 str("\\\""),
                                 str("\\\\"),
                                 charType(CharType.VALID)
                         )
                 )
-        ).makeValue();
+        );
         rule(SEQUENCE,
-                str("(").silent(),
+                str("("),
                 ref(EXPRESSION_LIST),
-                str(")").silent()
+                str(")")
         );
         return result;
     }

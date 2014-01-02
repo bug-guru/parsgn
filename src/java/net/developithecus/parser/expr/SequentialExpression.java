@@ -2,7 +2,8 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.exceptions.InternalParsingException;
+import net.developithecus.parser.ResultType;
+import net.developithecus.parser.TransparentExpressionChecker;
 import net.developithecus.parser.exceptions.ParsingException;
 
 import java.util.Arrays;
@@ -36,9 +37,10 @@ public class SequentialExpression extends Expression {
         return new Checker();
     }
 
-    private class Checker extends ExpressionChecker {
+    private class Checker extends TransparentExpressionChecker {
         private Iterator<Expression> expressions = getExpressions().iterator();
         private Expression curExpr;
+        private boolean hasCommitted;
 
         @Override
         public Expression next() {
@@ -47,36 +49,29 @@ public class SequentialExpression extends Expression {
         }
 
         @Override
-        public void check() throws ParsingException {
-            switch (ctx().getResult()) {
-                case COMMIT:
-                case ROLLBACK_OPTIONAL:
-                    doCommitOrContinue();
-                    break;
-                case ROLLBACK:
-                    ctx().markForRollback();
-                    break;
-                case CONTINUE:
-                    ctx().markForContinue();
-                    break;
-                default:
-                    throw new InternalParsingException("unknown result: " + ctx().getResult());
-            }
-        }
-
-        private void doCommitOrContinue() throws ParsingException {
-            if (expressions.hasNext()) {
-                ctx().markForContinue();
-            } else if (!ctx().hasCommitted()) {
-                throw new ParsingException("sequence without result");
-            } else {
-                ctx().markForCommit();
-            }
+        public ResultType checkChildCommit() throws ParsingException {
+            hasCommitted = true;
+            return doCommitOrContinue();
         }
 
         @Override
-        protected String getName() {
-            return "sequence";
+        public ResultType checkChildOptionalRollback() throws ParsingException {
+            return doCommitOrContinue();
+        }
+
+        @Override
+        public ResultType checkChildRollback() throws ParsingException {
+            return ResultType.ROLLBACK;
+        }
+
+        private ResultType doCommitOrContinue() throws ParsingException {
+            if (expressions.hasNext()) {
+                return ResultType.CONTINUE;
+            } else if (!hasCommitted) {
+                throw new ParsingException("sequence without result");
+            } else {
+                return ResultType.COMMIT;
+            }
         }
     }
 }

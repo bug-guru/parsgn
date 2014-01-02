@@ -7,25 +7,8 @@ import net.developithecus.parser.exceptions.ParsingException;
  * @version 13.25.12
  * @since 1.0
  */
-public abstract class ExpressionChecker {
-    private CheckerContext ctx;
+public interface ExpressionChecker {
+    public Expression next();
 
-    void init(CheckerContext ctx) {
-        this.ctx = ctx;
-    }
-
-    public abstract Expression next();
-
-    public abstract void check() throws ParsingException;
-
-    protected abstract String getName();
-
-    protected final CheckerContext ctx() {
-        return ctx;
-    }
-
-    @Override
-    public String toString() {
-        return getName();
-    }
+    public CheckResult check(int codePoint, ResultType prevResult) throws ParsingException;
 }

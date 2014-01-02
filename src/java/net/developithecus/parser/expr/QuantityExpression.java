@@ -2,7 +2,8 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.exceptions.InternalParsingException;
+import net.developithecus.parser.ResultType;
+import net.developithecus.parser.TransparentExpressionChecker;
 import net.developithecus.parser.exceptions.ParsingException;
 
 /**
@@ -59,7 +60,7 @@ public class QuantityExpression extends Expression {
         return new Checker();
     }
 
-    private class Checker extends ExpressionChecker {
+    private class Checker extends TransparentExpressionChecker {
         private int turnsPassed = 0;
 
         @Override
@@ -67,45 +68,38 @@ public class QuantityExpression extends Expression {
             return expression;
         }
 
+        @Override
+        public ResultType checkChildCommit() throws ParsingException {
+            return doCommitOrContinue();
+        }
 
         @Override
-        public void check() throws ParsingException {
-            switch (ctx().getResult()) {
-                case COMMIT:
-                    doCommitOrContinue();
-                    break;
-                case ROLLBACK:
-                case ROLLBACK_OPTIONAL:
-                    doCommitOrRollback();
-                    break;
-                default:
-                    throw new InternalParsingException("unknown result: " + ctx().getResult());
-            }
+        public ResultType checkChildOptionalRollback() throws ParsingException {
+            return doCommitOrRollback();
         }
 
-        private void doCommitOrRollback() throws ParsingException {
+        @Override
+        public ResultType checkChildRollback() throws ParsingException {
+            return doCommitOrRollback();
+        }
+
+        private ResultType doCommitOrRollback() throws ParsingException {
             if (minOccurrences == 0 && turnsPassed == 0) {
-                ctx().markForRollbackOptional();
+                return ResultType.ROLLBACK_OPTIONAL;
             } else if (turnsPassed >= minOccurrences) {
-                ctx().markForCommit();
+                return ResultType.COMMIT;
             } else {
-                ctx().markForRollback();
+                return ResultType.ROLLBACK;
             }
         }
 
-        private void doCommitOrContinue() throws ParsingException {
+        private ResultType doCommitOrContinue() throws ParsingException {
             turnsPassed++;
             if (maxOccurrences == turnsPassed) {
-                ctx().markForCommit();
+                return ResultType.COMMIT;
             } else {
-                ctx().markForContinue();
+                return ResultType.CONTINUE;
             }
         }
-
-        @Override
-        protected String getName() {
-            return "qty";
-        }
-
     }
 }

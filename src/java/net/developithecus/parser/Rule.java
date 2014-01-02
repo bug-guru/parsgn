@@ -7,7 +7,6 @@ package net.developithecus.parser;
  */
 public abstract class Rule {
     private String name;
-    private boolean compact;
 
     protected Rule(String name) {
         this.name = name;
@@ -19,16 +18,4 @@ public abstract class Rule {
 
     public abstract Expression getExpression();
 
-    public boolean isCompact() {
-        return compact;
-    }
-
-    public void setCompact(boolean compact) {
-        this.compact = compact;
-    }
-
-    public Rule makeValue() {
-        compact = true;
-        return this;
-    }
 }

@@ -21,9 +21,6 @@ public class RuleRef extends Rule {
     private void init() {
         if (rule == null) {
             rule = definitions.get(getName());
-            if (rule != null) {
-                setCompact(rule.isCompact());
-            }
         }
         if (expression == null) {
             expression = rule == null ? null : rule.getExpression();
@@ -33,11 +30,5 @@ public class RuleRef extends Rule {
     public Expression getExpression() {
         init();
         return expression;
-    }
-
-    @Override
-    public boolean isCompact() {
-        init();
-        return super.isCompact();
     }
 }

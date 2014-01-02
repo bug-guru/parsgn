@@ -2,7 +2,8 @@ package net.developithecus.parser.expr;
 
 import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.exceptions.InternalParsingException;
+import net.developithecus.parser.ResultType;
+import net.developithecus.parser.TransparentExpressionChecker;
 import net.developithecus.parser.exceptions.ParsingException;
 
 import java.util.Arrays;
@@ -36,7 +37,7 @@ public class OneOfExpression extends Expression {
         return new Checker();
     }
 
-    private class Checker extends ExpressionChecker {
+    private class Checker extends TransparentExpressionChecker {
         private Iterator<Expression> exprIterator = expressions.iterator();
         private Expression curExpr;
 
@@ -47,31 +48,26 @@ public class OneOfExpression extends Expression {
         }
 
         @Override
-        public void check() throws ParsingException {
-            switch (ctx().getResult()) {
-                case COMMIT:
-                    ctx().markForCommit();
-                    break;
-                case ROLLBACK:
-                case ROLLBACK_OPTIONAL:
-                    doRollbackOrContinue();
-                    break;
-                default:
-                    throw new InternalParsingException("unknown result: " + ctx().getResult());
-            }
-        }
-
-        private void doRollbackOrContinue() throws ParsingException {
-            if (exprIterator.hasNext()) {
-                ctx().markForContinue();
-            } else {
-                ctx().markForRollback();
-            }
+        public ResultType checkChildCommit() throws ParsingException {
+            return ResultType.COMMIT;
         }
 
         @Override
-        protected String getName() {
-            return "oneOf";
+        public ResultType checkChildOptionalRollback() throws ParsingException {
+            return doRollbackOrContinue();
+        }
+
+        @Override
+        public ResultType checkChildRollback() throws ParsingException {
+            return doRollbackOrContinue();
+        }
+
+        private ResultType doRollbackOrContinue() throws ParsingException {
+            if (exprIterator.hasNext()) {
+                return ResultType.CONTINUE;
+            } else {
+                return ResultType.ROLLBACK;
+            }
         }
     }
 }

@@ -12,18 +12,8 @@ public class NodeResultBuilder extends ResultBuilder<Node> {
     private Node root;
 
     @Override
-    protected Node createNode(String name, Position beginPosition, int length) {
-        return new Node(name, beginPosition, length);
-    }
-
-    @Override
-    protected Node createNode(String name, Position beginPosition, int length, String value) {
-        return new Node(name, beginPosition, length, value);
-    }
-
-    @Override
-    protected Node createNode(String name, Position beginPosition, int length, List<Node> children) {
-        return new Node(name, beginPosition, length, children);
+    protected Node createNode(String name, Position beginPosition, int length, String value, List<Node> children) {
+        return new Node(name, beginPosition, length, value, children);
     }
 
     @Override

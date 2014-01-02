@@ -15,28 +15,12 @@ public class Node {
     private final List<Node> children;
     private final String value;
 
-    public Node(String name, Position beginPosition, int length) {
-        this.name = name;
-        this.beginPosition = beginPosition;
-        this.length = length;
-        this.value = null;
-        this.children = null;
-    }
-
-    public Node(String name, Position beginPosition, int length, String value) {
+    public Node(String name, Position beginPosition, int length, String value, List<Node> children) {
         this.name = name;
         this.beginPosition = beginPosition;
         this.length = length;
         this.value = value;
-        this.children = null;
-    }
-
-    public Node(String name, Position beginPosition, int length, List<Node> children) {
-        this.name = name;
-        this.beginPosition = beginPosition;
-        this.length = length;
-        this.value = null;
-        this.children = Collections.unmodifiableList(children);
+        this.children = children == null ? null : Collections.unmodifiableList(children);
     }
 
     public String getName() {

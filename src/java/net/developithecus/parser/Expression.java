@@ -8,26 +8,5 @@ package net.developithecus.parser;
  */
 
 public abstract class Expression {
-    private boolean silent;
-
-
     public abstract ExpressionChecker checker();
-
-
-    public boolean isSilent() {
-        return silent;
-    }
-
-    public void setSilent(boolean silent) {
-        this.silent = silent;
-    }
-
-    public Expression silent() {
-        silent = true;
-        return this;
-    }
-
-    public boolean isCompact() {
-        return false;
-    }
 }

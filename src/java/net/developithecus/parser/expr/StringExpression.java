@@ -1,8 +1,6 @@
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.Expression;
-import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.StringUtils;
+import net.developithecus.parser.*;
 import net.developithecus.parser.exceptions.ParsingException;
 
 /**
@@ -31,32 +29,26 @@ public class StringExpression extends Expression {
         return new Checker();
     }
 
-    private class Checker extends ExpressionChecker {
+    private class Checker extends StringExpressionChecker {
         private int offset;
 
         @Override
-        public Expression next() {
+        protected String getResult() {
             return null;
         }
 
         @Override
-        public void check() throws ParsingException {
-            int codePoint = ctx().getCodePoint();
+        public ResultType check(int codePoint) throws ParsingException {
             if (codePoints[offset] != codePoint) {
-                ctx().markForRollback();
+                return ResultType.ROLLBACK;
             } else {
                 offset++;
                 if (offset == len) {
-                    ctx().markForCommit(value);
+                    return ResultType.COMMIT;
                 } else {
-                    ctx().markForContinue();
+                    return ResultType.CONTINUE;
                 }
             }
-        }
-
-        @Override
-        protected String getName() {
-            return "str[" + value + "]";
         }
     }
 }

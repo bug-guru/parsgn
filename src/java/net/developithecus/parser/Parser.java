@@ -62,12 +62,12 @@ public class Parser {
         }
     }
 
-    public void parse(InputStream input, ResultBuilder<?> builder) throws ParsingException, IOException {
+    public <T> void parse(InputStream input, ResultBuilder<T> builder) throws ParsingException, IOException {
         try (
                 BufferedReader reader = new BufferedReader(new InputStreamReader(input))
         ) {
             List<ParsingEntry> log = new ArrayList<>(INITIAL_LOG_CAPACITY);
-            ParsingContext ctx = new ParsingContext(root, builder);
+            ParsingContext<T> ctx = new ParsingContext<>(root, builder);
             int row = 0;
             while (true) {
                 row++;

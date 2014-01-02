@@ -1,9 +1,6 @@
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.Expression;
-import net.developithecus.parser.ExpressionChecker;
-import net.developithecus.parser.Rule;
-import net.developithecus.parser.exceptions.InternalParsingException;
+import net.developithecus.parser.*;
 import net.developithecus.parser.exceptions.ParsingException;
 
 /**
@@ -35,12 +32,7 @@ public class ReferenceExpression extends Expression {
         return new Checker();
     }
 
-    @Override
-    public boolean isCompact() {
-        return reference.isCompact();
-    }
-
-    private class Checker extends ExpressionChecker {
+    private class Checker extends GroupingExpressionChecker {
 
         @Override
         public Expression next() {
@@ -48,24 +40,23 @@ public class ReferenceExpression extends Expression {
         }
 
         @Override
-        public void check() throws ParsingException {
-            switch (ctx().getResult()) {
-                case COMMIT:
-                    ctx().markForCommitGroup(reference.getName());
-                    break;
-                case ROLLBACK:
-                case ROLLBACK_OPTIONAL:
-                    ctx().markForRollback();
-                    break;
-                default:
-                    throw new InternalParsingException("unknown result: " + ctx().getResult());
-            }
+        public String getGroupName() {
+            return reference.getName();
         }
 
         @Override
-        protected String getName() {
-            return "ref[" + getReference().getName() + "]";
+        public ResultType checkChildCommit() throws ParsingException {
+            return ResultType.COMMIT;
         }
 
+        @Override
+        public ResultType checkChildOptionalRollback() throws ParsingException {
+            return ResultType.ROLLBACK;
+        }
+
+        @Override
+        public ResultType checkChildRollback() throws ParsingException {
+            return ResultType.ROLLBACK;
+        }
     }
 }

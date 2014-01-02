@@ -1,7 +1,9 @@
 package net.developithecus.parser.expr;
 
+import net.developithecus.parser.CodePointExpressionChecker;
 import net.developithecus.parser.Expression;
 import net.developithecus.parser.ExpressionChecker;
+import net.developithecus.parser.ResultType;
 import net.developithecus.parser.exceptions.ParsingException;
 
 /**
@@ -25,31 +27,24 @@ public class CharacterExpression extends Expression {
         return new Checker();
     }
 
-    private class Checker extends ExpressionChecker {
+    private class Checker extends CodePointExpressionChecker {
+        private int result;
 
         @Override
-        public Expression next() {
-            return null;
+        protected int getResult() {
+            return result;
         }
 
         @Override
-        public void check() throws ParsingException {
-            int codePoint = ctx().getCodePoint();
+        public ResultType check(int codePoint) throws ParsingException {
             if (charType.apply(codePoint)) {
-                if (Character.isValidCodePoint(codePoint)) {
-                    ctx().markForCommit(codePoint);
-                } else {
-                    ctx().markForCommit("");
-                }
+                result = codePoint;
+                return ResultType.COMMIT;
             } else {
-                ctx().markForRollback();
+                return ResultType.ROLLBACK;
             }
         }
 
-        @Override
-        protected String getName() {
-            return "char[" + charType + "]";
-        }
     }
 
 

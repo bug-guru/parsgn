@@ -1,40 +1,32 @@
 ConfigFile:
-    (^I* Rule)+ ^I* ^#EOF;
+    (I* Rule)+ I* #EOF;
 
 Rule:
-    (Prefix ^I*)*
     Name
-    ^I*
-    (Quantifier ^I*)?
-    NormalNode | CompactNode
+    I*
+    ":"
     ExpressionList
-    ^";"
+    ";"
     ;
 
-NormalNode: ^":";
-CompactNode: ^"=";
+I: WhiteSpace | Comment;
 
-I: ^WhiteSpace | Comment;
+WhiteSpace: (#WHITESPACE)+;
 
-WhiteSpace: ^(#WHITESPACE)+;
+Comment: SingleLineComment | MultiLineComment;
 
-Comment = SingleLineComment | MultiLineComment;
+SingleLineComment: "//" #ANY{#EOL};
 
-SingleLineComment: ^"//" #ANY{^#EOL};
+MultiLineComment: "/*" #ANY{"*/"};
 
-MultiLineComment: ^"/*" #ANY{^"*/"};
-
-Name = #UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART*;
+Name: #UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART*;
 
 Expression:
-    (Silent ^I*)?
     OneOf | Reference | CharType | String | Sequence
-    ^I*
-    (Quantifier | Until ^I*)?;
+    I*
+    (Quantifier | Until I*)?;
 
-ExpressionList: (^I* Expression)+;
-
-Silent: ^"^";
+ExpressionList: (I* Expression)+;
 
 Quantifier:
       ZeroOrOne
@@ -44,32 +36,32 @@ Quantifier:
     | AtLeastMinTimes
     | AtLeastMinButNotMoreThanMaxTimes;
 
-ZeroOrOne: ^"?";
+ZeroOrOne: "?";
 
-OneOrMore: ^"+";
+OneOrMore: "+";
 
-ZeroOrMore: ^"*";
+ZeroOrMore: "*";
 
-Until: ^"{" ^I* Expression ^I* ^"}";
+Until: "{" I* Expression I* "}";
 
-ExactlyNTimes = ^"{" ^I* Number ^I* ^"}";
+ExactlyNTimes: "{" I* Number I* "}";
 
-AtLeastMinTimes = ^"{" ^I* Number ^I* ^"," ^I* ^"}";
+AtLeastMinTimes: "{" I* Number I* "," I* "}";
 
-AtLeastMinButNotMoreThanMaxTimes: ^"{" ^I* Min ^I* ^"," ^I* Max ^I* ^"}";
+AtLeastMinButNotMoreThanMaxTimes: "{" I* Min I* "," I* Max I* "}";
 
 Number: #DIGIT+;
 
-Min = Number;
+Min: Number;
 
-Max = Number;
+Max: Number;
 
-OneOf: Reference | CharType | String | Sequence (^I* ^"|" ^I* Reference | CharType | String | Sequence)+;
+OneOf: Reference | CharType | String | Sequence (I* "|" I* Reference | CharType | String | Sequence)+;
 
 Reference: Name;
 
-CharType = ^"#" Name; //TODO: list all possible char types
+CharType: "#" Name; //TODO: list all possible char types
 
-String = ^"\"" ("\\\"" | "\\\\" | #ANY){^"\""};
+String: "\"" ("\\\"" | "\\\\" | #ANY){"\""};
 
-Sequence: ^"(" ExpressionList ^")";
+Sequence: "(" ExpressionList ")";

@@ -4,27 +4,29 @@ import net.developithecus.parser.exceptions.InternalParsingException;
 import net.developithecus.parser.exceptions.ParsingException;
 import net.developithecus.parser.exceptions.SyntaxErrorException;
 
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
  * @version 13.25.12
  * @since 1.0
  */
-public class ParsingContext implements CheckerContext {
+public class ParsingContext<T> {
     private int index;
     private ParsingEntry entry;
     private int nextIndex;
-    private ResultType result;
     private Deque<Holder> stack = new LinkedList<>();
     private Position maxPos;
-    private ResultBuilder<?> builder;
+    private ResultBuilder<T> builder;
 
-    public ParsingContext(Expression root, ResultBuilder<?> builder) {
+    public ParsingContext(Expression root, ResultBuilder<T> builder) {
         this.builder = builder;
         maxPos = new Position(1, 1);
         entry = new ParsingEntry(maxPos, 0);
+        stack.push(new ResultHolder());
         pushExpression(root);
     }
 
@@ -32,77 +34,10 @@ public class ParsingContext implements CheckerContext {
         this.index = nextIndex;
         this.entry = entry;
         this.nextIndex = index + 1;
-        this.result = ResultType.CONTINUE;
-    }
-
-    public int getCodePoint() {
-        return entry.getCodePoint();
     }
 
     public int getNextIndex() {
         return nextIndex;
-    }
-
-    public ResultType getResult() {
-        return result;
-    }
-
-    @Override
-    public void markForCommit(String nodeValue) throws ParsingException {
-        Holder holder = stack.peek();
-        holder.commit(nodeValue);
-        result = ResultType.COMMIT;
-    }
-
-    @Override
-    public void markForCommit(int codePoint) throws ParsingException {
-        Holder holder = stack.peek();
-        holder.commit(codePoint);
-        result = ResultType.COMMIT;
-    }
-
-    @Override
-    public void markForCommitGroup(String groupNodeValue) throws ParsingException {
-        Holder holder = stack.peek();
-        holder.commitGroup(groupNodeValue);
-        result = ResultType.COMMIT;
-    }
-
-    @Override
-    public void markForCommit() throws ParsingException {
-        result = ResultType.COMMIT;
-    }
-
-    @Override
-    public void markForRollback() throws ParsingException {
-        markForRollback(false);
-    }
-
-    @Override
-    public void markForRollbackOptional() throws ParsingException {
-        markForRollback(true);
-    }
-
-    private void markForRollback(boolean optional) {
-        this.result = optional ? ResultType.ROLLBACK_OPTIONAL : ResultType.ROLLBACK;
-        Holder holder = stack.peek();
-        this.nextIndex = holder.beginIndex;
-        holder.committed = false;
-    }
-
-    @Override
-    public void markForContinue() throws ParsingException {
-        this.result = ResultType.CONTINUE;
-    }
-
-    public ExpressionChecker peekChecker() {
-        Holder holder = stack.peek();
-        return holder == null ? null : holder.checker;
-    }
-
-    public boolean hasCommitted() {
-        Holder holder = stack.peek();
-        return holder.committed;
     }
 
     public void next(ParsingEntry entry) throws ParsingException {
@@ -113,18 +48,20 @@ public class ParsingContext implements CheckerContext {
 
     private void completePath() {
         Expression nextExpr;
-        while ((nextExpr = peekChecker().next()) != null) {
+        while ((nextExpr = peek().checker.next()) != null) {
             pushExpression(nextExpr);
         }
     }
 
     private void process() throws ParsingException {
         boolean loop = true;
-        while (loop) {
+        ResultType prevResult = null;
+        while (loop && !builder.isFinished()) {
             Holder holder = stack.peek();
             ExpressionChecker currentChecker = holder.checker;
-            currentChecker.check();
-            switch (getResult()) {
+            CheckResult checkResult = currentChecker.check(entry.getCodePoint(), prevResult);
+            prevResult = checkResult.doAction(this);
+            switch (prevResult) {
                 case CONTINUE:
                     loop = false;
                     break;
@@ -132,33 +69,22 @@ public class ParsingContext implements CheckerContext {
                     if (maxPos == null || maxPos.compareTo(holder.beginPosition) < 0) {
                         maxPos = holder.beginPosition;
                     }
-                    popChecker();
-                    Holder parent = stack.peek();
-                    if (parent == null) {
-                        builder.mergeNodes();
-                        return;
-                    } else {
-                        parent.addCommitted();
-                    }
                     break;
                 case ROLLBACK:
                 case ROLLBACK_OPTIONAL:
-                    if (!popChecker()) {
+                    if (stack.isEmpty()) {
                         throw new SyntaxErrorException(maxPos);
                     }
-                    builder.removeHead();
                     break;
                 default:
-                    throw new ParsingException("unknown result: " + getResult());
+                    throw new ParsingException("unknown result: " + prevResult);
             }
         }
     }
 
     private void pushExpression(Expression nextExpr) {
-        Holder top = stack.peek();
         ExpressionChecker nextChecker = nextExpr.checker();
-        nextChecker.init(this);
-        Holder holder = newHolder(nextExpr, top);
+        Holder holder = new Holder();
         holder.beginIndex = index;
         holder.beginPosition = entry.getPosition();
         holder.expression = nextExpr;
@@ -166,151 +92,107 @@ public class ParsingContext implements CheckerContext {
         stack.push(holder);
     }
 
-    private Holder newHolder(Expression nextExpression, Holder topHolder) {
-        if (nextExpression.isSilent() || topHolder != null && topHolder instanceof SilentHolder) {
-            return new SilentHolder();
-        } else if (nextExpression.isCompact() && !(topHolder instanceof CompactHolder)) {
-            return new ValueRootHolder();
-        } else if (nextExpression.isCompact() || topHolder instanceof CompactHolder || topHolder instanceof ValueRootHolder) {
-            return new CompactHolder();
-        } else {
-            return new DefaultHolder();
-        }
+    public Holder pop() {
+        return stack.pop();
     }
 
-    public boolean popChecker() {
-        stack.pop();
-        return !stack.isEmpty();
+    public Holder peek() {
+        return stack.peek();
     }
 
-    @Override
-    public String toString() {
-        return "ParsingContext{" +
-                "result=" + result +
-                ", nextIndex=" + nextIndex +
-                ", entry=" + entry +
-                ", index=" + index +
-                ", stack=" + stack +
-                '}';
+    public void setNextIndex(int nextIndex) {
+        this.nextIndex = nextIndex;
     }
 
-    private abstract class Holder {
+    public class Holder {
         Expression expression;
         ExpressionChecker checker;
         int beginIndex;
         Position beginPosition;
-        boolean committed;
+        List<T> committedNodes;
+        StringBuilder committedValue;
 
-        private Holder() {
-            builder.push();
+        protected void initValue() throws InternalParsingException {
+            if (committedValue == null) {
+                committedValue = new StringBuilder();
+            }
         }
 
-        protected void committed() {
-            this.committed = true;
+        protected void initNodes() throws InternalParsingException {
+            if (committedNodes == null) {
+                committedNodes = new ArrayList<>();
+            }
+        }
+
+        protected void addNode(T node) throws InternalParsingException {
+            initNodes();
+            committedNodes.add(node);
+        }
+
+        protected void addNodes(List<T> nodes) {
+            if (nodes == null || nodes.isEmpty()) {
+                return;
+            }
+            if (committedNodes == null || committedNodes.isEmpty()) {
+                committedNodes = nodes;
+            } else {
+                committedNodes.addAll(nodes);
+            }
         }
 
         protected int length() {
             return nextIndex - beginIndex;
         }
 
-        abstract void commit(String value) throws InternalParsingException;
-
-        abstract void commit(int codePoint) throws InternalParsingException;
-
-        abstract void commitGroup(String nodeName);
-
-        abstract void addCommitted() throws InternalParsingException;
-
-    }
-
-    private class DefaultHolder extends Holder {
-        @Override
-        void commit(String value) throws InternalParsingException {
-            committed();
-            builder.addNode(value, beginPosition, length());
+        public void commitValue(String value) throws InternalParsingException {
+            if (value == null || value.isEmpty()) {
+                return;
+            }
+            initValue();
+            committedValue.append(value);
         }
 
-        @Override
-        void commit(int codePoint) throws InternalParsingException {
-            committed();
-            builder.addNode(StringUtils.fromCodePoint(codePoint), beginPosition, length());
+        public void commitValue(int codePoint) throws InternalParsingException {
+            if (Character.isValidCodePoint(codePoint)) {
+                initValue();
+                committedValue.appendCodePoint(codePoint);
+            }
         }
 
-        @Override
-        void commitGroup(String nodeName) {
-            committed();
-            builder.addNodeWithChildren(nodeName, beginPosition, length());
+        public void commitValue(StringBuilder builder) throws InternalParsingException {
+            if (builder == null || builder.length() == 0) {
+                return;
+            }
+            initValue();
+            committedValue.append(builder);
         }
 
-        @Override
-        void addCommitted() throws InternalParsingException {
-            committed();
-            builder.mergeNodes();
-        }
-    }
-
-    private class SilentHolder extends Holder {
-
-        void commit(String value) throws InternalParsingException {
-            committed();
+        public void commitNode(String nodeName, Holder child) throws ParsingException {
+            T node = wrapNode(nodeName, child);
+            addNode(node);
         }
 
-        public void commit(int codePoint) throws InternalParsingException {
-            committed();
+        protected T wrapNode(String nodeName, Holder child) {
+            boolean emptyNodes = child == null || child.committedNodes == null || child.committedNodes.isEmpty();
+            boolean emptyValue = child == null || child.committedValue == null || child.committedValue.length() == 0;
+            String value = emptyValue ? null : child.committedValue.toString();
+            List<T> nodes = emptyNodes ? null : child.committedNodes;
+            return builder.createNode(nodeName, beginPosition, length(), value, nodes);
         }
 
-        void commitGroup(String nodeName) {
-            committed();
-        }
-
-        void addCommitted() throws InternalParsingException {
-            committed();
-            builder.removeHead();
+        public void merge(Holder another) throws ParsingException {
+            commitValue(another.committedValue);
+            addNodes(another.committedNodes);
         }
     }
 
-    private class CompactHolder extends Holder {
+    private class ResultHolder extends Holder {
 
-        void commit(String value) throws InternalParsingException {
-            committed();
-            builder.appendValue(value);
-        }
-
-        public void commit(int codePoint) throws InternalParsingException {
-            committed();
-            builder.appendValue(codePoint);
-        }
-
-        void commitGroup(String nodeName) {
-            committed();
-        }
-
-        void addCommitted() throws InternalParsingException {
-            committed();
-            builder.mergeValue();
-        }
-    }
-
-    private class ValueRootHolder extends Holder {
-
-        void commit(String value) throws InternalParsingException {
-            committed();
-            throw new InternalParsingException("valueRoot is set");
-        }
-
-        public void commit(int codePoint) throws InternalParsingException {
-            committed();
-            throw new InternalParsingException("valueRoot is set");
-        }
-
-        void commitGroup(String nodeName) {
-            committed();
-            builder.addNodeWithValue(nodeName, beginPosition, length());
-        }
-
-        void addCommitted() throws InternalParsingException {
-            committed();
-            builder.mergeValue();
+        @Override
+        public void commitNode(String nodeName, Holder child) throws ParsingException {
+            T node = wrapNode(nodeName, child);
+            builder.committedRoot(node);
+            builder.setFinished(true);
         }
     }
 }
