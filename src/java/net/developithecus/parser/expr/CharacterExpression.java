@@ -27,7 +27,7 @@ public class CharacterExpression extends Expression {
         return new Checker();
     }
 
-    private class Checker extends CodePointExpressionChecker {
+    class Checker extends CodePointExpressionChecker {
         private int result;
 
         @Override

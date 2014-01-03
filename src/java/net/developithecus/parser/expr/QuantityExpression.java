@@ -60,7 +60,7 @@ public class QuantityExpression extends Expression {
         return new Checker();
     }
 
-    private class Checker extends TransparentExpressionChecker {
+    class Checker extends TransparentExpressionChecker {
         private int turnsPassed = 0;
 
         @Override

@@ -19,12 +19,12 @@ import java.util.List;
 public class OneOfExpression extends Expression {
     private List<Expression> expressions;
 
-    public void setExpressions(Expression... expressions) {
-        this.expressions = Arrays.asList(expressions);
-    }
-
     public List<Expression> getExpressions() {
         return expressions;
+    }
+
+    public void setExpressions(Expression... expressions) {
+        this.expressions = Arrays.asList(expressions);
     }
 
     public OneOfExpression expressions(Expression... expressions) {
@@ -37,14 +37,15 @@ public class OneOfExpression extends Expression {
         return new Checker();
     }
 
-    private class Checker extends TransparentExpressionChecker {
-        private final Iterator<Expression> exprIterator = expressions.iterator();
-        private Expression curExpr;
+    class Checker extends TransparentExpressionChecker {
+        private Iterator<Expression> exprIterator;
 
         @Override
         public Expression next() {
-            curExpr = exprIterator.next();
-            return curExpr;
+            if (exprIterator == null) {
+                exprIterator = expressions.iterator();
+            }
+            return exprIterator.next();
         }
 
         @Override
