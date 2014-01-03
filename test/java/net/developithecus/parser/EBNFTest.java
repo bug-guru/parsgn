@@ -2,6 +2,11 @@ package net.developithecus.parser;
 
 import org.junit.Test;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.InputStream;
 
 /**
@@ -22,23 +27,23 @@ public class EBNFTest {
                 int indent = -1;
 
                 @Override
-                public void startNode(Node node) {
+                public void startNode(ParseNode node) {
                     indent++;
                     printNode(node);
                 }
 
                 @Override
-                public void endNode(Node node) {
+                public void endNode(ParseNode node) {
                     indent--;
                 }
 
                 @Override
-                public void leafNode(Node node) {
+                public void leafNode(ParseNode node) {
                     startNode(node);
                     endNode(node);
                 }
 
-                private void printNode(Node node) {
+                private void printNode(ParseNode node) {
                     for (int i = 0; i < indent; i++) {
                         System.out.append("    ");
                     }
@@ -52,6 +57,25 @@ public class EBNFTest {
                 }
 
             });
+        }
+    }
+
+    @Test
+    public void printXml() throws Exception {
+        EBNFParserBuilder builder = new EBNFParserBuilder();
+        Parser parser = builder.createParser();
+        try (
+                InputStream input = getClass().getResourceAsStream("config.rules")
+        ) {
+            XmlResultBuilder resultBuilder = new XmlResultBuilder();
+            parser.parse(input, resultBuilder);
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            StreamResult result = new StreamResult(System.out);
+            DOMSource source = new DOMSource(resultBuilder.getResult());
+            transformer.transform(source, result);
         }
     }
 }

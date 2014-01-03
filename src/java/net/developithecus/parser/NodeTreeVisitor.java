@@ -6,9 +6,9 @@ package net.developithecus.parser;
  * @since 1.0
  */
 public interface NodeTreeVisitor {
-    public void startNode(Node node);
+    public void startNode(ParseNode node);
 
-    public void endNode(Node node);
+    public void endNode(ParseNode node);
 
-    public void leafNode(Node node);
+    public void leafNode(ParseNode node);
 }

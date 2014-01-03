@@ -8,14 +8,14 @@ import java.util.List;
  * @version 13.5.12
  * @since 1.0
  */
-public class Node {
+public class ParseNode {
     private final String name;
     private final Position beginPosition;
     private final int length;
-    private final List<Node> children;
+    private final List<ParseNode> children;
     private final String value;
 
-    public Node(String name, Position beginPosition, int length, String value, List<Node> children) {
+    public ParseNode(String name, Position beginPosition, int length, String value, List<ParseNode> children) {
         this.name = name;
         this.beginPosition = beginPosition;
         this.length = length;
@@ -31,7 +31,7 @@ public class Node {
         return value;
     }
 
-    public List<Node> getChildren() {
+    public List<ParseNode> getChildren() {
         return children;
     }
 

@@ -26,14 +26,14 @@ public class Parser {
     }
 
     public void parse(InputStream input, NodeTreeVisitor visitor) throws ParsingException, IOException {
-        NodeResultBuilder builder = new NodeResultBuilder();
+        ParseTreeResultBuilder builder = new ParseTreeResultBuilder();
         parse(input, builder);
-        Node root = builder.getRoot();
+        ParseNode root = builder.getRoot();
         class NodeHolder {
-            final Node node;
-            final Iterator<Node> iterator;
+            final ParseNode node;
+            final Iterator<ParseNode> iterator;
 
-            NodeHolder(Node node) {
+            NodeHolder(ParseNode node) {
                 this.node = node;
                 this.iterator = node.getChildren().iterator();
             }
@@ -48,7 +48,7 @@ public class Parser {
         while (!stack.isEmpty()) {
             NodeHolder current = stack.peek();
             if (current.iterator.hasNext()) {
-                Node node = current.iterator.next();
+                ParseNode node = current.iterator.next();
                 if (node.isLeaf()) {
                     visitor.leafNode(node);
                 } else {

@@ -26,7 +26,9 @@ public class ParsingContext<T> {
         this.builder = builder;
         maxPos = new Position(1, 1);
         entry = new ParsingEntry(maxPos, 0);
-        stack.push(new ResultHolder());
+        Holder holder = new ResultHolder();
+        holder.beginPosition = maxPos;
+        stack.push(holder);
         pushExpression(root);
     }
 
