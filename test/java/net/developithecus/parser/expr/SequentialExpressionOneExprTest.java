@@ -1,7 +1,6 @@
 package net.developithecus.parser.expr;
 
 import net.developithecus.parser.ResultType;
-import net.developithecus.parser.exceptions.ParsingException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertSame;
@@ -39,9 +38,9 @@ public class SequentialExpressionOneExprTest extends SequentialExpressionTestBas
         assertSame(ResultType.ROLLBACK, checker.checkChildRollback());
     }
 
-    @Test(expected = ParsingException.class)
+    @Test
     public void testChecker_O() throws Exception {
         checker.next();
-        checker.checkChildOptionalRollback();
+        assertSame(ResultType.ROLLBACK_OPTIONAL, checker.checkChildOptionalRollback());
     }
 }

@@ -8,5 +8,20 @@ package net.developithecus.parser;
  */
 
 public abstract class Expression {
+    private boolean hidden;
+
     public abstract ExpressionChecker checker();
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
+    }
+
+    public Expression hide() {
+        setHidden(true);
+        return this;
+    }
 }

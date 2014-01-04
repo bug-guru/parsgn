@@ -7,6 +7,7 @@ package net.developithecus.parser;
  */
 public class RuleDef extends Rule {
     private Expression expression;
+    private boolean hidden;
 
     public RuleDef(String name) {
         super(name);
@@ -19,5 +20,18 @@ public class RuleDef extends Rule {
 
     public void setExpression(Expression expression) {
         this.expression = expression;
+    }
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
+    }
+
+    public RuleDef hide() {
+        setHidden(true);
+        return this;
     }
 }

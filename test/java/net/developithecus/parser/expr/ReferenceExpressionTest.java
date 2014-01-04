@@ -46,6 +46,6 @@ public class ReferenceExpressionTest {
     @Test
     public void testChecker_O() throws Exception {
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildOptionalRollback());
+        assertSame(ResultType.ROLLBACK_OPTIONAL, checker.checkChildOptionalRollback());
     }
 }

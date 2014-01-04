@@ -1,165 +1,65 @@
-ConfigFile: repeat Rule until ignore sequence Ignorable, EOF;
+ConfigFile:
+    (I Rule)+ I #EOF;
 
-Rule: sequence 
-        RuleName,
-        ignore RuleNameSeparator,
-        Expression,
-        ignore RuleTerminator;
+Rule:
+    Name
+    I
+    ":"
+    ExpressionList
+    ";"
+    ;
 
-RuleName: compact Token;
+I: (#WHITESPACE | SingleLineComment | MultiLineComment)*;
 
-Token: sequence
-        optional ignore Ignorable,
-        compact repeat InputChar until ignore reapply Separator;
+SingleLineComment: "//" #ANY{#EOL};
 
-Ignorable: repeat one of WhiteSpaces, Comment;
+MultiLineComment: "/*" #ANY{"*/"};
 
-Separator: one of
-            char ":;,#\"() \n\r\f\t" of InputChar,
-            EOF;
-
-RuleNameSeparator: sequence
-        optional ignore Ignorable,
-        value ":" of InputChar;
-
-RuleTerminator: sequence
-        optional ignore Ignorable,
-        value ";" of InputChar;
-
-ExpressionSeparator: sequence
-        optional ignore Ignorable,
-        value "," of InputChar;
-
-OpenExpression: sequence
-        optional ignore Ignorable,
-        value "(" of InputChar;
-
-CloseExpression: sequence
-        optional ignore Ignorable,
-        value ")" of InputChar;
-
-WhiteSpace: char "\n\r\t\f " of InputChar;
-
-WhiteSpaces: compact repeat WhiteSpace;
-
-Comment: repeat InputChar from CommentStart until CommentEnd;
-
-CommentStart: ignore value "#" of InputChar;
-
-CommentEnd: ignore reapply char "\n\r" of InputChar;
-
-InputChar:
-    one of
-        convert value "\\\\" to "\\",
-        convert value "\\\"" to "\"",
-        convert value "\\n" to "\n",
-        convert value "\\r" to "\r",
-        convert value "\\t" to "\t",
-        convert value "\\f" to "\f",
-        char;
-
-QuotationMark:
-    compact char "\"" of InputChar;
-
-StringLiteral:
-    sequence
-        optional ignore Ignorable,
-        compact repeat InputChar 
-                  from ignore QuotationMark
-                 until ignore QuotationMark;
-
-Prefix:
-    set of
-        value "compact" of Token,
-        value "ignore" of Token,
-        value "optional" of Token,
-        value "reapply" of Token;
-
-OfExpression:
-    sequence
-        ignore value "of" of Token,
-        Expression;
-
-ExpressionList:
-    repeat Expression from Expression while ignore ExpressionSeparator;
+Name: #UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART*;
 
 Expression:
-    one of
-        CharExpression,
-        ConvertExpression,
-        OneOfExpression,
-        RepeatExpression,
-        SequenceExpression,
-        SetOfExpression,
-        ValueExpression,
-        ReferenceExpression;
+    OneOf | Reference | CharType | String | Sequence
+    I
+    (Quantifier | Until I)?;
 
-CharExpression:
-    sequence
-        optional Prefix,
-        ignore value "char" of Token,
-        optional StringLiteral,
-        optional OfExpression;
+ExpressionList: (I Expression)+;
 
-ConvertExpression:
-    sequence
-        optional Prefix,
-        ignore value "convert" of Token,
-        Expression,
-        ignore value "to" of Token,
-        StringLiteral;
+Quantifier:
+      ZeroOrOne
+    | OneOrMore
+    | ZeroOrMore
+    | ExactlyNTimes
+    | AtLeastMinTimes
+    | AtLeastMinButNotMoreThanMaxTimes;
 
-OneOfExpression:
-    sequence
-        optional Prefix,
-        ignore value "one" of Token,
-        ignore value "of" of Token,
-        ExpressionList;
+ZeroOrOne: "?";
 
-RepeatExpression:
-    sequence
-        optional Prefix,
-        ignore value "repeat" of Token,
-        Expression,
-        optional RepeatFrom,
-        optional one of RepeatUntil, RepeatWhile;
+OneOrMore: "+";
 
-RepeatFrom:
-    sequence
-        ignore value "from" of Token,
-        Expression;
+ZeroOrMore: "*";
 
-RepeatUntil:
-    sequence
-        ignore value "until" of Token,
-        Expression;
+Until: "{" I Expression I "}";
 
-RepeatWhile:
-    sequence
-        ignore value "while" of Token,
-        Expression;
+ExactlyNTimes: "{" I Number I "}";
 
-SequenceExpression:
-    sequence
-        optional Prefix,
-        ignore value "sequence" of Token,
-        ExpressionList;
+AtLeastMinTimes: "{" I Number I "," I "}";
 
-SetOfExpression:
-    sequence
-        optional Prefix,
-        ignore value "set" of Token,
-        ignore value "of" of Token,
-        ExpressionList;
+AtLeastMinButNotMoreThanMaxTimes: "{" I Min I "," I Max I "}";
 
-ValueExpression:
-    sequence
-        optional Prefix,
-        ignore value "value" of Token,
-        optional StringLiteral,
-        optional OfExpression;
+Number: #DIGIT+;
 
-ReferenceExpression:
-    sequence
-        optional Prefix,
-        RuleName;
+Min: Number;
+
+Max: Number;
+
+OneOf: Reference | CharType | String | Sequence (I "|" I Reference | CharType | String | Sequence)+;
+
+Reference: Name;
+
+CharType: "#" Name; //TODO: list all possible char types
+
+String: "\"" ("\\\"" -> "\"" | "\\\\" -> "\\" | #ANY){"\""} (StrTransform)?;
+
+StrTransform: I "->" I String;
+
+Sequence: "(" ExpressionList ")";

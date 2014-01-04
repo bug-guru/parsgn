@@ -28,6 +28,11 @@ public class ReferenceExpression extends Expression {
     }
 
     @Override
+    public boolean isHidden() {
+        return super.isHidden() || reference.isHidden();
+    }
+
+    @Override
     public ExpressionChecker checker() {
         return new Checker();
     }
@@ -51,7 +56,7 @@ public class ReferenceExpression extends Expression {
 
         @Override
         public ResultType checkChildOptionalRollback() throws ParsingException {
-            return ResultType.ROLLBACK;
+            return ResultType.ROLLBACK_OPTIONAL;
         }
 
         @Override

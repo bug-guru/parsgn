@@ -18,4 +18,5 @@ public abstract class Rule {
 
     public abstract Expression getExpression();
 
+    public abstract boolean isHidden();
 }

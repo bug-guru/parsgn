@@ -1,5 +1,6 @@
 package net.developithecus.parser;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.transform.OutputKeys;
@@ -61,6 +62,7 @@ public class EBNFTest {
     }
 
     @Test
+    @Ignore
     public void printXml() throws Exception {
         EBNFParserBuilder builder = new EBNFParserBuilder();
         Parser parser = builder.createParser();

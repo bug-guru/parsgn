@@ -11,6 +11,7 @@ public class RuleRef extends Rule {
     private final Map<String, RuleDef> definitions;
     private RuleDef rule;
     private Expression expression;
+    private boolean hidden;
 
     public RuleRef(String name, Map<String, RuleDef> definitions) {
         super(name);
@@ -21,6 +22,10 @@ public class RuleRef extends Rule {
     private void init() {
         if (rule == null) {
             rule = definitions.get(getName());
+            if (rule == null) {
+                return;
+            }
+            hidden = rule.isHidden();
         }
         if (expression == null) {
             expression = rule == null ? null : rule.getExpression();
@@ -30,5 +35,11 @@ public class RuleRef extends Rule {
     public Expression getExpression() {
         init();
         return expression;
+    }
+
+    @Override
+    public boolean isHidden() {
+        init();
+        return hidden;
     }
 }

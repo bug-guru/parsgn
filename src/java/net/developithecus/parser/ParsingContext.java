@@ -89,6 +89,7 @@ public class ParsingContext<T> {
         holder.beginIndex = index;
         holder.beginPosition = entry.getPosition();
         holder.checker = nextChecker;
+        holder.ignore = nextExpr.isHidden() || stack.peek().ignore;
         stack.push(holder);
     }
 
@@ -110,6 +111,7 @@ public class ParsingContext<T> {
         Position beginPosition;
         List<T> committedNodes;
         StringBuilder committedValue;
+        boolean ignore;
 
         protected void initValue() throws InternalParsingException {
             if (committedValue == null) {
@@ -144,7 +146,7 @@ public class ParsingContext<T> {
         }
 
         public void commitValue(String value) throws InternalParsingException {
-            if (value == null || value.isEmpty()) {
+            if (ignore || value == null || value.isEmpty()) {
                 return;
             }
             initValue();
@@ -152,6 +154,9 @@ public class ParsingContext<T> {
         }
 
         public void commitValue(int codePoint) throws InternalParsingException {
+            if (ignore) {
+                return;
+            }
             if (Character.isValidCodePoint(codePoint)) {
                 initValue();
                 committedValue.appendCodePoint(codePoint);
@@ -159,7 +164,7 @@ public class ParsingContext<T> {
         }
 
         public void commitValue(StringBuilder builder) throws InternalParsingException {
-            if (builder == null || builder.length() == 0) {
+            if (ignore || builder == null || builder.length() == 0) {
                 return;
             }
             initValue();
@@ -167,6 +172,9 @@ public class ParsingContext<T> {
         }
 
         public void commitNode(String nodeName, Holder child) throws ParsingException {
+            if (child.ignore) {
+                return;
+            }
             T node = wrapNode(nodeName, child);
             addNode(node);
         }
@@ -180,6 +188,9 @@ public class ParsingContext<T> {
         }
 
         public void merge(Holder another) throws ParsingException {
+            if (another.ignore) {
+                return;
+            }
             commitValue(another.committedValue);
             addNodes(another.committedNodes);
         }

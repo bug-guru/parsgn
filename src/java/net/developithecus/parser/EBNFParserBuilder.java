@@ -10,9 +10,8 @@ import net.developithecus.parser.expr.CharType;
 public class EBNFParserBuilder extends ParserBuilder {
     public static final String CONFIG_FILE = "ConfigFile";
     public static final String RULE = "Rule";
+    public static final String HIDDEN_FLAG = "HiddenFlag";
     public static final String I = "I";
-    public static final String WHITE_SPACE = "WhiteSpace";
-    public static final String COMMENT = "Comment";
     public static final String SINGLE_LINE_COMMENT = "SingleLineComment";
     public static final String MULTI_LINE_COMMENT = "MultiLineComment";
     public static final String NAME = "Name";
@@ -35,7 +34,6 @@ public class EBNFParserBuilder extends ParserBuilder {
     public static final String STRING = "String";
     public static final String STR_TRANSFORM = "StrTransform";
     public static final String SEQUENCE = "Sequence";
-
     private final Rule root;
 
     public EBNFParserBuilder() {
@@ -43,37 +41,37 @@ public class EBNFParserBuilder extends ParserBuilder {
     }
 
     private Rule generateRules() {
-        Expression ignorable = zeroOrMore(ref(I));
         Rule result = rule(CONFIG_FILE,
                 oneOrMore(
-                        ignorable,
+                        ref(I),
                         ref(RULE)
                 ),
-                ignorable,
+                ref(I),
                 charType(CharType.EOF)
         );
         rule(RULE,
+                zeroOrOne(
+                        ref(HIDDEN_FLAG),
+                        ref(I)
+                ),
                 ref(NAME),
-                ignorable,
+                ref(I),
                 str(":"),
                 ref(EXPRESSION_LIST),
                 str(";")
         );
+        rule(HIDDEN_FLAG,
+                str(".")
+        );
         rule(I,
-                oneOf(
-                        ref(WHITE_SPACE),
-                        ref(COMMENT)
+                zeroOrMore(
+                        oneOf(
+                                charType(CharType.WHITESPACE),
+                                ref(SINGLE_LINE_COMMENT),
+                                ref(MULTI_LINE_COMMENT)
+                        )
                 )
-        );
-        rule(WHITE_SPACE,
-                oneOrMore(charType(CharType.WHITESPACE))
-        );
-        rule(COMMENT,
-                oneOf(
-                        ref(SINGLE_LINE_COMMENT),
-                        ref(MULTI_LINE_COMMENT)
-                )
-        );
+        ).hide();
         rule(SINGLE_LINE_COMMENT,
                 str("//"),
                 repeatUntil(
@@ -104,18 +102,18 @@ public class EBNFParserBuilder extends ParserBuilder {
                         ref(STRING),
                         ref(SEQUENCE)
                 ),
-                ignorable,
+                ref(I),
                 zeroOrOne(
                         oneOf(
                                 ref(QUANTIFIER),
                                 ref(UNTIL)
                         ),
-                        ignorable
+                        ref(I)
                 )
         );
         rule(EXPRESSION_LIST,
                 oneOrMore(
-                        ignorable,
+                        ref(I),
                         ref(EXPRESSION)
                 )
         );
@@ -140,36 +138,36 @@ public class EBNFParserBuilder extends ParserBuilder {
         );
         rule(UNTIL,
                 str("{"),
-                ignorable,
+                ref(I),
                 ref(EXPRESSION),
-                ignorable,
+                ref(I),
                 str("}")
         );
         rule(EXACTLY_N_TIMES,
                 str("{"),
-                ignorable,
+                ref(I),
                 ref(NUMBER),
-                ignorable,
+                ref(I),
                 str("}")
         );
         rule(AT_LEAST_MIN_TIMES,
                 str("{"),
-                ignorable,
+                ref(I),
                 ref(NUMBER),
-                ignorable,
+                ref(I),
                 str(","),
-                ignorable,
+                ref(I),
                 str("}")
         );
         rule(AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES,
                 str("{"),
-                ignorable,
+                ref(I),
                 ref(MIN),
-                ignorable,
+                ref(I),
                 str(","),
-                ignorable,
+                ref(I),
                 ref(MAX),
-                ignorable,
+                ref(I),
                 str("}")
         );
         rule(NUMBER,
@@ -191,9 +189,9 @@ public class EBNFParserBuilder extends ParserBuilder {
                         ref(SEQUENCE)
                 ),
                 oneOrMore(
-                        ignorable,
+                        ref(I),
                         str("|"),
-                        ignorable,
+                        ref(I),
                         oneOf(
                                 ref(REFERENCE),
                                 ref(CHAR_TYPE),
@@ -224,9 +222,9 @@ public class EBNFParserBuilder extends ParserBuilder {
                 )
         );
         rule(STR_TRANSFORM,
-                ignorable,
+                ref(I),
                 str("->"),
-                ignorable,
+                ref(I),
                 ref(STRING)
         );
         rule(SEQUENCE,

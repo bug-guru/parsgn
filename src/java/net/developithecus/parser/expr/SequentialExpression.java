@@ -68,7 +68,7 @@ public class SequentialExpression extends Expression {
             if (expressions.hasNext()) {
                 return ResultType.CONTINUE;
             } else if (!hasCommitted) {
-                throw new ParsingException("sequence without result");
+                return ResultType.ROLLBACK_OPTIONAL;
             } else {
                 return ResultType.COMMIT;
             }
