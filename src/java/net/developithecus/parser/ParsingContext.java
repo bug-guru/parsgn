@@ -89,7 +89,7 @@ public class ParsingContext<T> {
         holder.beginIndex = index;
         holder.beginPosition = entry.getPosition();
         holder.checker = nextChecker;
-        holder.ignore = nextExpr.isHidden() || stack.peek().ignore;
+        holder.hidden = nextExpr.isHidden() || stack.peek().hidden;
         stack.push(holder);
     }
 
@@ -111,7 +111,7 @@ public class ParsingContext<T> {
         Position beginPosition;
         List<T> committedNodes;
         StringBuilder committedValue;
-        boolean ignore;
+        boolean hidden;
 
         protected void initValue() throws InternalParsingException {
             if (committedValue == null) {
@@ -146,7 +146,7 @@ public class ParsingContext<T> {
         }
 
         public void commitValue(String value) throws InternalParsingException {
-            if (ignore || value == null || value.isEmpty()) {
+            if (hidden || value == null || value.isEmpty()) {
                 return;
             }
             initValue();
@@ -154,7 +154,7 @@ public class ParsingContext<T> {
         }
 
         public void commitValue(int codePoint) throws InternalParsingException {
-            if (ignore) {
+            if (hidden) {
                 return;
             }
             if (Character.isValidCodePoint(codePoint)) {
@@ -164,7 +164,7 @@ public class ParsingContext<T> {
         }
 
         public void commitValue(StringBuilder builder) throws InternalParsingException {
-            if (ignore || builder == null || builder.length() == 0) {
+            if (hidden || builder == null || builder.length() == 0) {
                 return;
             }
             initValue();
@@ -172,7 +172,7 @@ public class ParsingContext<T> {
         }
 
         public void commitNode(String nodeName, Holder child) throws ParsingException {
-            if (child.ignore) {
+            if (hidden || child.hidden) {
                 return;
             }
             T node = wrapNode(nodeName, child);
@@ -188,7 +188,7 @@ public class ParsingContext<T> {
         }
 
         public void merge(Holder another) throws ParsingException {
-            if (another.ignore) {
+            if (hidden || another.hidden) {
                 return;
             }
             commitValue(another.committedValue);
