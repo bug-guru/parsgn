@@ -62,6 +62,8 @@ Reference: Name;
 
 CharType: "#" Name; //TODO: list all possible char types
 
-String: "\"" ("\\\"" | "\\\\" | #ANY){"\""};
+String: "\"" ("\\\""->"\"" | "\\\\"->"\\" | #ANY){"\""} (StrTransform)?;
+
+StrTransform: I* "->" I* String;
 
 Sequence: "(" ExpressionList ")";

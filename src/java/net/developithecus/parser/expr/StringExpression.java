@@ -11,6 +11,7 @@ import net.developithecus.parser.exceptions.ParsingException;
 
 public class StringExpression extends Expression {
     private String value;
+    private String result;
     private int[] codePoints;
     private int len;
 
@@ -24,6 +25,24 @@ public class StringExpression extends Expression {
         this.len = codePoints.length;
     }
 
+    public StringExpression value(String value) {
+        setValue(value);
+        return this;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public StringExpression result(String result) {
+        setResult(result);
+        return this;
+    }
+
     @Override
     public ExpressionChecker checker() {
         return new Checker();
@@ -34,7 +53,7 @@ public class StringExpression extends Expression {
 
         @Override
         protected String getResult() {
-            return null;
+            return result;
         }
 
         @Override

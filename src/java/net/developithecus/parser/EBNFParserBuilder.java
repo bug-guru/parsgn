@@ -33,6 +33,7 @@ public class EBNFParserBuilder extends ParserBuilder {
     public static final String REFERENCE = "Reference";
     public static final String CHAR_TYPE = "CharType";
     public static final String STRING = "String";
+    public static final String STR_TRANSFORM = "StrTransform";
     public static final String SEQUENCE = "Sequence";
 
     private final Rule root;
@@ -213,11 +214,20 @@ public class EBNFParserBuilder extends ParserBuilder {
                 repeatUntil(
                         str("\""),
                         oneOf(
-                                str("\\\""),
-                                str("\\\\"),
+                                str("\\\"").result("\""),
+                                str("\\\\").result("\\"),
                                 charType(CharType.VALID)
                         )
+                ),
+                zeroOrOne(
+                        ref(STR_TRANSFORM)
                 )
+        );
+        rule(STR_TRANSFORM,
+                ignorable,
+                str("->"),
+                ignorable,
+                ref(STRING)
         );
         rule(SEQUENCE,
                 str("("),
