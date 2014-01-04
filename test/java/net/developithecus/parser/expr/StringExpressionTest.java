@@ -1,0 +1,48 @@
+package net.developithecus.parser.expr;
+
+import net.developithecus.parser.ResultType;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+
+/**
+ * @author dima
+ */
+public class StringExpressionTest {
+    protected final StringExpression expression;
+    protected StringExpression.Checker checker;
+
+    public StringExpressionTest() {
+        expression = new StringExpression();
+        expression.setValue("Hello, World!");
+    }
+
+    @Before
+    public void setUp() {
+        checker = (StringExpression.Checker) expression.checker();
+    }
+
+    @Test
+    public void testChecker_next() throws Exception {
+        assertNull(checker.next());
+    }
+
+    @Test
+    public void testChecker_OK() throws Exception {
+        test(ResultType.COMMIT, "Hello, World!");
+    }
+
+    @Test
+    public void testChecker_FAIL() throws Exception {
+        test(ResultType.ROLLBACK, "Hello, World?");
+    }
+
+    private void test(ResultType expectedResult, String input) throws Exception {
+        for (int i = 0; i < input.length() - 1; i++) {
+            assertSame(ResultType.CONTINUE, checker.check(input.codePointAt(i)));
+        }
+        assertSame(expectedResult, checker.check(input.codePointAt(input.length() - 1)));
+    }
+}

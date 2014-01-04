@@ -19,12 +19,12 @@ import java.util.List;
 public class SequentialExpression extends Expression {
     private List<Expression> expressions;
 
-    public void setExpressions(Expression... expressions) {
-        this.expressions = Arrays.asList(expressions);
-    }
-
     public List<Expression> getExpressions() {
         return expressions;
+    }
+
+    public void setExpressions(Expression... expressions) {
+        this.expressions = Arrays.asList(expressions);
     }
 
     public SequentialExpression expressions(Expression... expressions) {
@@ -37,7 +37,7 @@ public class SequentialExpression extends Expression {
         return new Checker();
     }
 
-    private class Checker extends TransparentExpressionChecker {
+    class Checker extends TransparentExpressionChecker {
         private final Iterator<Expression> expressions = getExpressions().iterator();
         private Expression curExpr;
         private boolean hasCommitted;

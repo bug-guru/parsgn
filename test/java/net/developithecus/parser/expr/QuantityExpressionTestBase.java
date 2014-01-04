@@ -15,7 +15,7 @@ public class QuantityExpressionTestBase {
     }
 
     @Before
-    public void createChecker() {
+    public void setUp() {
         checker = (QuantityExpression.Checker) expression.checker();
     }
 

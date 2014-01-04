@@ -10,7 +10,7 @@ public class OneOfExpressionTestBase {
     protected OneOfExpression.Checker checker;
 
     @Before
-    public void createChecker() {
+    public void setUp() {
         checker = (OneOfExpression.Checker) expression.checker();
     }
 }

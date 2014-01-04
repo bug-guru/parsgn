@@ -29,7 +29,7 @@ public class StringExpression extends Expression {
         return new Checker();
     }
 
-    private class Checker extends StringExpressionChecker {
+    class Checker extends StringExpressionChecker {
         private int offset;
 
         @Override

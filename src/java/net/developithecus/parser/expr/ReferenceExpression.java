@@ -32,7 +32,7 @@ public class ReferenceExpression extends Expression {
         return new Checker();
     }
 
-    private class Checker extends GroupingExpressionChecker {
+    class Checker extends GroupingExpressionChecker {
 
         @Override
         public Expression next() {

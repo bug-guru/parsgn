@@ -60,7 +60,7 @@ public class UntilExpression extends Expression {
         return new Checker();
     }
 
-    private class Checker extends TransparentExpressionChecker {
+    class Checker extends TransparentExpressionChecker {
         private boolean checkingEndCondition = true;
         private int turnsPassed = 0;
 
@@ -76,7 +76,7 @@ public class UntilExpression extends Expression {
         @Override
         public ResultType checkChildCommit() throws ParsingException {
             if (checkingEndCondition) {
-                return ResultType.COMMIT;
+                return doCommitOrRollback();
             } else {
                 checkingEndCondition = true;
                 turnsPassed++;
