@@ -10,13 +10,17 @@ import net.developithecus.parser.expr.CharType;
 public class EBNFParserBuilder extends ParserBuilder {
     public static final String CONFIG_FILE = "ConfigFile";
     public static final String RULE = "Rule";
+    public static final String RULE_PREFIX = "RulePrefix";
     public static final String HIDDEN_FLAG = "HiddenFlag";
+    public static final String TEMPLATE_FLAG = "TemplateFlag";
     public static final String I = "I";
     public static final String SINGLE_LINE_COMMENT = "SingleLineComment";
     public static final String MULTI_LINE_COMMENT = "MultiLineComment";
     public static final String NAME = "Name";
     public static final String EXPRESSION = "Expression";
+    public static final String TRANSFORM = "Transform";
     public static final String EXPRESSION_LIST = "ExpressionList";
+    public static final String EXPRESSION_SUFFIX = "ExpressionSuffix";
     public static final String QUANTIFIER = "Quantifier";
     public static final String ZERO_OR_ONE = "ZeroOrOne";
     public static final String ONE_OR_MORE = "OneOrMore";
@@ -28,11 +32,13 @@ public class EBNFParserBuilder extends ParserBuilder {
     public static final String NUMBER = "Number";
     public static final String MIN = "Min";
     public static final String MAX = "Max";
-    public static final String ONE_OF = "oneOf";
+    public static final String ONE_OF = "OneOf";
+    public static final String ONE_OF_VARIANT1 = "OneOfVariant1";
+    public static final String ONE_OF_VARIANT2 = "OneOfVariant2";
+    public static final String ONE_OF_EXPRESSION = "OneOfItem";
     public static final String REFERENCE = "Reference";
     public static final String CHAR_TYPE = "CharType";
     public static final String STRING = "String";
-    public static final String STR_TRANSFORM = "StrTransform";
     public static final String SEQUENCE = "Sequence";
     private final Rule root;
 
@@ -51,17 +57,29 @@ public class EBNFParserBuilder extends ParserBuilder {
         );
         rule(RULE,
                 zeroOrOne(
-                        ref(HIDDEN_FLAG),
+                        ref(RULE_PREFIX),
                         ref(I)
                 ),
                 ref(NAME),
+                zeroOrOne(
+                        ref(TRANSFORM)
+                ),
                 ref(I),
                 str(":"),
                 ref(EXPRESSION_LIST),
                 str(";")
         );
+        rule(RULE_PREFIX,
+                oneOf(
+                        ref(HIDDEN_FLAG),
+                        ref(TEMPLATE_FLAG)
+                )
+        ).template();
         rule(HIDDEN_FLAG,
                 str(".")
+        );
+        rule(TEMPLATE_FLAG,
+                str("^")
         );
         rule(I,
                 zeroOrMore(
@@ -94,6 +112,12 @@ public class EBNFParserBuilder extends ParserBuilder {
                         )
                 )
         );
+        rule(EXPRESSION_LIST,
+                oneOrMore(
+                        ref(I),
+                        ref(EXPRESSION)
+                )
+        ).template();
         rule(EXPRESSION,
                 oneOf(
                         ref(ONE_OF),
@@ -102,6 +126,9 @@ public class EBNFParserBuilder extends ParserBuilder {
                         ref(STRING),
                         ref(SEQUENCE)
                 ),
+                ref(EXPRESSION_SUFFIX)
+        );
+        rule(EXPRESSION_SUFFIX,
                 ref(I),
                 zeroOrOne(
                         oneOf(
@@ -110,11 +137,14 @@ public class EBNFParserBuilder extends ParserBuilder {
                         ),
                         ref(I)
                 )
-        );
-        rule(EXPRESSION_LIST,
-                oneOrMore(
-                        ref(I),
-                        ref(EXPRESSION)
+        ).template();
+        rule(TRANSFORM,
+                ref(I),
+                str("->"),
+                ref(I),
+                oneOf(
+                        ref(STRING),
+                        ref(NAME).transform(STRING)
                 )
         );
         rule(QUANTIFIER,
@@ -126,7 +156,7 @@ public class EBNFParserBuilder extends ParserBuilder {
                         ref(AT_LEAST_MIN_TIMES),
                         ref(AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES)
                 )
-        );
+        ).template();
         rule(ZERO_OR_ONE,
                 str("?")
         );
@@ -183,25 +213,40 @@ public class EBNFParserBuilder extends ParserBuilder {
         );
         rule(ONE_OF,
                 oneOf(
+                        ref(ONE_OF_VARIANT1),
+                        ref(ONE_OF_VARIANT2)
+                )
+        );
+        rule(ONE_OF_VARIANT1,
+                str("("),
+                ref(I),
+                ref(ONE_OF_VARIANT2),
+                ref(I),
+                str(")")
+        ).template();
+        rule(ONE_OF_VARIANT2,
+                ref(ONE_OF_EXPRESSION),
+                oneOrMore(
+                        ref(I),
+                        str("|"),
+                        ref(I),
+                        ref(ONE_OF_EXPRESSION)
+                )
+        ).template();
+        rule(ONE_OF_EXPRESSION,
+                oneOf(
                         ref(REFERENCE),
                         ref(CHAR_TYPE),
                         ref(STRING),
                         ref(SEQUENCE)
                 ),
-                oneOrMore(
-                        ref(I),
-                        str("|"),
-                        ref(I),
-                        oneOf(
-                                ref(REFERENCE),
-                                ref(CHAR_TYPE),
-                                ref(STRING),
-                                ref(SEQUENCE)
-                        )
-                )
-        );
+                ref(EXPRESSION_SUFFIX)
+        ).transform(EXPRESSION);
         rule(REFERENCE,
-                ref(NAME)
+                ref(NAME),
+                zeroOrOne(
+                        ref(TRANSFORM)
+                )
         );
         rule(CHAR_TYPE,
                 str("#"),
@@ -212,20 +257,14 @@ public class EBNFParserBuilder extends ParserBuilder {
                 repeatUntil(
                         str("\""),
                         oneOf(
-                                str("\\\"").result("\""),
-                                str("\\\\").result("\\"),
+                                str("\\\"").transform("\""),
+                                str("\\\\").transform("\\"),
                                 charType(CharType.VALID)
                         )
                 ),
                 zeroOrOne(
-                        ref(STR_TRANSFORM)
+                        ref(TRANSFORM)
                 )
-        );
-        rule(STR_TRANSFORM,
-                ref(I),
-                str("->"),
-                ref(I),
-                ref(STRING)
         );
         rule(SEQUENCE,
                 str("("),

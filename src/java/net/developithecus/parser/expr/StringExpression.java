@@ -11,7 +11,7 @@ import net.developithecus.parser.exceptions.ParsingException;
 
 public class StringExpression extends Expression {
     private String value;
-    private String result;
+    private String transform;
     private int[] codePoints;
     private int len;
 
@@ -30,16 +30,16 @@ public class StringExpression extends Expression {
         return this;
     }
 
-    public String getResult() {
-        return result;
+    public String getTransform() {
+        return transform;
     }
 
-    public void setResult(String result) {
-        this.result = result;
+    public void setTransform(String transform) {
+        this.transform = transform;
     }
 
-    public StringExpression result(String result) {
-        setResult(result);
+    public StringExpression transform(String transform) {
+        setTransform(transform);
         return this;
     }
 
@@ -53,7 +53,7 @@ public class StringExpression extends Expression {
 
         @Override
         protected String getResult() {
-            return result;
+            return transform;
         }
 
         @Override

@@ -11,6 +11,7 @@ import net.developithecus.parser.exceptions.ParsingException;
 
 public class ReferenceExpression extends Expression {
     private Rule reference;
+    private String transform;
 
     public ReferenceExpression(Rule reference) {
         this.reference = reference;
@@ -32,12 +33,29 @@ public class ReferenceExpression extends Expression {
         return super.isHidden() || reference.isHidden();
     }
 
-    @Override
-    public ExpressionChecker checker() {
-        return new Checker();
+    public String getTransform() {
+        return transform;
     }
 
-    class Checker extends GroupingExpressionChecker {
+    public void setTransform(String transform) {
+        this.transform = transform;
+    }
+
+    public ReferenceExpression transform(String transform) {
+        setTransform(transform);
+        return this;
+    }
+
+    @Override
+    public ExpressionChecker checker() {
+        if (reference.isTemplate()) {
+            return new TemplateChecker();
+        } else {
+            return new GroupingChecker();
+        }
+    }
+
+    class GroupingChecker extends GroupingExpressionChecker {
 
         @Override
         public Expression next() {
@@ -46,7 +64,36 @@ public class ReferenceExpression extends Expression {
 
         @Override
         public String getGroupName() {
-            return reference.getName();
+            if (transform != null) {
+                return transform;
+            } else if (reference.getTransform() != null) {
+                return reference.getTransform();
+            } else {
+                return reference.getName();
+            }
+        }
+
+        @Override
+        public ResultType checkChildCommit() throws ParsingException {
+            return ResultType.COMMIT;
+        }
+
+        @Override
+        public ResultType checkChildOptionalRollback() throws ParsingException {
+            return ResultType.ROLLBACK_OPTIONAL;
+        }
+
+        @Override
+        public ResultType checkChildRollback() throws ParsingException {
+            return ResultType.ROLLBACK;
+        }
+    }
+
+    class TemplateChecker extends TransparentExpressionChecker {
+
+        @Override
+        public Expression next() {
+            return getReference().getExpression();
         }
 
         @Override

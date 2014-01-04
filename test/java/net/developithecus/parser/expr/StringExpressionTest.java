@@ -30,7 +30,7 @@ public class StringExpressionTest {
     @Test
     public void testChecker_OK() throws Exception {
         expression.setValue("Hello, World!");
-        expression.setResult(null);
+        expression.setTransform(null);
         test(ResultType.COMMIT, "Hello, World!");
         assertEquals(null, checker.getResult());
     }
@@ -44,7 +44,7 @@ public class StringExpressionTest {
     @Test
     public void testChecker_Transform() throws Exception {
         expression.setValue("Hello, World!");
-        expression.setResult("Bye-bye!");
+        expression.setTransform("Bye-bye!");
         test(ResultType.COMMIT, "Hello, World!");
         assertEquals("Bye-bye!", checker.getResult());
     }

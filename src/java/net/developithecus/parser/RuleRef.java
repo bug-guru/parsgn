@@ -12,6 +12,8 @@ public class RuleRef extends Rule {
     private RuleDef rule;
     private Expression expression;
     private boolean hidden;
+    private boolean template;
+    private String transform;
 
     public RuleRef(String name, Map<String, RuleDef> definitions) {
         super(name);
@@ -26,9 +28,9 @@ public class RuleRef extends Rule {
                 return;
             }
             hidden = rule.isHidden();
-        }
-        if (expression == null) {
-            expression = rule == null ? null : rule.getExpression();
+            template = rule.isTemplate();
+            transform = rule.getTransform();
+            expression = rule.getExpression();
         }
     }
 
@@ -41,5 +43,17 @@ public class RuleRef extends Rule {
     public boolean isHidden() {
         init();
         return hidden;
+    }
+
+    @Override
+    public boolean isTemplate() {
+        init();
+        return template;
+    }
+
+    @Override
+    public String getTransform() {
+        init();
+        return transform;
     }
 }

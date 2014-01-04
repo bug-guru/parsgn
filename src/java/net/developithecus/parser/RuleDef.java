@@ -8,6 +8,8 @@ package net.developithecus.parser;
 public class RuleDef extends Rule {
     private Expression expression;
     private boolean hidden;
+    private boolean template;
+    private String transform;
 
     public RuleDef(String name) {
         super(name);
@@ -32,6 +34,34 @@ public class RuleDef extends Rule {
 
     public RuleDef hide() {
         setHidden(true);
+        return this;
+    }
+
+    @Override
+    public boolean isTemplate() {
+        return template;
+    }
+
+    public void setTemplate(boolean template) {
+        this.template = template;
+    }
+
+    public RuleDef template() {
+        setTemplate(true);
+        return this;
+    }
+
+    @Override
+    public String getTransform() {
+        return transform;
+    }
+
+    public void setTransform(String transform) {
+        this.transform = transform;
+    }
+
+    public RuleDef transform(String transform) {
+        setTransform(transform);
         return this;
     }
 }

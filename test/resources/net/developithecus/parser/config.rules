@@ -2,15 +2,13 @@ ConfigFile:
     (I Rule)+ I #EOF;
 
 Rule:
-    (HiddenFlag I)?
-    Name
-    I
-    ":"
-    ExpressionList
-    ";"
-    ;
+    (RulePrefix I)? Name Transform? I ":" ExpressionList ";";
+
+^RulePrefix: HiddenFlag | TemplateFlag;
 
 HiddenFlag: ".";
+
+TemplateFlag: "^";
 
 .I: (#WHITESPACE | SingleLineComment | MultiLineComment)*;
 
@@ -20,14 +18,17 @@ MultiLineComment: "/*" #ANY{"*/"};
 
 Name: #UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART*;
 
+^ExpressionList: (I Expression)+;
+
 Expression:
     OneOf | Reference | CharType | String | Sequence
-    I
-    (Quantifier | Until I)?;
+    ExpressionSuffix;
 
-ExpressionList: (I Expression)+;
+^ExpressionSuffix: I (Quantifier | Until I)?;
 
-Quantifier:
+Transform: I "->" I (String | Name->String);
+
+^Quantifier:
       ZeroOrOne
     | OneOrMore
     | ZeroOrMore
@@ -55,14 +56,20 @@ Min: Number;
 
 Max: Number;
 
-OneOf: Reference | CharType | String | Sequence (I "|" I Reference | CharType | String | Sequence)+;
+OneOf: OneOfVariant1 | OneOfVariant2;
 
-Reference: Name;
+^OneOfVariant1: "(" I OneOfVariant2 I ")";
+
+^OneOfVariant2: OneOfExpression (I "|" I OneOfExpression)+;
+
+OneOfExpression -> Expression:
+    Reference | CharType | String | Sequence
+    ExpressionSuffix;
+
+Reference: Name Transform?;
 
 CharType: "#" Name; //TODO: list all possible char types
 
-String: "\"" ("\\\"" -> "\"" | "\\\\" -> "\\" | #ANY){"\""} (StrTransform)?;
-
-StrTransform: I "->" I String;
+String: "\"" ("\\\"" -> "\"" | "\\\\" -> "\\" | #ANY){"\""} Transform?;
 
 Sequence: "(" ExpressionList ")";

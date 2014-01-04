@@ -15,7 +15,7 @@ public class ReferenceExpressionTest {
     private RuleDef rule = new RuleDef("fake");
     private ReferenceExpression expression = new ReferenceExpression(rule);
     private FakeExpression expr = new FakeExpression();
-    private ReferenceExpression.Checker checker;
+    private ReferenceExpression.GroupingChecker checker;
 
     public ReferenceExpressionTest() {
         rule.setExpression(expr);
@@ -23,7 +23,7 @@ public class ReferenceExpressionTest {
 
     @Before
     public void setUp() throws Exception {
-        checker = (ReferenceExpression.Checker) expression.checker();
+        checker = (ReferenceExpression.GroupingChecker) expression.checker();
     }
 
     @Test
