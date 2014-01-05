@@ -6,6 +6,7 @@ import net.developithecus.parser.ResultType;
 import net.developithecus.parser.TransparentExpressionChecker;
 import net.developithecus.parser.exceptions.ParsingException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +26,10 @@ public class SequentialExpression extends Expression {
 
     public void setExpressions(Expression... expressions) {
         this.expressions = Arrays.asList(expressions);
+    }
+
+    public void setExpressions(List<Expression> expressions) {
+        this.expressions = new ArrayList<>(expressions);
     }
 
     public SequentialExpression expressions(Expression... expressions) {

@@ -6,6 +6,7 @@ import net.developithecus.parser.ResultType;
 import net.developithecus.parser.TransparentExpressionChecker;
 import net.developithecus.parser.exceptions.ParsingException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -23,11 +24,20 @@ public class OneOfExpression extends Expression {
         return expressions;
     }
 
+    public void setExpressions(List<Expression> expressions) {
+        this.expressions = new ArrayList<>(expressions);
+    }
+
     public void setExpressions(Expression... expressions) {
         this.expressions = Arrays.asList(expressions);
     }
 
     public OneOfExpression expressions(Expression... expressions) {
+        setExpressions(expressions);
+        return this;
+    }
+
+    public OneOfExpression expressions(List<Expression> expressions) {
         setExpressions(expressions);
         return this;
     }

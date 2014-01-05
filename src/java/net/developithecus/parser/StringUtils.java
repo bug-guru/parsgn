@@ -1,6 +1,6 @@
 package net.developithecus.parser;
 
-import java.io.PrintStream;
+import java.io.StringWriter;
 import java.util.Arrays;
 
 /**
@@ -28,7 +28,7 @@ public final class StringUtils {
         return result;
     }
 
-    static void escape(PrintStream result, String value) {
+    static void escape(StringWriter result, String value) {
         int offset = 0;
         int len = value.length();
         while (offset < len) {
@@ -36,28 +36,28 @@ public final class StringUtils {
             offset += Character.charCount(codePoint);
             switch (codePoint) {
                 case '\\':
-                    result.append("\\\\");
+                    result.write("\\\\");
                     break;
                 case '\t':
-                    result.append("\\t");
+                    result.write("\\t");
                     break;
                 case '\b':
-                    result.append("\\b");
+                    result.write("\\b");
                     break;
                 case '\n':
-                    result.append("\\n");
+                    result.write("\\n");
                     break;
                 case '\r':
-                    result.append("\\r");
+                    result.write("\\r");
                     break;
                 case '\f':
-                    result.append("\\f");
+                    result.write("\\f");
                     break;
                 case '\"':
-                    result.append("\\\"");
+                    result.write("\\\"");
                     break;
                 default:
-                    result.append((char) codePoint);
+                    result.write((char) codePoint);
             }
         }
     }

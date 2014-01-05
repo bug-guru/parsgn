@@ -1,6 +1,5 @@
 package net.developithecus.parser;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.transform.OutputKeys;
@@ -9,6 +8,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.InputStream;
+import java.io.StringWriter;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -17,10 +19,17 @@ import java.io.InputStream;
  */
 public class EBNFTest {
 
-    @Test
-    public void printConfigFile() throws Exception {
-        EBNFParserBuilder builder = new EBNFParserBuilder();
-        Parser parser = builder.createParser();
+    private Parser generateDefaultParser() throws Exception {
+        DefaultParserBuilder builder = new DefaultParserBuilder();
+        try (
+                InputStream ebnfInput = getClass().getResourceAsStream("config.rules")
+        ) {
+            return builder.createParser(ebnfInput);
+        }
+    }
+
+    private String parseToTree(Parser parser) throws Exception {
+        final StringWriter result = new StringWriter(2048);
         try (
                 InputStream input = getClass().getResourceAsStream("config.rules")
         ) {
@@ -46,23 +55,34 @@ public class EBNFTest {
 
                 private void printNode(ParseNode node) {
                     for (int i = 0; i < indent; i++) {
-                        System.out.append("    ");
+                        result.append("    ");
                     }
-                    StringUtils.escape(System.out, node.getName());
+                    StringUtils.escape(result, node.getName());
                     if (node.getValue() != null) {
-                        System.out.append("=\"");
-                        StringUtils.escape(System.out, node.getValue());
-                        System.out.append("\"");
+                        result.write("=\"");
+                        StringUtils.escape(result, node.getValue());
+                        result.write("\"");
                     }
-                    System.out.format(" {%s-%d}\n", node.getBeginPosition(), node.getLength());
+                    result.write(String.format(" {%s-%d}\n", node.getBeginPosition(), node.getLength()));
                 }
 
             });
         }
+        result.close();
+        return result.toString();
     }
 
     @Test
-    @Ignore
+    public void compareGeneratedAndBuiltIn() throws Exception {
+        Parser generated = generateDefaultParser();
+        Parser builtIn = new EBNFParserBuilder().createParser();
+        String generatedTree = parseToTree(generated);
+        String builtInTree = parseToTree(builtIn);
+        assertEquals(builtInTree, generatedTree);
+    }
+
+
+    //    @Test
     public void printXml() throws Exception {
         EBNFParserBuilder builder = new EBNFParserBuilder();
         Parser parser = builder.createParser();

@@ -12,9 +12,9 @@ TemplateFlag: "^";
 
 .I: (#WHITESPACE | SingleLineComment | MultiLineComment)*;
 
-SingleLineComment: "//" #ANY{#EOL};
+SingleLineComment: "//" #VALID{#LINE_SEPARATOR};
 
-MultiLineComment: "/*" #ANY{"*/"};
+MultiLineComment: "/*" #VALID{"*/"};
 
 Name: #UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART*;
 
@@ -50,7 +50,7 @@ AtLeastMinTimes: "{" I Number I "," I "}";
 
 AtLeastMinButNotMoreThanMaxTimes: "{" I Min I "," I Max I "}";
 
-Number: #DIGIT+;
+^Number: #DIGIT+;
 
 Min: Number;
 
@@ -70,6 +70,6 @@ Reference: Name Transform?;
 
 CharType: "#" Name; //TODO: list all possible char types
 
-String: "\"" ("\\\"" -> "\"" | "\\\\" -> "\\" | #ANY){"\""} Transform?;
+String: "\"" ("\\\"" -> "\"" | "\\\\" -> "\\" | #VALID){"\""} Transform?;
 
 Sequence: "(" ExpressionList ")";

@@ -3,6 +3,7 @@ package net.developithecus.parser;
 import net.developithecus.parser.expr.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Map;
  * @version 13.30.12
  * @since 1.0
  */
-public abstract class ParserBuilder {
+public abstract class AbstractParserBuilder {
 
     private Map<String, RuleDef> ruleDefinitions = new HashMap<>();
 
@@ -24,12 +25,19 @@ public abstract class ParserBuilder {
 
     protected final RuleDef rule(String name, Expression... expressions) {
         RuleDef result = new RuleDef(name);
-        result.setExpression(wrap(expressions));
+        if (expressions.length > 0) {
+            result.setExpression(wrap(expressions));
+        }
         ruleDefinitions.put(name, result);
         return result;
     }
 
     protected final OneOfExpression oneOf(Expression... expressions) {
+        return new OneOfExpression()
+                .expressions(expressions);
+    }
+
+    protected final OneOfExpression oneOf(List<Expression> expressions) {
         return new OneOfExpression()
                 .expressions(expressions);
     }
@@ -91,6 +99,12 @@ public abstract class ParserBuilder {
     protected final SequentialExpression sequence(Expression... expressions) {
         return new SequentialExpression()
                 .expressions(expressions);
+    }
+
+    protected final SequentialExpression sequence(List<Expression> expressions) {
+        SequentialExpression expr = new SequentialExpression();
+        expr.setExpressions(expressions);
+        return expr;
     }
 
     protected final StringExpression str(String str) {

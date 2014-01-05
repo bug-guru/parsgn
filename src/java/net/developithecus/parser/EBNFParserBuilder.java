@@ -7,7 +7,7 @@ import net.developithecus.parser.expr.CharType;
  * @version 13.26.12
  * @since 1.0
  */
-public class EBNFParserBuilder extends ParserBuilder {
+public class EBNFParserBuilder extends AbstractParserBuilder {
     public static final String CONFIG_FILE = "ConfigFile";
     public static final String RULE = "Rule";
     public static final String RULE_PREFIX = "RulePrefix";
@@ -204,7 +204,7 @@ public class EBNFParserBuilder extends ParserBuilder {
                 oneOrMore(
                         charType(CharType.DIGIT)
                 )
-        );
+        ).template();
         rule(MIN,
                 ref(NUMBER)
         );
