@@ -1,0 +1,17 @@
+expression: operation #EOF;
+
+operation: operand operator operand;
+
+operand: number;
+
+operator: addition | subtraction | multiplication | division;
+
+number: #DIGIT+;
+
+addition: "+";
+
+subtraction: "-";
+
+multiplication: "*";
+
+division: "/";
