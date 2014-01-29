@@ -1,5 +1,5 @@
 ConfigFile:
-    (I Rule)+ I #EOF;
+    (I Rule)+ I;
 
 Rule:
     (RulePrefix I)? Name Transform? I ":" ExpressionList ";";
@@ -73,3 +73,5 @@ CharType: "#" Name; //TODO: list all possible char types
 String: "\"" ("\\\"" -> "\"" | "\\\\" -> "\\" | #VALID){"\""} Transform?;
 
 Sequence: "(" ExpressionList ")";
+
+

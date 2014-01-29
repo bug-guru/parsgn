@@ -42,7 +42,7 @@ public class ParseNode {
         this.beginPosition = beginPosition;
         this.length = length;
         this.value = value;
-        this.children = children == null ? null : Collections.unmodifiableList(children);
+        this.children = children == null ? Collections.<ParseNode>emptyList() : Collections.unmodifiableList(children);
     }
 
     public String getName() {
@@ -72,13 +72,39 @@ public class ParseNode {
         if (value != null) {
             result.append('=').append(value);
         }
-        if (children != null && !children.isEmpty()) {
+        if (!children.isEmpty()) {
             result.append(children);
         }
         return result.toString();
     }
 
     public boolean isLeaf() {
-        return children == null || children.isEmpty();
+        return children.isEmpty();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ParseNode parseNode = (ParseNode) o;
+
+        if (length != parseNode.length) return false;
+        if (!beginPosition.equals(parseNode.beginPosition)) return false;
+        if (!children.equals(parseNode.children)) return false;
+        if (!name.equals(parseNode.name)) return false;
+        if (value != null ? !value.equals(parseNode.value) : parseNode.value != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + beginPosition.hashCode();
+        result = 31 * result + length;
+        result = 31 * result + children.hashCode();
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
     }
 }

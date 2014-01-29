@@ -44,6 +44,10 @@ public class XmlResultBuilder extends ResultBuilder<org.w3c.dom.Node> {
         result = db.newDocument();
     }
 
+    public XmlResultBuilder(DocumentBuilder builder) {
+        result = builder.newDocument();
+    }
+
     @Override
     protected Node createNode(String name, Position beginPosition, int length, String value, List<Node> children) {
         Element node = result.createElement(name);

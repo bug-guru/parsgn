@@ -23,7 +23,6 @@
 package net.developithecus.parser;
 
 import net.developithecus.parser.exceptions.ParsingException;
-import net.developithecus.parser.exceptions.UnexpectedEOFException;
 import net.developithecus.parser.expr.ReferenceExpression;
 
 import java.io.BufferedReader;
@@ -91,9 +90,9 @@ public class Parser {
             List<ParsingEntry> log = new ArrayList<>(INITIAL_LOG_CAPACITY);
             ParsingContext<T> ctx = new ParsingContext<>(root, builder);
             int row = 0;
+            String line = reader.readLine();
             while (true) {
                 row++;
-                String line = reader.readLine();
                 int length = line == null ? 0 : line.length();
                 int col = 0;
                 for (int offset = 0; offset <= length; ) {
@@ -104,6 +103,10 @@ public class Parser {
                         codePoint = -1;
                         offset++;
                     } else if (offset == length) {
+                        line = reader.readLine();
+                        if (line == null) {
+                            break;
+                        }
                         codePoint = '\n';
                         offset++;
                     } else {
@@ -119,11 +122,7 @@ public class Parser {
                         }
                     } while (ctx.getNextIndex() < log.size());
                 }
-                if (line == null) {
-                    break;
-                }
             }
-            throw new UnexpectedEOFException();
         }
     }
 

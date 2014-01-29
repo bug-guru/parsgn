@@ -1,6 +1,4 @@
-expression: operation #EOF;
-
-operation: operand operator operand;
+expression: operand operator operand;
 
 operand: number;
 

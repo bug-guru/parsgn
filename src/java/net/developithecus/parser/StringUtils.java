@@ -22,7 +22,8 @@
 
 package net.developithecus.parser;
 
-import java.io.StringWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Arrays;
 
 /**
@@ -50,7 +51,7 @@ public final class StringUtils {
         return result;
     }
 
-    static void escape(StringWriter result, String value) {
+    static void escape(Writer result, String value) throws IOException {
         int offset = 0;
         int len = value.length();
         while (offset < len) {
