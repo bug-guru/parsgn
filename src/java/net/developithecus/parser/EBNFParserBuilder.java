@@ -74,7 +74,8 @@ public class EBNFParserBuilder extends AbstractParserBuilder {
                         ref(I),
                         ref(RULE)
                 ),
-                ref(I));
+                ref(I),
+                charType(CharType.EOF));
         rule(RULE,
                 zeroOrOne(
                         ref(RULE_PREFIX),

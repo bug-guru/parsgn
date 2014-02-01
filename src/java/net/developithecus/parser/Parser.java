@@ -25,11 +25,11 @@ package net.developithecus.parser;
 import net.developithecus.parser.exceptions.ParsingException;
 import net.developithecus.parser.expr.ReferenceExpression;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.*;
+import java.io.Reader;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -38,7 +38,6 @@ import java.util.*;
  */
 
 public class Parser {
-    private static final int INITIAL_LOG_CAPACITY = 2048;
     private final ReferenceExpression root;
 
     public Parser(Rule root) {
@@ -46,7 +45,7 @@ public class Parser {
         this.root.setReference(root);
     }
 
-    public void parse(InputStream input, NodeTreeVisitor visitor) throws ParsingException, IOException {
+    public void parse(Reader input, NodeTreeVisitor visitor) throws ParsingException, IOException {
         ParseTreeResultBuilder builder = new ParseTreeResultBuilder();
         parse(input, builder);
         ParseNode root = builder.getRoot();
@@ -83,47 +82,10 @@ public class Parser {
         }
     }
 
-    public <T> void parse(InputStream input, ResultBuilder<T> builder) throws ParsingException, IOException {
-        try (
-                BufferedReader reader = new BufferedReader(new InputStreamReader(input))
-        ) {
-            List<ParsingEntry> log = new ArrayList<>(INITIAL_LOG_CAPACITY);
-            ParsingContext<T> ctx = new ParsingContext<>(root, builder);
-            int row = 0;
-            String line = reader.readLine();
-            while (true) {
-                row++;
-                int length = line == null ? 0 : line.length();
-                int col = 0;
-                for (int offset = 0; offset <= length; ) {
-                    col++;
-                    Position pos = new Position(row, col);
-                    int codePoint;
-                    if (line == null) {
-                        codePoint = -1;
-                        offset++;
-                    } else if (offset == length) {
-                        line = reader.readLine();
-                        if (line == null) {
-                            break;
-                        }
-                        codePoint = '\n';
-                        offset++;
-                    } else {
-                        codePoint = line.codePointAt(offset);
-                        offset += Character.charCount(codePoint);
-                    }
-                    log.add(new ParsingEntry(pos, codePoint));
-                    do {
-                        ParsingEntry entry = log.get(ctx.getNextIndex());
-                        ctx.next(entry);
-                        if (builder.isFinished()) {
-                            return;
-                        }
-                    } while (ctx.getNextIndex() < log.size());
-                }
-            }
-        }
+    public <T> void parse(Reader input, ResultBuilder<T> builder) throws ParsingException, IOException {
+        CodePointSource src = new CodePointSource(input);
+        ParsingContext<T> ctx = new ParsingContext<>(root, builder, src);
+        ctx.parse();
     }
 
 }

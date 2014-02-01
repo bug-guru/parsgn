@@ -22,10 +22,7 @@
 
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.Expression;
-import net.developithecus.parser.ExpressionChecker;
 import net.developithecus.parser.ResultType;
-import net.developithecus.parser.TransparentExpressionChecker;
 import net.developithecus.parser.exceptions.ParsingException;
 
 /**
@@ -122,6 +119,11 @@ public class QuantityExpression extends Expression {
             } else {
                 return ResultType.CONTINUE;
             }
+        }
+
+        @Override
+        public String toString() {
+            return "Quantity";
         }
     }
 }

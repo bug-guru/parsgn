@@ -20,36 +20,19 @@
  * THE SOFTWARE.
  */
 
-package net.developithecus.parser;
+package net.developithecus.parser.expr;
+
+import net.developithecus.parser.CheckResult;
+import net.developithecus.parser.ResultType;
+import net.developithecus.parser.exceptions.ParsingException;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
- * @version 13.30.12
+ * @version 13.25.12
  * @since 1.0
  */
-class ParsingEntry {
-    private final Position position;
-    private final int codePoint;
+public abstract class ExpressionChecker {
+    public abstract Expression next();
 
-    public ParsingEntry(Position position, int codePoint) {
-        this.position = position;
-        this.codePoint = codePoint;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    public int getCodePoint() {
-        return codePoint;
-    }
-
-    @Override
-    public String toString() {
-        return "ParsingEntry{" +
-                "pos=" + position +
-                ", codePoint=" + codePoint +
-                (codePoint > 0 ? ", char=" + (char) codePoint : "") +
-                '}';
-    }
+    public abstract CheckResult check(int codePoint, ResultType prevResult) throws ParsingException;
 }

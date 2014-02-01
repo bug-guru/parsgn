@@ -34,8 +34,8 @@ public class ParseTreeResultBuilder extends ResultBuilder<ParseNode> {
     private ParseNode root;
 
     @Override
-    protected ParseNode createNode(String name, Position beginPosition, int length, String value, List<ParseNode> children) {
-        return new ParseNode(name, beginPosition, length, value, children);
+    protected ParseNode createNode(String name, String value, List<ParseNode> children) {
+        return new ParseNode(name, value, children);
     }
 
     @Override

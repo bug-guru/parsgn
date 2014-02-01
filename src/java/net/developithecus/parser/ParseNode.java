@@ -32,15 +32,11 @@ import java.util.List;
  */
 public class ParseNode {
     private final String name;
-    private final Position beginPosition;
-    private final int length;
     private final List<ParseNode> children;
     private final String value;
 
-    public ParseNode(String name, Position beginPosition, int length, String value, List<ParseNode> children) {
+    public ParseNode(String name, String value, List<ParseNode> children) {
         this.name = name;
-        this.beginPosition = beginPosition;
-        this.length = length;
         this.value = value;
         this.children = children == null ? Collections.<ParseNode>emptyList() : Collections.unmodifiableList(children);
     }
@@ -55,14 +51,6 @@ public class ParseNode {
 
     public List<ParseNode> getChildren() {
         return children;
-    }
-
-    public Position getBeginPosition() {
-        return beginPosition;
-    }
-
-    public int getLength() {
-        return length;
     }
 
     @Override
@@ -89,8 +77,6 @@ public class ParseNode {
 
         ParseNode parseNode = (ParseNode) o;
 
-        if (length != parseNode.length) return false;
-        if (!beginPosition.equals(parseNode.beginPosition)) return false;
         if (!children.equals(parseNode.children)) return false;
         if (!name.equals(parseNode.name)) return false;
         if (value != null ? !value.equals(parseNode.value) : parseNode.value != null) return false;
@@ -101,8 +87,6 @@ public class ParseNode {
     @Override
     public int hashCode() {
         int result = name.hashCode();
-        result = 31 * result + beginPosition.hashCode();
-        result = 31 * result + length;
         result = 31 * result + children.hashCode();
         result = 31 * result + (value != null ? value.hashCode() : 0);
         return result;

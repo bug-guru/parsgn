@@ -22,9 +22,6 @@
 
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.CodePointExpressionChecker;
-import net.developithecus.parser.Expression;
-import net.developithecus.parser.ExpressionChecker;
 import net.developithecus.parser.ResultType;
 import net.developithecus.parser.exceptions.ParsingException;
 
@@ -65,6 +62,11 @@ public class CharacterExpression extends Expression {
             } else {
                 return ResultType.ROLLBACK;
             }
+        }
+
+        @Override
+        public String toString() {
+            return charType.toString();
         }
 
     }

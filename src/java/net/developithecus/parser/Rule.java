@@ -22,6 +22,8 @@
 
 package net.developithecus.parser;
 
+import net.developithecus.parser.expr.Expression;
+
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
  * @version 13.5.12

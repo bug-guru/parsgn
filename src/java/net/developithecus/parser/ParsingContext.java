@@ -25,11 +25,15 @@ package net.developithecus.parser;
 import net.developithecus.parser.exceptions.InternalParsingException;
 import net.developithecus.parser.exceptions.ParsingException;
 import net.developithecus.parser.exceptions.SyntaxErrorException;
+import net.developithecus.parser.expr.Expression;
+import net.developithecus.parser.expr.ExpressionChecker;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -37,38 +41,26 @@ import java.util.List;
  * @since 1.0
  */
 public class ParsingContext<T> {
-    private int index;
-    private ParsingEntry entry;
-    private int nextIndex;
+    private static final Logger logger = Logger.getLogger(ParsingContext.class.getName());
     private final Deque<Holder> stack = new LinkedList<>();
-    private Position maxPos;
     private final ResultBuilder<T> builder;
+    private final CodePointSource source;
 
-    public ParsingContext(Expression root, ResultBuilder<T> builder) {
+    public ParsingContext(Expression root, ResultBuilder<T> builder, CodePointSource source) {
         this.builder = builder;
-        maxPos = new Position(1, 1);
-        entry = new ParsingEntry(maxPos, 0);
+        this.source = source;
         Holder holder = new ResultHolder();
-        holder.beginPosition = maxPos;
         stack.push(holder);
         pushExpression(root);
     }
 
-    private void reset(ParsingEntry entry) {
-        if (maxPos == null || maxPos.compareTo(entry.getPosition()) < 0) {
-            maxPos = entry.getPosition();
+    public void parse() throws IOException, ParsingException {
+        while (!builder.isFinished()) {
+            next();
         }
-        this.index = nextIndex;
-        this.entry = entry;
-        this.nextIndex = index + 1;
     }
 
-    public int getNextIndex() {
-        return nextIndex;
-    }
-
-    public void next(ParsingEntry entry) throws ParsingException {
-        reset(entry);
+    public void next() throws ParsingException, IOException {
         completePath();
         process();
     }
@@ -80,23 +72,31 @@ public class ParsingContext<T> {
         }
     }
 
-    private void process() throws ParsingException {
+    private void process() throws ParsingException, IOException {
+        int codePoint = source.getNext();
         ResultType prevResult = null;
+//        System.out.printf("\"%s\" %s\n", (char)codePoint, stack);
         loop:
         while (!builder.isFinished()) {
             Holder holder = stack.peek();
             ExpressionChecker currentChecker = holder.checker;
-            CheckResult checkResult = currentChecker.check(entry.getCodePoint(), prevResult);
-            prevResult = checkResult.doAction(this);
+            CheckResult checkResult = currentChecker.check(codePoint, prevResult);
+            ResultType result = checkResult.doAction(this);
+//            if (prevResult == null) {
+//                System.out.println("result: " + result);
+//            }
+            prevResult = result;
             switch (prevResult) {
                 case CONTINUE:
                     break loop;
                 case COMMIT:
+                    source.removeMark();
                     break;
                 case ROLLBACK:
                 case ROLLBACK_OPTIONAL:
+                    source.rewind();
                     if (stack.size() == 1) {
-                        throw new SyntaxErrorException(maxPos);
+                        throw new SyntaxErrorException();
                     }
                     break;
                 default:
@@ -108,11 +108,10 @@ public class ParsingContext<T> {
     private void pushExpression(Expression nextExpr) {
         ExpressionChecker nextChecker = nextExpr.checker();
         Holder holder = new Holder();
-        holder.beginIndex = index;
-        holder.beginPosition = entry.getPosition();
         holder.checker = nextChecker;
         holder.hidden = nextExpr.isHidden() || stack.peek().hidden;
         stack.push(holder);
+        source.mark();
     }
 
     public Holder pop() {
@@ -123,14 +122,8 @@ public class ParsingContext<T> {
         return stack.peek();
     }
 
-    public void setNextIndex(int nextIndex) {
-        this.nextIndex = nextIndex;
-    }
-
     public class Holder {
         ExpressionChecker checker;
-        int beginIndex;
-        Position beginPosition;
         List<T> committedNodes;
         StringBuilder committedValue;
         boolean hidden;
@@ -161,10 +154,6 @@ public class ParsingContext<T> {
             } else {
                 committedNodes.addAll(nodes);
             }
-        }
-
-        protected int length() {
-            return nextIndex - beginIndex;
         }
 
         public void commitValue(String value) throws InternalParsingException {
@@ -206,7 +195,7 @@ public class ParsingContext<T> {
             boolean emptyValue = child == null || child.committedValue == null || child.committedValue.length() == 0;
             String value = emptyValue ? null : child.committedValue.toString();
             List<T> nodes = emptyNodes ? null : child.committedNodes;
-            return builder.createNode(nodeName, beginPosition, length(), value, nodes);
+            return builder.createNode(nodeName, value, nodes);
         }
 
         public void merge(Holder another) throws ParsingException {
@@ -215,6 +204,11 @@ public class ParsingContext<T> {
             }
             commitValue(another.committedValue);
             addNodes(another.committedNodes);
+        }
+
+        @Override
+        public String toString() {
+            return checker.toString();
         }
     }
 
@@ -225,6 +219,11 @@ public class ParsingContext<T> {
             T node = wrapNode(nodeName, child);
             builder.committedRoot(node);
             builder.setFinished(true);
+        }
+
+        @Override
+        public String toString() {
+            return "ROOT";
         }
     }
 }

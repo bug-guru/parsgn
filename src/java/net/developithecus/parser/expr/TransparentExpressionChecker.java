@@ -20,8 +20,11 @@
  * THE SOFTWARE.
  */
 
-package net.developithecus.parser;
+package net.developithecus.parser.expr;
 
+import net.developithecus.parser.CheckResult;
+import net.developithecus.parser.ParsingContext;
+import net.developithecus.parser.ResultType;
 import net.developithecus.parser.exceptions.InternalParsingException;
 import net.developithecus.parser.exceptions.ParsingException;
 
@@ -30,27 +33,16 @@ import net.developithecus.parser.exceptions.ParsingException;
  * @version 14.1.1
  * @since 1.0
  */
-public abstract class CodePointExpressionChecker implements ExpressionChecker {
+public abstract class TransparentExpressionChecker extends ParentExpressionChecker {
     @Override
-    public final Expression next() {
-        return null;
-    }
-
-    protected abstract int getResult();
-
-    protected abstract ResultType check(int codePoint) throws ParsingException;
-
-    @Override
-    public final CheckResult check(int codePoint, ResultType prevResult) throws ParsingException {
-        ResultType result = check(codePoint);
-        switch (result) {
+    public CheckResult check(ResultType childResult) throws ParsingException {
+        switch (childResult) {
             case COMMIT:
                 return new CheckResult() {
                     @Override
                     public ResultType doAction(ParsingContext ctx) throws ParsingException {
-                        int value = getResult();
-                        ctx.pop();
-                        ctx.peek().commitValue(value);
+                        ParsingContext.Holder top = ctx.pop();
+                        ctx.peek().merge(top);
                         return ResultType.COMMIT;
                     }
                 };
@@ -61,7 +53,7 @@ public abstract class CodePointExpressionChecker implements ExpressionChecker {
             case ROLLBACK:
                 return CheckResult.doRollback();
             default:
-                throw new InternalParsingException("unknown result " + result);
+                throw new InternalParsingException("unknown result " + childResult);
         }
     }
 }

@@ -29,7 +29,9 @@ import net.developithecus.parser.Parser;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.BufferedInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 /**
@@ -43,9 +45,11 @@ public class Calculator01Test {
     public static Parser createParser(String fileName) throws Exception {
         DefaultParserBuilder builder = new DefaultParserBuilder();
         try (
-                InputStream ebnfInput = Calculator01Test.class.getResourceAsStream(fileName)
+                InputStream ebnfInput = Calculator01Test.class.getResourceAsStream(fileName);
+                BufferedInputStream buf = new BufferedInputStream(ebnfInput);
+                InputStreamReader reader = new InputStreamReader(buf);
         ) {
-            return builder.createParser(ebnfInput);
+            return builder.createParser(reader);
         }
     }
 
@@ -63,9 +67,11 @@ public class Calculator01Test {
         String sampleFileName = "calculator01" + name + "_sample.txt";
         String expectedFileName = "calculator01" + name + "_tree.xml";
         try (InputStream sample = Calculator01Test.class.getResourceAsStream(sampleFileName);
+             BufferedInputStream bufSample = new BufferedInputStream(sample);
+             InputStreamReader bufReader = new InputStreamReader(bufSample);
              InputStream expected = Calculator01Test.class.getResourceAsStream(expectedFileName)) {
             ParseTreeResultBuilder builder = new ParseTreeResultBuilder();
-            parser.parse(sample, builder);
+            parser.parse(bufReader, builder);
             StringWriter out = new StringWriter(2048);
             ParseTreeSerialization.serialize(builder.getRoot(), out);
             System.out.println(out.toString());

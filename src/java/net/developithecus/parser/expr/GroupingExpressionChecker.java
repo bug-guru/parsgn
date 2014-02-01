@@ -20,8 +20,11 @@
  * THE SOFTWARE.
  */
 
-package net.developithecus.parser;
+package net.developithecus.parser.expr;
 
+import net.developithecus.parser.CheckResult;
+import net.developithecus.parser.ParsingContext;
+import net.developithecus.parser.ResultType;
 import net.developithecus.parser.exceptions.InternalParsingException;
 import net.developithecus.parser.exceptions.ParsingException;
 

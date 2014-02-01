@@ -22,7 +22,6 @@
 
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.Expression;
 import net.developithecus.parser.ResultType;
 import org.junit.Before;
 import org.junit.Test;

@@ -22,7 +22,8 @@
 
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.*;
+import net.developithecus.parser.ResultType;
+import net.developithecus.parser.Rule;
 import net.developithecus.parser.exceptions.ParsingException;
 
 /**
@@ -109,6 +110,11 @@ public class ReferenceExpression extends Expression {
         public ResultType checkChildRollback() throws ParsingException {
             return ResultType.ROLLBACK;
         }
+
+        @Override
+        public String toString() {
+            return "ref_g:" + reference.getName();
+        }
     }
 
     class TemplateChecker extends TransparentExpressionChecker {
@@ -131,6 +137,11 @@ public class ReferenceExpression extends Expression {
         @Override
         public ResultType checkChildRollback() throws ParsingException {
             return ResultType.ROLLBACK;
+        }
+
+        @Override
+        public String toString() {
+            return "ref_t:" + reference.getName();
         }
     }
 }

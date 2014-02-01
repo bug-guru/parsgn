@@ -33,16 +33,14 @@ public abstract class CheckResult {
     private static final CheckResult OPTIONAL_ROLLBACK = new CheckResult() {
         @Override
         public ResultType doAction(ParsingContext ctx) {
-            ParsingContext.Holder holder = ctx.pop();
-            ctx.setNextIndex(holder.beginIndex);
+            ctx.pop();
             return ResultType.ROLLBACK_OPTIONAL;
         }
     };
     private static final CheckResult ROLLBACK = new CheckResult() {
         @Override
         public ResultType doAction(ParsingContext ctx) {
-            ParsingContext.Holder holder = ctx.pop();
-            ctx.setNextIndex(holder.beginIndex);
+            ctx.pop();
             return ResultType.ROLLBACK;
         }
     };

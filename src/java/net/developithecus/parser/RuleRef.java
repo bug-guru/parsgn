@@ -22,6 +22,8 @@
 
 package net.developithecus.parser;
 
+import net.developithecus.parser.expr.Expression;
+
 import java.util.Map;
 
 /**

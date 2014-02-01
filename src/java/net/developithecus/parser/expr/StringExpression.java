@@ -22,7 +22,8 @@
 
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.*;
+import net.developithecus.parser.ResultType;
+import net.developithecus.parser.StringUtils;
 import net.developithecus.parser.exceptions.ParsingException;
 
 /**
@@ -90,6 +91,11 @@ public class StringExpression extends Expression {
                     return ResultType.CONTINUE;
                 }
             }
+        }
+
+        @Override
+        public String toString() {
+            return "str:" + value;
         }
     }
 }

@@ -52,8 +52,7 @@ public class ParseTreeSerialization {
     }
 
     private static void printNode(Writer out, ParseNode node, int indent) throws IOException {
-        Position pos = node.getBeginPosition();
-        out.append(String.format("%08x %08x %08x %08x ", indent, pos.getRow(), pos.getCol(), node.getLength()));
+        out.append(String.format("%08x ", indent));
         for (int i = 0; i < indent; i++) {
             out.append("  ");
         }

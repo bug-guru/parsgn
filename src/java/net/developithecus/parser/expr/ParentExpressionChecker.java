@@ -20,8 +20,10 @@
  * THE SOFTWARE.
  */
 
-package net.developithecus.parser;
+package net.developithecus.parser.expr;
 
+import net.developithecus.parser.CheckResult;
+import net.developithecus.parser.ResultType;
 import net.developithecus.parser.exceptions.InternalParsingException;
 import net.developithecus.parser.exceptions.ParsingException;
 
@@ -30,7 +32,7 @@ import net.developithecus.parser.exceptions.ParsingException;
  * @version 14.1.1
  * @since 1.0
  */
-public abstract class ParentExpressionChecker implements ExpressionChecker {
+public abstract class ParentExpressionChecker extends ExpressionChecker {
 
     public abstract ResultType checkChildCommit() throws ParsingException;
 

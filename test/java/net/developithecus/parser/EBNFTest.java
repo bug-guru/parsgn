@@ -29,7 +29,9 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.BufferedInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import static org.junit.Assert.assertEquals;
 
@@ -43,18 +45,22 @@ public class EBNFTest {
     private Parser generateDefaultParser() throws Exception {
         DefaultParserBuilder builder = new DefaultParserBuilder();
         try (
-                InputStream ebnfInput = getClass().getResourceAsStream("config.rules")
+                InputStream ebnfInput = getClass().getResourceAsStream("config.rules");
+                BufferedInputStream buf = new BufferedInputStream(ebnfInput);
+                InputStreamReader reader = new InputStreamReader(buf);
         ) {
-            return builder.createParser(ebnfInput);
+            return builder.createParser(reader);
         }
     }
 
     private ParseNode parseToTree(Parser parser) throws Exception {
         try (
-                InputStream input = getClass().getResourceAsStream("config.rules")
+                InputStream input = getClass().getResourceAsStream("config.rules");
+                BufferedInputStream buf = new BufferedInputStream(input);
+                InputStreamReader reader = new InputStreamReader(buf);
         ) {
             ParseTreeResultBuilder builder = new ParseTreeResultBuilder();
-            parser.parse(input, builder);
+            parser.parse(reader, builder);
             return builder.getRoot();
         }
     }
@@ -74,10 +80,12 @@ public class EBNFTest {
         EBNFParserBuilder builder = new EBNFParserBuilder();
         Parser parser = builder.createParser();
         try (
-                InputStream input = getClass().getResourceAsStream("config.rules")
+                InputStream input = getClass().getResourceAsStream("config.rules");
+                BufferedInputStream buf = new BufferedInputStream(input);
+                InputStreamReader reader = new InputStreamReader(buf);
         ) {
             XmlResultBuilder resultBuilder = new XmlResultBuilder();
-            parser.parse(input, resultBuilder);
+            parser.parse(reader, resultBuilder);
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");

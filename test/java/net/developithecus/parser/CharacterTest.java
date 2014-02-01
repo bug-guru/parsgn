@@ -23,14 +23,13 @@
 package net.developithecus.parser;
 
 import net.developithecus.parser.expr.CharType;
-import org.junit.Test;
 
 /**
  *
  */
 public class CharacterTest {
 
-    @Test
+    //@Test
     public void testIgnorable() {
         isIdentifierIgnorable(';');
         isIdentifierIgnorable(' ');

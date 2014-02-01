@@ -25,10 +25,11 @@ package net.developithecus.parser;
 import net.developithecus.parser.exceptions.InternalParsingException;
 import net.developithecus.parser.exceptions.ParsingException;
 import net.developithecus.parser.expr.CharType;
+import net.developithecus.parser.expr.Expression;
 import net.developithecus.parser.expr.OneOfExpression;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +43,7 @@ import static net.developithecus.parser.EBNFParserBuilder.*;
 public class DefaultParserBuilder extends AbstractParserBuilder {
     private static final Parser EBNF_PARSER = new EBNFParserBuilder().createParser();
 
-    public Parser createParser(InputStream input) throws IOException, ParsingException {
+    public Parser createParser(Reader input) throws IOException, ParsingException {
         ParseTreeResultBuilder builder = new ParseTreeResultBuilder();
         EBNF_PARSER.parse(input, builder);
         Rule root = null;

@@ -1,5 +1,5 @@
 ConfigFile:
-    (I Rule)+ I;
+    (I Rule)+ I #EOF;
 
 Rule:
     (RulePrefix I)? Name Transform? I ":" ExpressionList ";";

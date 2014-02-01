@@ -20,8 +20,11 @@
  * THE SOFTWARE.
  */
 
-package net.developithecus.parser;
+package net.developithecus.parser.expr;
 
+import net.developithecus.parser.CheckResult;
+import net.developithecus.parser.ParsingContext;
+import net.developithecus.parser.ResultType;
 import net.developithecus.parser.exceptions.InternalParsingException;
 import net.developithecus.parser.exceptions.ParsingException;
 
@@ -30,13 +33,13 @@ import net.developithecus.parser.exceptions.ParsingException;
  * @version 14.1.1
  * @since 1.0
  */
-public abstract class StringExpressionChecker implements ExpressionChecker {
+public abstract class CodePointExpressionChecker extends ExpressionChecker {
     @Override
     public final Expression next() {
         return null;
     }
 
-    protected abstract String getResult();
+    protected abstract int getResult();
 
     protected abstract ResultType check(int codePoint) throws ParsingException;
 
@@ -48,11 +51,9 @@ public abstract class StringExpressionChecker implements ExpressionChecker {
                 return new CheckResult() {
                     @Override
                     public ResultType doAction(ParsingContext ctx) throws ParsingException {
-                        String value = getResult();
+                        int value = getResult();
                         ctx.pop();
-                        if (value != null) {
-                            ctx.peek().commitValue(value);
-                        }
+                        ctx.peek().commitValue(value);
                         return ResultType.COMMIT;
                     }
                 };
