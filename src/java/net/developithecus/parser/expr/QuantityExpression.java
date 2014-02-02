@@ -79,7 +79,7 @@ public class QuantityExpression extends Expression {
         return new Checker();
     }
 
-    class Checker extends TransparentExpressionChecker {
+    class Checker extends IntermediateExpressionChecker {
         private int turnsPassed = 0;
 
         @Override
@@ -88,18 +88,16 @@ public class QuantityExpression extends Expression {
         }
 
         @Override
-        public ResultType checkChildCommit() throws ParsingException {
-            return doCommitOrContinue();
-        }
-
-        @Override
-        public ResultType checkChildOptionalRollback() throws ParsingException {
-            return doCommitOrRollback();
-        }
-
-        @Override
-        public ResultType checkChildRollback() throws ParsingException {
-            return doCommitOrRollback();
+        public ResultType check(ResultType childResult) throws ParsingException {
+            switch (childResult) {
+                case COMMIT:
+                    return doCommitOrContinue();
+                case ROLLBACK_OPTIONAL:
+                case ROLLBACK:
+                    return doCommitOrRollback();
+                default:
+                    throw new ParsingException("unknown result: " + childResult);
+            }
         }
 
         private ResultType doCommitOrRollback() throws ParsingException {

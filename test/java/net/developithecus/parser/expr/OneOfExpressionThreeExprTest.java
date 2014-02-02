@@ -71,142 +71,142 @@ public class OneOfExpressionThreeExprTest extends OneOfExpressionTestBase {
     @Test
     public void testChecker_C() throws Exception {
         checker.next();
-        assertSame(ResultType.COMMIT, checker.checkChildCommit());
+        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
     }
 
     @Test
     public void testChecker_RC() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         checker.next();
-        assertSame(ResultType.COMMIT, checker.checkChildCommit());
+        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
     }
 
     @Test
     public void testChecker_OC() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildOptionalRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
         checker.next();
-        assertSame(ResultType.COMMIT, checker.checkChildCommit());
+        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
     }
 
     @Test
     public void testChecker_RRC() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         checker.next();
-        assertSame(ResultType.COMMIT, checker.checkChildCommit());
+        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
     }
 
     @Test
     public void testChecker_ROC() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildOptionalRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
         checker.next();
-        assertSame(ResultType.COMMIT, checker.checkChildCommit());
+        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
     }
 
     @Test
     public void testChecker_ORC() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildOptionalRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         checker.next();
-        assertSame(ResultType.COMMIT, checker.checkChildCommit());
+        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
     }
 
     @Test
     public void testChecker_OOC() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildOptionalRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildOptionalRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
         checker.next();
-        assertSame(ResultType.COMMIT, checker.checkChildCommit());
+        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
     }
 
     @Test
     public void testChecker_RRR() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK));
     }
 
     @Test
     public void testChecker_RRO() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildOptionalRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK_OPTIONAL));
     }
 
     @Test
     public void testChecker_ROR() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildOptionalRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK));
     }
 
     @Test
     public void testChecker_ROO() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildOptionalRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildOptionalRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK_OPTIONAL));
     }
 
     @Test
     public void testChecker_ORR() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildOptionalRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK));
     }
 
     @Test
     public void testChecker_ORO() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildOptionalRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildOptionalRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK_OPTIONAL));
     }
 
     @Test
     public void testChecker_OOR() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildOptionalRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildOptionalRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK));
     }
 
     @Test
     public void testChecker_OOO() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildOptionalRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildOptionalRollback());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildOptionalRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK_OPTIONAL));
     }
 }

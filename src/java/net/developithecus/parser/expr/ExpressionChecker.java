@@ -22,17 +22,10 @@
 
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.CheckResult;
-import net.developithecus.parser.ResultType;
-import net.developithecus.parser.exceptions.ParsingException;
-
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
  * @version 13.25.12
  * @since 1.0
  */
 public abstract class ExpressionChecker {
-    public abstract Expression next();
-
-    public abstract CheckResult check(int codePoint, ResultType prevResult) throws ParsingException;
 }

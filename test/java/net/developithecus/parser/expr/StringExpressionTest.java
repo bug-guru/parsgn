@@ -26,14 +26,15 @@ import net.developithecus.parser.ResultType;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 /**
  * @author dima
  */
 public class StringExpressionTest {
     protected final StringExpression expression;
-    protected StringExpression.Checker checker;
+    protected LeafExpressionChecker checker;
 
     public StringExpressionTest() {
         expression = new StringExpression();
@@ -45,16 +46,13 @@ public class StringExpressionTest {
     }
 
     @Test
-    public void testChecker_next() throws Exception {
-        assertNull(checker.next());
-    }
-
-    @Test
     public void testChecker_OK() throws Exception {
         expression.setValue("Hello, World!");
         expression.setTransform(null);
         test(ResultType.COMMIT, "Hello, World!");
-        assertEquals(null, checker.getResult());
+        StringBuilder builder = new StringBuilder();
+        checker.commitResult(builder);
+        assertEquals(0, builder.length());
     }
 
     @Test
@@ -68,7 +66,9 @@ public class StringExpressionTest {
         expression.setValue("Hello, World!");
         expression.setTransform("Bye-bye!");
         test(ResultType.COMMIT, "Hello, World!");
-        assertEquals("Bye-bye!", checker.getResult());
+        StringBuilder builder = new StringBuilder();
+        checker.commitResult(builder);
+        assertEquals("Bye-bye!", builder.toString());
     }
 
     private void test(ResultType expectedResult, String input) throws Exception {

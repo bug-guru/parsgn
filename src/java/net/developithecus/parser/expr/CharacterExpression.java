@@ -46,12 +46,14 @@ public class CharacterExpression extends Expression {
         return new Checker();
     }
 
-    class Checker extends CodePointExpressionChecker {
+    class Checker extends LeafExpressionChecker {
         private int result;
 
         @Override
-        protected int getResult() {
-            return result;
+        public void commitResult(StringBuilder sb) {
+            if (Character.isValidCodePoint(result)) {
+                sb.appendCodePoint(result);
+            }
         }
 
         @Override

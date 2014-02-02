@@ -79,7 +79,7 @@ public class UntilExpression extends Expression {
         return new Checker();
     }
 
-    class Checker extends TransparentExpressionChecker {
+    class Checker extends IntermediateExpressionChecker {
         private boolean checkingEndCondition = true;
         private int turnsPassed = 0;
 
@@ -93,28 +93,26 @@ public class UntilExpression extends Expression {
         }
 
         @Override
-        public ResultType checkChildCommit() throws ParsingException {
-            if (checkingEndCondition) {
-                return doCommitOrRollback();
-            } else {
-                checkingEndCondition = true;
-                turnsPassed++;
-                return ResultType.CONTINUE;
-            }
-        }
-
-        @Override
-        public ResultType checkChildOptionalRollback() throws ParsingException {
-            return checkChildRollback();
-        }
-
-        @Override
-        public ResultType checkChildRollback() throws ParsingException {
-            if (checkingEndCondition) {
-                checkingEndCondition = false;
-                return ResultType.CONTINUE;
-            } else {
-                return doCommitOrRollback();
+        public ResultType check(ResultType childResult) throws ParsingException {
+            switch (childResult) {
+                case COMMIT:
+                    if (checkingEndCondition) {
+                        return doCommitOrRollback();
+                    } else {
+                        checkingEndCondition = true;
+                        turnsPassed++;
+                        return ResultType.CONTINUE;
+                    }
+                case ROLLBACK_OPTIONAL:
+                case ROLLBACK:
+                    if (checkingEndCondition) {
+                        checkingEndCondition = false;
+                        return ResultType.CONTINUE;
+                    } else {
+                        return doCommitOrRollback();
+                    }
+                default:
+                    throw new ParsingException("unknown result: " + childResult);
             }
         }
 

@@ -45,18 +45,18 @@ public class QuantityExpressionZeroOrOneTest extends QuantityExpressionTestBase 
     @Test
     public void testChecker_COMMIT() throws Exception {
         checker.next();
-        assertSame(ResultType.COMMIT, checker.checkChildCommit());
+        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
     }
 
     @Test
     public void testChecker_ROLLBACK() throws Exception {
         checker.next();
-        assertSame(ResultType.ROLLBACK_OPTIONAL, checker.checkChildRollback());
+        assertSame(ResultType.ROLLBACK_OPTIONAL, checker.check(ResultType.ROLLBACK));
     }
 
     @Test
     public void testChecker_ROLLBACK_OPTIONAL() throws Exception {
         checker.next();
-        assertSame(ResultType.ROLLBACK_OPTIONAL, checker.checkChildOptionalRollback());
+        assertSame(ResultType.ROLLBACK_OPTIONAL, checker.check(ResultType.ROLLBACK_OPTIONAL));
     }
 }

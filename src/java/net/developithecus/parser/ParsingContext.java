@@ -27,13 +27,14 @@ import net.developithecus.parser.exceptions.ParsingException;
 import net.developithecus.parser.exceptions.SyntaxErrorException;
 import net.developithecus.parser.expr.Expression;
 import net.developithecus.parser.expr.ExpressionChecker;
+import net.developithecus.parser.expr.IntermediateExpressionChecker;
+import net.developithecus.parser.expr.LeafExpressionChecker;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -41,7 +42,6 @@ import java.util.logging.Logger;
  * @since 1.0
  */
 public class ParsingContext<T> {
-    private static final Logger logger = Logger.getLogger(ParsingContext.class.getName());
     private final Deque<Holder> stack = new LinkedList<>();
     private final ResultBuilder<T> builder;
     private final CodePointSource source;
@@ -67,41 +67,9 @@ public class ParsingContext<T> {
 
     private void completePath() {
         Expression nextExpr;
-        while ((nextExpr = peek().checker.next()) != null) {
+        while (stack.peek().checker instanceof IntermediateExpressionChecker) {
+            nextExpr = ((IntermediateExpressionChecker) stack.peek().checker).next();
             pushExpression(nextExpr);
-        }
-    }
-
-    private void process() throws ParsingException, IOException {
-        int codePoint = source.getNext();
-        ResultType prevResult = null;
-//        System.out.printf("\"%s\" %s\n", (char)codePoint, stack);
-        loop:
-        while (!builder.isFinished()) {
-            Holder holder = stack.peek();
-            ExpressionChecker currentChecker = holder.checker;
-            CheckResult checkResult = currentChecker.check(codePoint, prevResult);
-            ResultType result = checkResult.doAction(this);
-//            if (prevResult == null) {
-//                System.out.println("result: " + result);
-//            }
-            prevResult = result;
-            switch (prevResult) {
-                case CONTINUE:
-                    break loop;
-                case COMMIT:
-                    source.removeMark();
-                    break;
-                case ROLLBACK:
-                case ROLLBACK_OPTIONAL:
-                    source.rewind();
-                    if (stack.size() == 1) {
-                        throw new SyntaxErrorException();
-                    }
-                    break;
-                default:
-                    throw new ParsingException("unknown result: " + prevResult);
-            }
         }
     }
 
@@ -114,12 +82,48 @@ public class ParsingContext<T> {
         source.mark();
     }
 
-    public Holder pop() {
-        return stack.pop();
-    }
-
-    public Holder peek() {
-        return stack.peek();
+    private void process() throws ParsingException, IOException {
+        int codePoint = source.getNext();
+        Holder leafHolder = stack.peek();
+        LeafExpressionChecker leaf = ((LeafExpressionChecker) leafHolder.checker);
+        ResultType prevResult = leaf.check(codePoint);
+        IntermediateExpressionChecker intermediateChecker = null;
+        loop:
+        while (true) {
+            switch (prevResult) {
+                case CONTINUE:
+                    break loop;
+                case COMMIT:
+                    source.removeMark();
+                    if (intermediateChecker == null) {
+                        stack.pop();
+                        leaf.commitResult(stack.peek().getCommittedValue());
+                    } else if (intermediateChecker.getGroupName() == null) {
+                        ParsingContext<T>.Holder top = stack.pop();
+                        stack.peek().merge(top);
+                    } else {
+                        ParsingContext<T>.Holder top = stack.pop();
+                        stack.peek().commitNode(intermediateChecker.getGroupName(), top);
+                    }
+                    break;
+                case ROLLBACK:
+                case ROLLBACK_OPTIONAL:
+                    source.rewind();
+                    stack.pop();
+                    if (stack.size() == 1) {
+                        throw new SyntaxErrorException();
+                    }
+                    break;
+                default:
+                    throw new ParsingException("unknown result: " + prevResult);
+            }
+            if (builder.isFinished()) {
+                break;
+            }
+            Holder holder = stack.peek();
+            intermediateChecker = (IntermediateExpressionChecker) holder.checker;
+            prevResult = intermediateChecker.check(prevResult);
+        }
     }
 
     public class Holder {
@@ -153,24 +157,6 @@ public class ParsingContext<T> {
                 committedNodes = nodes;
             } else {
                 committedNodes.addAll(nodes);
-            }
-        }
-
-        public void commitValue(String value) throws InternalParsingException {
-            if (hidden || value == null || value.isEmpty()) {
-                return;
-            }
-            initValue();
-            committedValue.append(value);
-        }
-
-        public void commitValue(int codePoint) throws InternalParsingException {
-            if (hidden) {
-                return;
-            }
-            if (Character.isValidCodePoint(codePoint)) {
-                initValue();
-                committedValue.appendCodePoint(codePoint);
             }
         }
 
@@ -209,6 +195,11 @@ public class ParsingContext<T> {
         @Override
         public String toString() {
             return checker.toString();
+        }
+
+        public StringBuilder getCommittedValue() throws InternalParsingException {
+            initValue();
+            return committedValue;
         }
     }
 

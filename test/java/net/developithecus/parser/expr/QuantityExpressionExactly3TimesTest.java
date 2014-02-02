@@ -49,59 +49,59 @@ public class QuantityExpressionExactly3TimesTest extends QuantityExpressionTestB
     @Test
     public void testChecker_R() throws Exception {
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK));
     }
 
     @Test
     public void testChecker_O() throws Exception {
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildOptionalRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK_OPTIONAL));
     }
 
     @Test
     public void testChecker_CR() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildCommit());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.COMMIT));
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK));
     }
 
     @Test
     public void testChecker_CO() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildCommit());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.COMMIT));
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildOptionalRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK_OPTIONAL));
     }
 
     @Test
     public void testChecker_CCR() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildCommit());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.COMMIT));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildCommit());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.COMMIT));
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK));
     }
 
     @Test
     public void testChecker_CCO() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildCommit());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.COMMIT));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildCommit());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.COMMIT));
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildOptionalRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK_OPTIONAL));
     }
 
     @Test
     public void testChecker_CCC() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildCommit());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.COMMIT));
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.checkChildCommit());
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.COMMIT));
         checker.next();
-        assertSame(ResultType.COMMIT, checker.checkChildCommit());
+        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
     }
 
 }

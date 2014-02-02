@@ -39,18 +39,18 @@ public class OneOfExpressionOneExprTest extends OneOfExpressionTestBase {
     @Test
     public void testChecker_COMMIT() throws Exception {
         checker.next();
-        assertSame(ResultType.COMMIT, checker.checkChildCommit());
+        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
     }
 
     @Test
     public void testChecker_ROLLBACK() throws Exception {
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK));
     }
 
     @Test
     public void testChecker_ROLLBACKOPTIONAL() throws Exception {
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.checkChildOptionalRollback());
+        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK_OPTIONAL));
     }
 }

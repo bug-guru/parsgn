@@ -66,7 +66,7 @@ public class OneOfExpression extends Expression {
         return new Checker();
     }
 
-    class Checker extends TransparentExpressionChecker {
+    class Checker extends IntermediateExpressionChecker {
         private Iterator<Expression> exprIterator;
 
         @Override
@@ -78,18 +78,16 @@ public class OneOfExpression extends Expression {
         }
 
         @Override
-        public ResultType checkChildCommit() throws ParsingException {
-            return ResultType.COMMIT;
-        }
-
-        @Override
-        public ResultType checkChildOptionalRollback() throws ParsingException {
-            return doRollbackOrContinue();
-        }
-
-        @Override
-        public ResultType checkChildRollback() throws ParsingException {
-            return doRollbackOrContinue();
+        public ResultType check(ResultType childResult) throws ParsingException {
+            switch (childResult) {
+                case COMMIT:
+                    return ResultType.COMMIT;
+                case ROLLBACK_OPTIONAL:
+                case ROLLBACK:
+                    return doRollbackOrContinue();
+                default:
+                    throw new ParsingException("unknown result: " + childResult);
+            }
         }
 
         private ResultType doRollbackOrContinue() throws ParsingException {

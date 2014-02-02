@@ -61,7 +61,7 @@ public class SequentialExpression extends Expression {
         return new Checker();
     }
 
-    class Checker extends TransparentExpressionChecker {
+    class Checker extends IntermediateExpressionChecker {
         private final Iterator<Expression> expressions = getExpressions().iterator();
         private Expression curExpr;
         private boolean hasCommitted;
@@ -73,19 +73,18 @@ public class SequentialExpression extends Expression {
         }
 
         @Override
-        public ResultType checkChildCommit() throws ParsingException {
-            hasCommitted = true;
-            return doCommitOrContinue();
-        }
-
-        @Override
-        public ResultType checkChildOptionalRollback() throws ParsingException {
-            return doCommitOrContinue();
-        }
-
-        @Override
-        public ResultType checkChildRollback() throws ParsingException {
-            return ResultType.ROLLBACK;
+        public ResultType check(ResultType childResult) throws ParsingException {
+            switch (childResult) {
+                case COMMIT:
+                    hasCommitted = true;
+                    return doCommitOrContinue();
+                case ROLLBACK_OPTIONAL:
+                    return doCommitOrContinue();
+                case ROLLBACK:
+                    return ResultType.ROLLBACK;
+                default:
+                    throw new ParsingException("unknown result: " + childResult);
+            }
         }
 
         private ResultType doCommitOrContinue() throws ParsingException {

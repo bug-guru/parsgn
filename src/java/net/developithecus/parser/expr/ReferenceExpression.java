@@ -22,9 +22,7 @@
 
 package net.developithecus.parser.expr;
 
-import net.developithecus.parser.ResultType;
 import net.developithecus.parser.Rule;
-import net.developithecus.parser.exceptions.ParsingException;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
@@ -71,14 +69,10 @@ public class ReferenceExpression extends Expression {
 
     @Override
     public ExpressionChecker checker() {
-        if (reference.isTemplate()) {
-            return new TemplateChecker();
-        } else {
-            return new GroupingChecker();
-        }
+        return new Checker();
     }
 
-    class GroupingChecker extends GroupingExpressionChecker {
+    class Checker extends IntermediateExpressionChecker {
 
         @Override
         public Expression next() {
@@ -87,7 +81,9 @@ public class ReferenceExpression extends Expression {
 
         @Override
         public String getGroupName() {
-            if (transform != null) {
+            if (reference.isTemplate()) {
+                return null;
+            } else if (transform != null) {
                 return transform;
             } else if (reference.getTransform() != null) {
                 return reference.getTransform();
@@ -97,51 +93,8 @@ public class ReferenceExpression extends Expression {
         }
 
         @Override
-        public ResultType checkChildCommit() throws ParsingException {
-            return ResultType.COMMIT;
-        }
-
-        @Override
-        public ResultType checkChildOptionalRollback() throws ParsingException {
-            return ResultType.ROLLBACK_OPTIONAL;
-        }
-
-        @Override
-        public ResultType checkChildRollback() throws ParsingException {
-            return ResultType.ROLLBACK;
-        }
-
-        @Override
         public String toString() {
-            return "ref_g:" + reference.getName();
-        }
-    }
-
-    class TemplateChecker extends TransparentExpressionChecker {
-
-        @Override
-        public Expression next() {
-            return getReference().getExpression();
-        }
-
-        @Override
-        public ResultType checkChildCommit() throws ParsingException {
-            return ResultType.COMMIT;
-        }
-
-        @Override
-        public ResultType checkChildOptionalRollback() throws ParsingException {
-            return ResultType.ROLLBACK_OPTIONAL;
-        }
-
-        @Override
-        public ResultType checkChildRollback() throws ParsingException {
-            return ResultType.ROLLBACK;
-        }
-
-        @Override
-        public String toString() {
-            return "ref_t:" + reference.getName();
+            return "ref:" + reference.getName();
         }
     }
 }

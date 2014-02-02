@@ -71,12 +71,14 @@ public class StringExpression extends Expression {
         return new Checker();
     }
 
-    class Checker extends StringExpressionChecker {
+    class Checker extends LeafExpressionChecker {
         private int offset;
 
         @Override
-        protected String getResult() {
-            return transform;
+        public void commitResult(StringBuilder result) {
+            if (transform != null) {
+                result.append(transform);
+            }
         }
 
         @Override
