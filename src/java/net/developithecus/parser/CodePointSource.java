@@ -34,9 +34,10 @@ import java.util.LinkedList;
  */
 public class CodePointSource {
     private final Deque<Bookmark> bookmarks = new LinkedList<>();
-    private Bookmark next;
-    private Bookmark last;
     private final Reader reader;
+    private Bookmark next;
+    private Bookmark max;
+    private Bookmark last;
 
     public CodePointSource(Reader reader) throws IOException {
         this.reader = reader;
@@ -116,8 +117,25 @@ public class CodePointSource {
 
     public int getNext() throws IOException {
         int result = next.codePoint;
+        updateMax();
         prepareNext();
         return result;
+    }
+
+    private void updateMax() {
+        if (max == null
+                || max.row == next.row && max.col < next.col
+                || max.row < next.row) {
+            max = next;
+        }
+    }
+
+    public int getMaxCol() {
+        return max.col;
+    }
+
+    public int getMaxRow() {
+        return max.row;
     }
 
     private static class Bookmark {

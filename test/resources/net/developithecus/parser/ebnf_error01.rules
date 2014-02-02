@@ -1,0 +1,7 @@
+good: rule is ok;
+
+good_rule: should work;
+
+bad rule: should fail;
+
+goodone: but will not be processed;

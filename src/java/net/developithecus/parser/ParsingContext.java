@@ -108,10 +108,10 @@ public class ParsingContext<T> {
                     break;
                 case ROLLBACK:
                 case ROLLBACK_OPTIONAL:
-                    source.rewind();
                     stack.pop();
+                    source.rewind();
                     if (stack.size() == 1) {
-                        throw new SyntaxErrorException();
+                        throw new SyntaxErrorException(source.getMaxRow(), source.getMaxCol());
                     }
                     break;
                 default:

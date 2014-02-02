@@ -20,40 +20,40 @@
  * THE SOFTWARE.
  */
 
-package net.developithecus.parser.exceptions;
+package net.developithecus.parser;
 
+import net.developithecus.parser.exceptions.SyntaxErrorException;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
- * @version 13.31.12
+ * @version 14.2.2
  * @since 1.0
  */
-public class SyntaxErrorException extends ParsingException {
-    private final int row;
-    private final int col;
+public class ErrorProcessingTest {
 
-    public SyntaxErrorException(int row, int col) {
-        super(String.format("Line %d: syntax error at or near col %d", row, col));
-        this.row = row;
-        this.col = col;
+    private Parser createParser(String fileName) throws Exception {
+        try (
+                InputStream input = getClass().getResourceAsStream(fileName);
+                BufferedInputStream bufInput = new BufferedInputStream(input);
+                InputStreamReader reader = new InputStreamReader(bufInput)) {
+            DefaultParserBuilder builder = new DefaultParserBuilder();
+            return builder.createParser(reader);
+        }
     }
 
-    public int getRow() {
-        return row;
+    @Test
+    public void testEBNFError() throws Exception {
+        try {
+            createParser("ebnf_error01.rules");
+        } catch (SyntaxErrorException ex) {
+            Assert.assertEquals(5, ex.getRow());
+            Assert.assertEquals(5, ex.getCol());
+        }
     }
-
-    public int getCol() {
-        return col;
-    }
-
-    //    private final Position position;
-//
-//    public SyntaxErrorException(Position position) {
-//        super(String.format("Line %d: syntax error at or near col %d", position.getRow(), position.getCol()));
-//        this.position = position;
-//    }
-//
-//    public Position getPosition() {
-//        return position;
-//    }
 }
