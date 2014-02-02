@@ -32,7 +32,7 @@ import java.util.List;
 public abstract class ResultBuilder<T> {
     private boolean finished = false;
 
-    protected abstract T createNode(String name, String value, List<T> children);
+    protected abstract T createNode(String name, String value, List<T> children, Position startPos, Position endPos);
 
     protected abstract void committedRoot(T root);
 

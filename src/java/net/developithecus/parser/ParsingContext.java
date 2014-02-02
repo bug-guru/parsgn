@@ -80,6 +80,7 @@ public class ParsingContext<T> {
         holder.hidden = nextExpr.isHidden() || stack.peek().hidden;
         stack.push(holder);
         source.mark();
+        holder.start = source.getNextPos();
     }
 
     private void process() throws ParsingException, IOException {
@@ -103,6 +104,7 @@ public class ParsingContext<T> {
                         stack.peek().merge(top);
                     } else {
                         ParsingContext<T>.Holder top = stack.pop();
+                        top.end = source.getNextPos();
                         stack.peek().commitNode(intermediateChecker.getGroupName(), top);
                     }
                     break;
@@ -111,7 +113,7 @@ public class ParsingContext<T> {
                     stack.pop();
                     source.rewind();
                     if (stack.size() == 1) {
-                        throw new SyntaxErrorException(source.getMaxRow(), source.getMaxCol());
+                        throw new SyntaxErrorException(source.getMaxPos());
                     }
                     break;
                 default:
@@ -131,6 +133,8 @@ public class ParsingContext<T> {
         List<T> committedNodes;
         StringBuilder committedValue;
         boolean hidden;
+        Position start;
+        Position end;
 
         protected void initValue() throws InternalParsingException {
             if (committedValue == null) {
@@ -177,11 +181,14 @@ public class ParsingContext<T> {
         }
 
         protected T wrapNode(String nodeName, Holder child) {
-            boolean emptyNodes = child == null || child.committedNodes == null || child.committedNodes.isEmpty();
-            boolean emptyValue = child == null || child.committedValue == null || child.committedValue.length() == 0;
+            if (child == null) {
+                throw new IllegalArgumentException("child cannot be null");
+            }
+            boolean emptyNodes = child.committedNodes == null || child.committedNodes.isEmpty();
+            boolean emptyValue = child.committedValue == null || child.committedValue.length() == 0;
             String value = emptyValue ? null : child.committedValue.toString();
             List<T> nodes = emptyNodes ? null : child.committedNodes;
-            return builder.createNode(nodeName, value, nodes);
+            return builder.createNode(nodeName, value, nodes, child.start, child.end);
         }
 
         public void merge(Holder another) throws ParsingException {

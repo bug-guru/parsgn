@@ -34,11 +34,15 @@ public class ParseNode {
     private final String name;
     private final List<ParseNode> children;
     private final String value;
+    private final Position start;
+    private final Position end;
 
-    public ParseNode(String name, String value, List<ParseNode> children) {
+    public ParseNode(String name, String value, List<ParseNode> children, Position start, Position end) {
         this.name = name;
         this.value = value;
         this.children = children == null ? Collections.<ParseNode>emptyList() : Collections.unmodifiableList(children);
+        this.start = start;
+        this.end = end;
     }
 
     public String getName() {
@@ -70,6 +74,14 @@ public class ParseNode {
         return children.isEmpty();
     }
 
+    public Position getStart() {
+        return start;
+    }
+
+    public Position getEnd() {
+        return end;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -78,7 +90,9 @@ public class ParseNode {
         ParseNode parseNode = (ParseNode) o;
 
         if (!children.equals(parseNode.children)) return false;
+        if (!end.equals(parseNode.end)) return false;
         if (!name.equals(parseNode.name)) return false;
+        if (!start.equals(parseNode.start)) return false;
         if (value != null ? !value.equals(parseNode.value) : parseNode.value != null) return false;
 
         return true;
@@ -89,6 +103,8 @@ public class ParseNode {
         int result = name.hashCode();
         result = 31 * result + children.hashCode();
         result = 31 * result + (value != null ? value.hashCode() : 0);
+        result = 31 * result + start.hashCode();
+        result = 31 * result + end.hashCode();
         return result;
     }
 }

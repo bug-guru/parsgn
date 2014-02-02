@@ -49,7 +49,7 @@ public class XmlResultBuilder extends ResultBuilder<org.w3c.dom.Node> {
     }
 
     @Override
-    protected Node createNode(String name, String value, List<Node> children) {
+    protected Node createNode(String name, String value, List<Node> children, Position start, Position end) {
         Element node = result.createElement(name);
         if (value != null) {
             Text txt = result.createTextNode(value);

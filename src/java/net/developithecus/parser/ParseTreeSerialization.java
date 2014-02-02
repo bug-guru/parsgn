@@ -52,15 +52,21 @@ public class ParseTreeSerialization {
     }
 
     private static void printNode(Writer out, ParseNode node, int indent) throws IOException {
-        out.append(String.format("%08x ", indent));
+        out.append(String.format("%08x %08x %08x %08x %08x ", indent,
+                node.getStart().getRow(),
+                node.getStart().getCol(),
+                node.getEnd().getRow(),
+                node.getEnd().getCol()));
         for (int i = 0; i < indent; i++) {
             out.append("  ");
         }
+        out.append('"');
         StringUtils.escape(out, node.getName());
+        out.append('"');
         if (node.getValue() != null) {
-            out.write("=\"");
+            out.append(" \"");
             StringUtils.escape(out, node.getValue());
-            out.write("\"");
+            out.append('"');
         }
         out.write('\n');
     }

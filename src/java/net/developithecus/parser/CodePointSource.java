@@ -33,11 +33,11 @@ import java.util.LinkedList;
  * @author dima
  */
 public class CodePointSource {
-    private final Deque<Bookmark> bookmarks = new LinkedList<>();
+    private final Deque<CodePoint> bookmarks = new LinkedList<>();
     private final Reader reader;
-    private Bookmark next;
-    private Bookmark max;
-    private Bookmark last;
+    private CodePoint next;
+    private Position max;
+    private CodePoint last;
 
     public CodePointSource(Reader reader) throws IOException {
         this.reader = reader;
@@ -79,7 +79,7 @@ public class CodePointSource {
         if (codePoint == '\r') {
             codePoint = '\n';
         }
-        Bookmark tmp = new Bookmark(last, codePoint);
+        CodePoint tmp = new CodePoint(last, codePoint);
         if (next == null) {
             next = tmp;
             last = tmp;
@@ -123,41 +123,41 @@ public class CodePointSource {
     }
 
     private void updateMax() {
-        if (max == null
-                || max.row == next.row && max.col < next.col
-                || max.row < next.row) {
-            max = next;
-        }
+        max = Position.max(max, next.pos);
     }
 
-    public int getMaxCol() {
-        return max.col;
+    public Position getMaxPos() {
+        return max;
     }
 
-    public int getMaxRow() {
-        return max.row;
+    public Position getNextPos() {
+        return next.pos;
     }
 
-    private static class Bookmark {
+    private static class CodePoint {
         private final int codePoint;
-        private final int row;
-        private final int col;
+        private final Position pos;
         private final boolean newLine;
-        private Bookmark next;
+        private CodePoint next;
 
-        public Bookmark(Bookmark prev, int codePoint) {
+        public CodePoint(CodePoint prev, int codePoint) {
             this.codePoint = codePoint;
             this.newLine = CharType.LINE_SEPARATOR.apply(codePoint);
             if (prev == null) {
-                row = 1;
-                col = 1;
+                pos = new Position(1, 1);
             } else if (prev.newLine) {
-                row = prev.row + 1;
-                col = 1;
+                pos = Position.newRow(prev.pos);
             } else {
-                row = prev.row;
-                col = prev.col + 1;
+                pos = Position.newCol(prev.pos);
             }
+        }
+
+        @Override
+        public String toString() {
+            return "CodePoint{" +
+                    "codePoint=" + codePoint +
+                    ", pos=" + pos +
+                    '}';
         }
     }
 }

@@ -52,8 +52,8 @@ public class ErrorProcessingTest {
         try {
             createParser("ebnf_error01.rules");
         } catch (SyntaxErrorException ex) {
-            Assert.assertEquals(5, ex.getRow());
-            Assert.assertEquals(5, ex.getCol());
+            Assert.assertEquals(5, ex.getPosition().getRow());
+            Assert.assertEquals(5, ex.getPosition().getCol());
         }
     }
 }

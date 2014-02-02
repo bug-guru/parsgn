@@ -23,37 +23,22 @@
 package net.developithecus.parser.exceptions;
 
 
+import net.developithecus.parser.Position;
+
 /**
  * @author <a href="mailto:dima@fedoto.ws">Dimitrijs Fedotovs</a>
  * @version 13.31.12
  * @since 1.0
  */
 public class SyntaxErrorException extends ParsingException {
-    private final int row;
-    private final int col;
+    private final Position position;
 
-    public SyntaxErrorException(int row, int col) {
-        super(String.format("Line %d: syntax error at or near col %d", row, col));
-        this.row = row;
-        this.col = col;
+    public SyntaxErrorException(Position position) {
+        super(String.format("Line %d: syntax error at or near col %d", position.getRow(), position.getCol()));
+        this.position = position;
     }
 
-    public int getRow() {
-        return row;
+    public Position getPosition() {
+        return position;
     }
-
-    public int getCol() {
-        return col;
-    }
-
-    //    private final Position position;
-//
-//    public SyntaxErrorException(Position position) {
-//        super(String.format("Line %d: syntax error at or near col %d", position.getRow(), position.getCol()));
-//        this.position = position;
-//    }
-//
-//    public Position getPosition() {
-//        return position;
-//    }
 }
