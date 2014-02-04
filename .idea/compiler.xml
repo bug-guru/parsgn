@@ -23,6 +23,7 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="parser" />
+        <module name="spargn" />
       </profile>
     </annotationProcessing>
   </component>
