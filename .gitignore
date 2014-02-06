@@ -23,6 +23,7 @@
 # Logs and databases #
 ######################
 *.log
+hs_err_pid*
 
 # OS generated files #
 ######################
