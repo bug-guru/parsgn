@@ -79,7 +79,7 @@ public class UntilExpression extends Expression {
         return new Checker();
     }
 
-    class Checker extends IntermediateExpressionChecker {
+    class Checker extends BranchExpressionChecker {
         private boolean checkingEndCondition = true;
         private int turnsPassed = 0;
 

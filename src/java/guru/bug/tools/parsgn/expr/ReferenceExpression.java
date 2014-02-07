@@ -71,7 +71,7 @@ public class ReferenceExpression extends Expression {
         return new Checker();
     }
 
-    class Checker extends IntermediateExpressionChecker {
+    class Checker extends BranchExpressionChecker {
 
         @Override
         public Expression next() {

@@ -60,7 +60,7 @@ public class SequentialExpression extends Expression {
         return new Checker();
     }
 
-    class Checker extends IntermediateExpressionChecker {
+    class Checker extends BranchExpressionChecker {
         private final Iterator<Expression> expressions = getExpressions().iterator();
         private Expression curExpr;
         private boolean hasCommitted;

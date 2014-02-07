@@ -25,9 +25,9 @@ package guru.bug.tools.parsgn;
 import guru.bug.tools.parsgn.exceptions.InternalParsingException;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
+import guru.bug.tools.parsgn.expr.BranchExpressionChecker;
 import guru.bug.tools.parsgn.expr.Expression;
 import guru.bug.tools.parsgn.expr.ExpressionChecker;
-import guru.bug.tools.parsgn.expr.IntermediateExpressionChecker;
 import guru.bug.tools.parsgn.expr.LeafExpressionChecker;
 
 import java.io.IOException;
@@ -67,8 +67,8 @@ public class ParsingContext<T> {
 
     private void completePath() {
         Expression nextExpr;
-        while (stack.peek().checker instanceof IntermediateExpressionChecker) {
-            nextExpr = ((IntermediateExpressionChecker) stack.peek().checker).next();
+        while (stack.peek().checker instanceof BranchExpressionChecker) {
+            nextExpr = ((BranchExpressionChecker) stack.peek().checker).next();
             pushExpression(nextExpr);
         }
     }
@@ -88,7 +88,7 @@ public class ParsingContext<T> {
         Holder leafHolder = stack.peek();
         LeafExpressionChecker leaf = ((LeafExpressionChecker) leafHolder.checker);
         ResultType prevResult = leaf.check(codePoint);
-        IntermediateExpressionChecker intermediateChecker = null;
+        BranchExpressionChecker branchChecker = null;
         loop:
         while (true) {
             switch (prevResult) {
@@ -96,16 +96,16 @@ public class ParsingContext<T> {
                     break loop;
                 case COMMIT:
                     source.removeMark();
-                    if (intermediateChecker == null) {
+                    if (branchChecker == null) {
                         stack.pop();
                         leaf.commitResult(stack.peek().getCommittedValue());
-                    } else if (intermediateChecker.getGroupName() == null) {
+                    } else if (branchChecker.getGroupName() == null) {
                         ParsingContext<T>.Holder top = stack.pop();
                         stack.peek().merge(top);
                     } else {
                         ParsingContext<T>.Holder top = stack.pop();
                         top.end = source.getNextPos();
-                        stack.peek().commitNode(intermediateChecker.getGroupName(), top);
+                        stack.peek().commitNode(branchChecker.getGroupName(), top);
                     }
                     break;
                 case ROLLBACK:
@@ -123,8 +123,8 @@ public class ParsingContext<T> {
                 break;
             }
             Holder holder = stack.peek();
-            intermediateChecker = (IntermediateExpressionChecker) holder.checker;
-            prevResult = intermediateChecker.check(prevResult);
+            branchChecker = (BranchExpressionChecker) holder.checker;
+            prevResult = branchChecker.check(prevResult);
         }
     }
 

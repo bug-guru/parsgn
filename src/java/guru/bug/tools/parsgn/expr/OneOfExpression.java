@@ -65,7 +65,7 @@ public class OneOfExpression extends Expression {
         return new Checker();
     }
 
-    class Checker extends IntermediateExpressionChecker {
+    class Checker extends BranchExpressionChecker {
         private Iterator<Expression> exprIterator;
 
         @Override

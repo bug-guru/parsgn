@@ -30,7 +30,7 @@ import guru.bug.tools.parsgn.exceptions.ParsingException;
  * @version 1.0.0
  * @since 1.0.0
  */
-public abstract class IntermediateExpressionChecker extends ExpressionChecker {
+public abstract class BranchExpressionChecker extends ExpressionChecker {
     public abstract Expression next();
 
     public String getGroupName() {

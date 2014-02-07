@@ -79,7 +79,7 @@ public class QuantityExpression extends Expression {
         return new Checker();
     }
 
-    class Checker extends IntermediateExpressionChecker {
+    class Checker extends BranchExpressionChecker {
         private int turnsPassed = 0;
 
         @Override
