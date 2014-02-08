@@ -37,7 +37,7 @@ import java.util.List;
  * @version 1.0.0
  * @since 1.0.0
  */
-public class XmlResultBuilder extends ResultBuilder<org.w3c.dom.Node> {
+public class XmlResultBuilder extends ResultBuilder<Node> {
     private Document result;
 
     public XmlResultBuilder() throws ParserConfigurationException {

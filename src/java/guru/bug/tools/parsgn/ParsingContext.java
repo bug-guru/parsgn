@@ -128,7 +128,7 @@ public class ParsingContext<T> {
         }
     }
 
-    public class Holder {
+    private class Holder {
         ExpressionChecker checker;
         List<T> committedNodes;
         StringBuilder committedValue;

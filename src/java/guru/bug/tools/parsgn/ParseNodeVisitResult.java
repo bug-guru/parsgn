@@ -27,10 +27,8 @@ package guru.bug.tools.parsgn;
  * @version 1.0.0
  * @since 1.0.0
  */
-public interface NodeTreeVisitor {
-    public void startNode(ParseNode node);
-
-    public void endNode(ParseNode node);
-
-    public void leafNode(ParseNode node);
+public enum ParseNodeVisitResult {
+    CONTINUE,
+    SKIP_SUBTREE,
+    TERMINATE
 }
