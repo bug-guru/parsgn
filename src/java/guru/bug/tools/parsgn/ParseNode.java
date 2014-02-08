@@ -70,10 +70,6 @@ public class ParseNode {
         return result.toString();
     }
 
-    public boolean isLeaf() {
-        return children.isEmpty();
-    }
-
     public Position getStart() {
         return start;
     }
