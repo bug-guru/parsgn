@@ -20,30 +20,32 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.exceptions;
 
-import guru.bug.tools.parsgn.exceptions.ParsingException;
-import guru.bug.tools.parsgn.expr.ReferenceExpression;
-
-import java.io.IOException;
-import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Dimitrijs Fedotovs <dima@fedoto.ws>
  * @version 1.0.0
  * @since 1.0.0
  */
-public class Parser {
-    private final ReferenceExpression root;
+public class UnresolvedRuleException extends ParsingException {
+    private Collection<String> ruleNames;
 
-    public Parser(ReferenceExpression root) {
-        this.root = root;
+    public UnresolvedRuleException(Collection<String> names) {
+        super("Unresolved rules: " + names);
+        List<String> copy = new ArrayList<>(names);
+        ruleNames = Collections.unmodifiableCollection(copy);
     }
 
-    public <T> void parse(Reader input, ResultBuilder<T> builder) throws ParsingException, IOException {
-        CodePointSource src = new CodePointSource(input);
-        ParsingContext<T> ctx = new ParsingContext<>(root, builder, src);
-        ctx.parse();
+    public UnresolvedRuleException(String name) {
+        this(Collections.singleton(name));
     }
 
+    public Collection<String> getRuleNames() {
+        return ruleNames;
+    }
 }

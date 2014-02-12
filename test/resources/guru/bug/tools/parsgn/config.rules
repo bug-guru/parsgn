@@ -2,15 +2,9 @@ ConfigFile:
     (I Rule)+ I #EOF;
 
 Rule:
-    (RulePrefix I)? Name Transform? I ":" ExpressionList ";";
+    Name I ":" ExpressionList ";";
 
-^RulePrefix: HiddenFlag | TemplateFlag;
-
-HiddenFlag: ".";
-
-TemplateFlag: "^";
-
-.I: (#WHITESPACE | SingleLineComment | MultiLineComment)*;
+I: (#WHITESPACE | SingleLineComment | MultiLineComment)*;
 
 SingleLineComment: "//" #VALID{#LINE_SEPARATOR};
 
@@ -18,17 +12,15 @@ MultiLineComment: "/*" #VALID{"*/"};
 
 Name: #UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART*;
 
-^ExpressionList: (I Expression)+;
+ExpressionList: (I Expression)+;
 
 Expression:
     OneOf | Reference | CharType | String | Sequence
-    ExpressionSuffix;
+    ExpressionSuffix?;
 
-^ExpressionSuffix: I (Quantifier | Until I)?;
+ExpressionSuffix: I (Quantifier | Until) I;
 
-Transform: I "->" I (String | Name->String);
-
-^Quantifier:
+Quantifier:
       ZeroOrOne
     | OneOrMore
     | ZeroOrMore
@@ -50,7 +42,7 @@ AtLeastMinTimes: "{" I Number I "," I "}";
 
 AtLeastMinButNotMoreThanMaxTimes: "{" I Min I "," I Max I "}";
 
-^Number: #DIGIT+;
+Number: #DIGIT+;
 
 Min: Number;
 
@@ -58,20 +50,20 @@ Max: Number;
 
 OneOf: OneOfVariant1 | OneOfVariant2;
 
-^OneOfVariant1: "(" I OneOfVariant2 I ")";
+OneOfVariant1: "(" I OneOfVariant2 I ")";
 
-^OneOfVariant2: OneOfExpression (I "|" I OneOfExpression)+;
+OneOfVariant2: OneOfExpression (I "|" I OneOfExpression)+;
 
-OneOfExpression -> Expression:
+OneOfExpression:
     Reference | CharType | String | Sequence
-    ExpressionSuffix;
+    ExpressionSuffix?;
 
-Reference: Name Transform?;
+Reference: Name;
 
 CharType: "#" Name; //TODO: list all possible char types
 
 String: "\"" ("\\\"" -> "\"" | "\\\\" -> "\\" | #VALID){"\""} Transform?;
 
+Transform: I "->" I String;
+
 Sequence: "(" ExpressionList ")";
-
-

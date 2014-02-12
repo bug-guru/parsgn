@@ -33,93 +33,151 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static guru.bug.tools.parsgn.EBNFParserBuilder.*;
+import static guru.bug.tools.parsgn.EBNFParser.*;
 
 /**
  * @author Dimitrijs Fedotovs <dima@fedoto.ws>
  * @version 1.0.0
  * @since 1.0.0
  */
-public class DefaultParserBuilder extends AbstractParserBuilder {
-    private static final Parser EBNF_PARSER = new EBNFParserBuilder().createParser();
+public class DefaultParserBuilder {
+    private static final Parser EBNF_PARSER = new EBNFParser();
 
     public Parser createParser(Reader input) throws IOException, ParsingException {
+        RuleBuilder rb = new RuleBuilder();
         ParseTreeResultBuilder builder = new ParseTreeResultBuilder();
         EBNF_PARSER.parse(input, builder);
-        Rule root = null;
+        String rootName = null;
         for (ParseNode ruleNode : builder.getRoot().getChildren()) {
-            Rule rule = createRule(ruleNode);
-            if (root == null) {
-                root = rule;
-            }
-        }
-        return createParser(root);
-    }
-
-    private Rule createRule(ParseNode ruleNode) throws ParsingException {
-        boolean isHidden = false;
-        boolean isTemplate = false;
-        String name = null;
-        String transform = null;
-        List<Expression> expressions = new ArrayList<>();
-        for (ParseNode node : ruleNode.getChildren()) {
-            String nodeName = node.getName();
+            String nodeName = ruleNode.getName();
             switch (nodeName) {
-                case HIDDEN_FLAG:
-                    isHidden = true;
+                case RULE:
+                    Rule rule = createRule(rb, ruleNode);
+                    if (rootName == null) {
+                        rootName = rule.getName();
+                    }
                     break;
-                case TEMPLATE_FLAG:
-                    isTemplate = true;
-                    break;
-                case NAME:
-                    name = node.getValue();
-                    break;
-                case TRANSFORM:
-                    transform = node.getChildren().get(0).getValue();
-                    break;
-                case EXPRESSION:
-                    Expression expr = createExpression(node);
-                    expressions.add(expr);
+                case I:
                     break;
                 default:
                     throw new InternalParsingException(nodeName);
             }
         }
-        RuleDef rule = rule(name);
-        rule.setHidden(isHidden);
-        rule.setTemplate(isTemplate);
-        rule.setTransform(transform);
+        return new Parser(rb.build(rootName));
+    }
+
+    private Rule createRule(RuleBuilder rb, ParseNode ruleNode) throws ParsingException {
+        String name = null;
+        List<Expression> expressions = null;
+        for (ParseNode node : ruleNode.getChildren()) {
+            String nodeName = node.getName();
+            switch (nodeName) {
+                case NAME:
+                    name = node.getValue();
+                    break;
+                case EXPRESSION_LIST:
+                    expressions = parseExpressionList(rb, node);
+                    break;
+                default:
+                    throw new InternalParsingException(nodeName);
+            }
+        }
+        Rule rule = rb.rule(name);
         if (expressions.size() > 1) {
-            rule.setExpression(sequence(expressions));
+            rule.setExpression(rb.sequence(expressions));
         } else {
             rule.setExpression(expressions.get(0));
         }
         return rule;
     }
 
-    private Expression createExpression(ParseNode exprNode) throws ParsingException {
+    private List<Expression> parseExpressionList(RuleBuilder rb, ParseNode listNode) throws ParsingException {
+        List<Expression> expressions = new ArrayList<>();
+        for (ParseNode node : listNode.getChildren()) {
+            switch (node.getName()) {
+                case EXPRESSION:
+                case ONE_OF_EXPRESSION:
+                    Expression expr = createExpression(rb, node);
+                    expressions.add(expr);
+                    break;
+                case I:
+                    break;
+                default:
+                    throw new InternalParsingException(node.getName());
+            }
+        }
+        return expressions;
+    }
+
+    private Expression createExpression(RuleBuilder rb, ParseNode exprNode) throws ParsingException {
         Expression expression = null;
-        int minOccurrences = 1;
-        int maxOccurrences = 1;
-        Expression until = null;
         for (ParseNode node : exprNode.getChildren()) {
             String nodeName = node.getName();
             switch (nodeName) {
                 case ONE_OF:
-                    expression = createOneOfExpression(node);
+                    expression = createOneOfExpression(rb, node);
                     break;
                 case REFERENCE:
-                    expression = createReferenceExpression(node);
+                    expression = createReferenceExpression(rb, node);
                     break;
                 case CHAR_TYPE:
-                    expression = createCharTypeExpression(node);
+                    expression = createCharTypeExpression(rb, node);
                     break;
                 case STRING:
-                    expression = createStringExpression(node);
+                    expression = createStringExpression(rb, node);
                     break;
                 case SEQUENCE:
-                    expression = createSequenceExpression(node);
+                    expression = createSequenceExpression(rb, node);
                     break;
+                case EXPRESSION_SUFFIX:
+                    expression = wrapRepeatExpression(rb, node, expression);
+                    break;
+                default:
+                    throw new InternalParsingException(nodeName);
+            }
+        }
+        return expression;
+    }
+
+    private Expression wrapRepeatExpression(RuleBuilder rb, ParseNode suffixNode, Expression expression) throws ParsingException {
+        for (ParseNode node : suffixNode.getChildren()) {
+            String nodeName = node.getName();
+            switch (nodeName) {
+                case QUANTIFIER:
+                    return createQuantityExpression(rb, node, expression);
+                case UNTIL:
+                    return createUntilExpression(rb, node, expression);
+                case I:
+                    break;
+                default:
+                    throw new InternalParsingException(nodeName);
+            }
+        }
+        throw new InternalParsingException("Quantifier or Until were expected");
+    }
+
+    private Expression createUntilExpression(RuleBuilder rb, ParseNode root, Expression expression) throws ParsingException {
+        for (ParseNode node : root.getChildren()) {
+            String nodeName = node.getName();
+            switch (nodeName) {
+                case EXPRESSION:
+                    Expression until = createExpression(rb, node);
+                    return rb.repeatUntil(until, expression);
+                case I:
+                    break;
+                default:
+                    throw new InternalParsingException(nodeName);
+            }
+        }
+        throw new InternalParsingException("Until-expression was expected");
+    }
+
+    private Expression createQuantityExpression(RuleBuilder rb, ParseNode root, Expression expression) throws InternalParsingException {
+        int minOccurrences = 1;
+        int maxOccurrences = 1;
+        for (ParseNode node : root.getChildren()) {
+            String nodeName = node.getName();
+            switch (nodeName) {
                 case ZERO_OR_ONE:
                     minOccurrences = 0;
                     maxOccurrences = 1;
@@ -133,99 +191,151 @@ public class DefaultParserBuilder extends AbstractParserBuilder {
                     maxOccurrences = Integer.MAX_VALUE;
                     break;
                 case EXACTLY_N_TIMES:
-                    minOccurrences = readNumber(node.getValue());
+                    minOccurrences = findNumber(node);
                     maxOccurrences = minOccurrences;
                     break;
                 case AT_LEAST_MIN_TIMES:
-                    minOccurrences = readNumber(node.getValue());
+                    minOccurrences = findNumber(node);
                     maxOccurrences = Integer.MAX_VALUE;
                     break;
                 case AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES:
-                    minOccurrences = readNumber(node.getChildren().get(0).getValue());
-                    maxOccurrences = readNumber(node.getChildren().get(1).getValue());
+                    Bounds bounds = findBounds(node);
+                    minOccurrences = bounds.min;
+                    maxOccurrences = bounds.max;
                     break;
-                case UNTIL:
-                    until = createExpression(node.getChildren().get(0));
+                case I:
                     break;
                 default:
                     throw new InternalParsingException(nodeName);
             }
         }
-        if (until != null) {
-            return repeatUntil(until, expression);
-        } else if (minOccurrences == 1 && maxOccurrences == 1) {
-            return expression;
-        } else {
-            return repeat(minOccurrences, maxOccurrences, expression);
+        return rb.repeat(minOccurrences, maxOccurrences, expression);
+    }
+
+    private Bounds findBounds(ParseNode root) throws InternalParsingException {
+        Bounds result = new Bounds();
+        for (ParseNode node : root.getChildren()) {
+            String nodeName = node.getName();
+            switch (nodeName) {
+                case MIN:
+                    result.min = findNumber(node);
+                    break;
+                case MAX:
+                    result.max = findNumber(node);
+                    break;
+                case I:
+                    break;
+                default:
+                    throw new InternalParsingException(nodeName);
+            }
         }
+        return result;
     }
 
-    private int readNumber(String value) {
-        return Integer.valueOf(value);
+    private int findNumber(ParseNode root) throws InternalParsingException {
+        for (ParseNode node : root.getChildren()) {
+            String nodeName = node.getName();
+            switch (nodeName) {
+                case NUMBER:
+                    return Integer.parseInt(node.getValue());
+                default:
+                    throw new InternalParsingException(nodeName);
+            }
+        }
+        throw new InternalParsingException("Number was expected");
     }
 
-    private Expression createSequenceExpression(ParseNode seqNode) throws ParsingException {
-        List<Expression> expressions = readExpressionList(seqNode);
-        return sequence(expressions);
+    private Expression createSequenceExpression(RuleBuilder rb, ParseNode seqNode) throws ParsingException {
+        for (ParseNode node : seqNode.getChildren()) {
+            String nodeName = node.getName();
+            switch (nodeName) {
+                case EXPRESSION_LIST:
+                    List<Expression> expressions = parseExpressionList(rb, node);
+                    return rb.sequence(expressions);
+                default:
+                    throw new InternalParsingException(nodeName);
+            }
+        }
+        throw new InternalParsingException("ExpressionList haven't been found");
     }
 
-    private Expression createStringExpression(ParseNode strNode) {
+    private Expression createStringExpression(RuleBuilder rb, ParseNode strNode) throws InternalParsingException {
         String str = strNode.getValue();
         String transform = null;
         if (strNode.getChildren() != null && !strNode.getChildren().isEmpty()) {
             transform = readTransform(strNode.getChildren().get(0));
         }
-        return str(str).transform(transform);
+        return rb.str(str).transform(transform);
     }
 
-    private Expression createCharTypeExpression(ParseNode charNode) {
+    private String readTransform(ParseNode transformNode) throws InternalParsingException {
+        for (ParseNode node : transformNode.getChildren()) {
+            String nodeName = node.getName();
+            switch (nodeName) {
+                case STRING:
+                    return node.getValue();
+                case I:
+                    break;
+                default:
+                    throw new InternalParsingException(nodeName);
+            }
+        }
+        throw new InternalParsingException("String was expected");
+    }
+
+    private Expression createCharTypeExpression(RuleBuilder rb, ParseNode charNode) {
         String strType = charNode.getChildren().get(0).getValue();
         CharType type = CharType.valueOf(strType);
-        return charType(type);
+        return rb.charType(type);
     }
 
-    private Expression createReferenceExpression(ParseNode refNode) throws ParsingException {
+    private Expression createReferenceExpression(RuleBuilder rb, ParseNode refNode) throws ParsingException {
         String ruleName = null;
-        String transform = null;
         for (ParseNode node : refNode.getChildren()) {
             String nodeName = node.getName();
             switch (nodeName) {
                 case NAME:
                     ruleName = node.getValue();
                     break;
-                case TRANSFORM:
-                    transform = readTransform(node);
-                    break;
                 default:
                     throw new InternalParsingException(nodeName);
             }
         }
-        return ref(ruleName).transform(transform);
+        return rb.ref(ruleName);
     }
 
-    private String readTransform(ParseNode transformNode) {
-        return transformNode.getChildren().get(0).getValue();
-    }
-
-    private OneOfExpression createOneOfExpression(ParseNode oneOfNode) throws ParsingException {
-        List<Expression> expressions = readExpressionList(oneOfNode);
-        return oneOf(expressions);
-    }
-
-    private List<Expression> readExpressionList(ParseNode parentNode) throws ParsingException {
-        List<Expression> expressions = new ArrayList<>();
-        for (ParseNode node : parentNode.getChildren()) {
+    private OneOfExpression createOneOfExpression(RuleBuilder rb, ParseNode oneOfNode) throws ParsingException {
+        for (ParseNode node : oneOfNode.getChildren()) {
             String nodeName = node.getName();
             switch (nodeName) {
-                case EXPRESSION:
-                    Expression expr = createExpression(node);
-                    expressions.add(expr);
-                    break;
+                case ONE_OF_VARIANT1:
+                    return createOneOfVariant1Expression(rb, node);
+                case ONE_OF_VARIANT2:
+                    List<Expression> expressions = parseExpressionList(rb, node);
+                    return rb.oneOf(expressions);
                 default:
                     throw new InternalParsingException(nodeName);
             }
         }
-        return expressions;
+        throw new InternalParsingException("OneOfVariant1 or OneOfVariant2 were expected");
     }
 
+    private OneOfExpression createOneOfVariant1Expression(RuleBuilder rb, ParseNode root) throws ParsingException {
+        for (ParseNode node : root.getChildren()) {
+            String nodeName = node.getName();
+            switch (nodeName) {
+                case ONE_OF_VARIANT2:
+                    List<Expression> expressions = parseExpressionList(rb, node);
+                    return rb.oneOf(expressions);
+                default:
+                    throw new InternalParsingException(nodeName);
+            }
+        }
+        throw new InternalParsingException("OneOfVariant2 was expected");
+    }
+
+    private static class Bounds {
+        int min;
+        int max;
+    }
 }

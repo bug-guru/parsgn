@@ -29,10 +29,11 @@ import guru.bug.tools.parsgn.expr.Expression;
  * @version 1.0.0
  * @since 1.0.0
  */
-public abstract class Rule {
+public class Rule {
+    private Expression expression;
     private final String name;
 
-    protected Rule(String name) {
+    public Rule(String name) {
         this.name = name;
     }
 
@@ -40,11 +41,11 @@ public abstract class Rule {
         return name;
     }
 
-    public abstract Expression getExpression();
+    public Expression getExpression() {
+        return expression;
+    }
 
-    public abstract boolean isHidden();
-
-    public abstract boolean isTemplate();
-
-    public abstract String getTransform();
+    public void setExpression(Expression expression) {
+        this.expression = expression;
+    }
 }

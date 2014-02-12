@@ -66,7 +66,7 @@ public class EBNFTest {
     @Test
     public void compareGeneratedAndBuiltIn() throws Exception {
         Parser generated = generateDefaultParser();
-        Parser builtIn = new EBNFParserBuilder().createParser();
+        Parser builtIn = new EBNFParser();
         ParseNode generatedTree = parseToTree(generated);
         ParseNode builtInTree = parseToTree(builtIn);
         assertEquals(builtInTree, generatedTree);
@@ -75,8 +75,7 @@ public class EBNFTest {
 
     //    @Test
     public void printXml() throws Exception {
-        EBNFParserBuilder builder = new EBNFParserBuilder();
-        Parser parser = builder.createParser();
+        Parser parser = new EBNFParser();
         try (
                 InputStream input = getClass().getResourceAsStream("config.rules");
                 BufferedInputStream buf = new BufferedInputStream(input);

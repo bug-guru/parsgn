@@ -23,7 +23,7 @@
 package guru.bug.tools.parsgn.expr;
 
 import guru.bug.tools.parsgn.ResultType;
-import guru.bug.tools.parsgn.RuleDef;
+import guru.bug.tools.parsgn.Rule;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,17 +34,16 @@ import static org.junit.Assert.assertSame;
  * @author Dimitrijs Fedotovs <dima@fedoto.ws>
  */
 public class ReferenceExpressionTest {
-    private RuleDef rule = new RuleDef("fake");
-    private ReferenceExpression expression = new ReferenceExpression(rule);
-    private FakeExpression expr = new FakeExpression();
+    private FakeExpression expr;
     private ReferenceExpression.Checker checker;
-
-    public ReferenceExpressionTest() {
-        rule.setExpression(expr);
-    }
 
     @Before
     public void setUp() throws Exception {
+        Rule rule = new Rule("fake");
+        ReferenceExpression expression = new ReferenceExpression("fake");
+        expression.setReference(rule);
+        expr = new FakeExpression();
+        rule.setExpression(expr);
         checker = (ReferenceExpression.Checker) expression.checker();
     }
 

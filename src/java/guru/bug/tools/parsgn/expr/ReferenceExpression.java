@@ -30,14 +30,15 @@ import guru.bug.tools.parsgn.Rule;
  * @since 1.0.0
  */
 public class ReferenceExpression extends Expression {
+    private final String ruleName;
     private Rule reference;
-    private String transform;
 
-    public ReferenceExpression(Rule reference) {
-        this.reference = reference;
+    public ReferenceExpression(String ruleName) {
+        this.ruleName = ruleName;
     }
 
-    public ReferenceExpression() {
+    public String getRuleName() {
+        return ruleName;
     }
 
     public Rule getReference() {
@@ -46,24 +47,6 @@ public class ReferenceExpression extends Expression {
 
     public void setReference(Rule reference) {
         this.reference = reference;
-    }
-
-    @Override
-    public boolean isHidden() {
-        return super.isHidden() || reference.isHidden();
-    }
-
-    public String getTransform() {
-        return transform;
-    }
-
-    public void setTransform(String transform) {
-        this.transform = transform;
-    }
-
-    public ReferenceExpression transform(String transform) {
-        setTransform(transform);
-        return this;
     }
 
     @Override
@@ -80,15 +63,7 @@ public class ReferenceExpression extends Expression {
 
         @Override
         public String getGroupName() {
-            if (reference.isTemplate()) {
-                return null;
-            } else if (transform != null) {
-                return transform;
-            } else if (reference.getTransform() != null) {
-                return reference.getTransform();
-            } else {
-                return reference.getName();
-            }
+            return reference.getName();
         }
 
         @Override

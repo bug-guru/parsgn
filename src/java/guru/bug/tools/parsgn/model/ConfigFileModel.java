@@ -20,72 +20,28 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.model;
 
-import guru.bug.tools.parsgn.expr.Expression;
+import guru.bug.tools.parsgn.Rule;
+import guru.bug.tools.parsgn.annotations.RuleValue;
+
+import java.util.List;
 
 /**
  * @author Dimitrijs Fedotovs <dima@fedoto.ws>
  * @version 1.0.0
  * @since 1.0.0
  */
-public class RuleDef extends Rule {
-    private Expression expression;
-    private boolean hidden;
-    private boolean template;
-    private String transform;
 
-    public RuleDef(String name) {
-        super(name);
-    }
+@RuleValue("ConfigFile")
+public class ConfigFileModel {
+    @RuleValue("Rule")
+    List<RuleModel> ruleList;
 
-    @Override
-    public Expression getExpression() {
-        return expression;
-    }
+    public Rule generateRules() {
+        for (RuleModel ruleModel : ruleList) {
 
-    public void setExpression(Expression expression) {
-        this.expression = expression;
-    }
-
-    public boolean isHidden() {
-        return hidden;
-    }
-
-    public void setHidden(boolean hidden) {
-        this.hidden = hidden;
-    }
-
-    public RuleDef hide() {
-        setHidden(true);
-        return this;
-    }
-
-    @Override
-    public boolean isTemplate() {
-        return template;
-    }
-
-    public void setTemplate(boolean template) {
-        this.template = template;
-    }
-
-    public RuleDef template() {
-        setTemplate(true);
-        return this;
-    }
-
-    @Override
-    public String getTransform() {
-        return transform;
-    }
-
-    public void setTransform(String transform) {
-        this.transform = transform;
-    }
-
-    public RuleDef transform(String transform) {
-        setTransform(transform);
-        return this;
+        }
+        return null;
     }
 }

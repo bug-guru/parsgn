@@ -20,30 +20,21 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.model;
 
-import guru.bug.tools.parsgn.exceptions.ParsingException;
-import guru.bug.tools.parsgn.expr.ReferenceExpression;
-
-import java.io.IOException;
-import java.io.Reader;
+import guru.bug.tools.parsgn.annotations.RuleValue;
 
 /**
  * @author Dimitrijs Fedotovs <dima@fedoto.ws>
  * @version 1.0.0
  * @since 1.0.0
  */
-public class Parser {
-    private final ReferenceExpression root;
-
-    public Parser(ReferenceExpression root) {
-        this.root = root;
-    }
-
-    public <T> void parse(Reader input, ResultBuilder<T> builder) throws ParsingException, IOException {
-        CodePointSource src = new CodePointSource(input);
-        ParsingContext<T> ctx = new ParsingContext<>(root, builder, src);
-        ctx.parse();
-    }
+@RuleValue({"Expression.String",
+        "OneOfExpression.String"})
+public class StringExpressionModel {
+    @RuleValue("")
+    String expectedValue;
+    @RuleValue("Transform.String")
+    String actualValue;
 
 }
