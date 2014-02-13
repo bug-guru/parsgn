@@ -23,6 +23,7 @@
 package guru.bug.tools.parsgn.model;
 
 import guru.bug.tools.parsgn.Rule;
+import guru.bug.tools.parsgn.RuleBuilder;
 import guru.bug.tools.parsgn.annotations.RuleValue;
 
 import java.util.List;
@@ -39,6 +40,7 @@ public class ConfigFileModel {
     List<RuleModel> ruleList;
 
     public Rule generateRules() {
+        RuleBuilder builder = new RuleBuilder();
         for (RuleModel ruleModel : ruleList) {
 
         }
