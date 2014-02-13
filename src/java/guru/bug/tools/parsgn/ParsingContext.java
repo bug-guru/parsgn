@@ -77,7 +77,6 @@ public class ParsingContext<T> {
         ExpressionChecker nextChecker = nextExpr.checker();
         Holder holder = new Holder();
         holder.checker = nextChecker;
-        holder.hidden = nextExpr.isHidden() || stack.peek().hidden;
         stack.push(holder);
         source.mark();
         holder.start = source.getNextPos();
@@ -132,7 +131,6 @@ public class ParsingContext<T> {
         ExpressionChecker checker;
         List<T> committedNodes;
         StringBuilder committedValue;
-        boolean hidden;
         Position start;
         Position end;
 
@@ -165,7 +163,7 @@ public class ParsingContext<T> {
         }
 
         public void commitValue(StringBuilder builder) throws InternalParsingException {
-            if (hidden || builder == null || builder.length() == 0) {
+            if (builder == null || builder.length() == 0) {
                 return;
             }
             initValue();
@@ -173,9 +171,6 @@ public class ParsingContext<T> {
         }
 
         public void commitNode(String nodeName, Holder child) throws ParsingException {
-            if (hidden || child.hidden) {
-                return;
-            }
             T node = wrapNode(nodeName, child);
             addNode(node);
         }
@@ -192,9 +187,6 @@ public class ParsingContext<T> {
         }
 
         public void merge(Holder another) throws ParsingException {
-            if (hidden || another.hidden) {
-                return;
-            }
             commitValue(another.committedValue);
             addNodes(another.committedNodes);
         }

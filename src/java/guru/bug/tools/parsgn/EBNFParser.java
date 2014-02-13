@@ -22,7 +22,7 @@
 
 package guru.bug.tools.parsgn;
 
-import guru.bug.tools.parsgn.exceptions.UnresolvedRuleException;
+import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.CharType;
 import guru.bug.tools.parsgn.expr.ReferenceExpression;
 
@@ -66,12 +66,12 @@ public class EBNFParser extends Parser {
     static {
         try {
             root = generateRules();
-        } catch (UnresolvedRuleException e) {
+        } catch (ParsingException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    private static ReferenceExpression generateRules() throws UnresolvedRuleException {
+    private static ReferenceExpression generateRules() throws ParsingException {
         RuleBuilder rb = new RuleBuilder();
         rb.rule(CONFIG_FILE,
                 rb.oneOrMore(

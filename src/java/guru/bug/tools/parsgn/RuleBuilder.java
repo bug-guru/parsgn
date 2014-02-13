@@ -22,6 +22,9 @@
 
 package guru.bug.tools.parsgn;
 
+import guru.bug.tools.parsgn.exceptions.DuplicateRuleNameException;
+import guru.bug.tools.parsgn.exceptions.EmptyExpressionListException;
+import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.exceptions.UnresolvedRuleException;
 import guru.bug.tools.parsgn.expr.*;
 
@@ -37,7 +40,10 @@ public class RuleBuilder {
     private Map<String, ReferenceExpression> unresolved = new HashMap<>();
     private Map<String, ReferenceExpression> resolved = new HashMap<>();
 
-    private Expression wrap(Expression... expressions) {
+    private Expression wrap(Expression... expressions) throws ParsingException {
+        if (expressions == null || expressions.length == 0) {
+            throw new EmptyExpressionListException();
+        }
         if (expressions.length > 1) {
             return sequence(expressions);
         } else {
@@ -45,13 +51,35 @@ public class RuleBuilder {
         }
     }
 
-    public final Rule rule(String name, Expression... expressions) {
-        Rule result = new Rule(name);
-        if (expressions.length > 0) {
-            result.setExpression(wrap(expressions));
+    private Expression wrap(List<Expression> expressions) throws ParsingException {
+        if (expressions == null || expressions.isEmpty()) {
+            throw new EmptyExpressionListException();
         }
+        if (expressions.size() > 1) {
+            return sequence(expressions);
+        } else {
+            return expressions.get(0);
+        }
+    }
+
+    private Rule rule(String name, Expression expression) throws ParsingException {
+        if (ruleDefinitions.containsKey(name)) {
+            throw new DuplicateRuleNameException(name);
+        }
+        Rule result = new Rule(name);
+        result.setExpression(expression);
         ruleDefinitions.put(name, result);
         return result;
+    }
+
+    public final Rule rule(String name, List<Expression> expressions) throws ParsingException {
+        Expression expr = wrap(expressions);
+        return rule(name, expr);
+    }
+
+    public final Rule rule(String name, Expression... expressions) throws ParsingException {
+        Expression expr = wrap(expressions);
+        return rule(name, expr);
     }
 
     public final OneOfExpression oneOf(Expression... expressions) {
@@ -79,38 +107,38 @@ public class RuleBuilder {
         return result;
     }
 
-    public final QuantityExpression zeroOrOne(Expression... expressions) {
+    public final QuantityExpression zeroOrOne(Expression... expressions) throws ParsingException {
         return repeat(0, 1, expressions);
     }
 
-    public final QuantityExpression oneOrMore(Expression... expressions) {
+    public final QuantityExpression oneOrMore(Expression... expressions) throws ParsingException {
         return repeat(1, Integer.MAX_VALUE, expressions);
     }
 
-    public final QuantityExpression zeroOrMore(Expression... expressions) {
+    public final QuantityExpression zeroOrMore(Expression... expressions) throws ParsingException {
         return repeat(0, Integer.MAX_VALUE, expressions);
     }
 
-    public final QuantityExpression exactlyNTimes(int n, Expression... expressions) {
+    public final QuantityExpression exactlyNTimes(int n, Expression... expressions) throws ParsingException {
         return repeat(n, n, expressions);
     }
 
-    public final QuantityExpression atLeastMinTimes(int min, Expression... expressions) {
+    public final QuantityExpression atLeastMinTimes(int min, Expression... expressions) throws ParsingException {
         return repeat(min, Integer.MAX_VALUE, expressions);
     }
 
-    public final QuantityExpression atLeastMinButNotMoreThanMaxTimes(int min, int max, Expression... expressions) {
+    public final QuantityExpression atLeastMinButNotMoreThanMaxTimes(int min, int max, Expression... expressions) throws ParsingException {
         return repeat(min, max, expressions);
     }
 
-    public final QuantityExpression repeat(int min, int max, Expression... expressions) {
+    public final QuantityExpression repeat(int min, int max, Expression... expressions) throws ParsingException {
         return new QuantityExpression()
                 .loop(wrap(expressions))
                 .minOccurrences(min)
                 .maxOccurrences(max);
     }
 
-    public final UntilExpression repeatUntil(Expression until, Expression... expressions) {
+    public final UntilExpression repeatUntil(Expression until, Expression... expressions) throws ParsingException {
         return new UntilExpression()
                 .loop(wrap(expressions))
                 .condition(until);

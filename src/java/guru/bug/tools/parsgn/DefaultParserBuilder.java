@@ -82,13 +82,7 @@ public class DefaultParserBuilder {
                     throw new InternalParsingException(nodeName);
             }
         }
-        Rule rule = rb.rule(name);
-        if (expressions.size() > 1) {
-            rule.setExpression(rb.sequence(expressions));
-        } else {
-            rule.setExpression(expressions.get(0));
-        }
-        return rule;
+        return rb.rule(name, expressions);
     }
 
     private List<Expression> parseExpressionList(RuleBuilder rb, ParseNode listNode) throws ParsingException {
@@ -172,7 +166,7 @@ public class DefaultParserBuilder {
         throw new InternalParsingException("Until-expression was expected");
     }
 
-    private Expression createQuantityExpression(RuleBuilder rb, ParseNode root, Expression expression) throws InternalParsingException {
+    private Expression createQuantityExpression(RuleBuilder rb, ParseNode root, Expression expression) throws ParsingException {
         int minOccurrences = 1;
         int maxOccurrences = 1;
         for (ParseNode node : root.getChildren()) {
