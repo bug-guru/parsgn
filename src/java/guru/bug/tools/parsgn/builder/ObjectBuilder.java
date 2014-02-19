@@ -20,27 +20,16 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.model;
+package guru.bug.tools.parsgn.builder;
 
-import guru.bug.tools.parsgn.RuleBuilder;
 import guru.bug.tools.parsgn.annotations.RuleValue;
-import guru.bug.tools.parsgn.expr.Expression;
 
 /**
  * @author Dimitrijs Fedotovs <dima@fedoto.ws>
  * @version 1.0.0
  * @since 1.0.0
  */
-@RuleValue({"Expression.String",
-        "OneOfExpression.String"})
-public class StringExpressionModel extends ExpressionModel {
-    @RuleValue
-    private String expectedValue;
-    @RuleValue("Transform.String")
-    private String actualValue;
-
-    @Override
-    public Expression generate(RuleBuilder builder) {
-        return null;
+public class ObjectBuilder {
+    public ObjectBuilder(Class<?> clazz, String[] value, RuleValue methodRuleName) {
     }
 }

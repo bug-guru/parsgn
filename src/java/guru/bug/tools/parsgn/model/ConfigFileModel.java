@@ -25,6 +25,7 @@ package guru.bug.tools.parsgn.model;
 import guru.bug.tools.parsgn.Rule;
 import guru.bug.tools.parsgn.RuleBuilder;
 import guru.bug.tools.parsgn.annotations.RuleValue;
+import guru.bug.tools.parsgn.exceptions.ParsingException;
 
 import java.util.List;
 
@@ -36,13 +37,13 @@ import java.util.List;
 
 @RuleValue("ConfigFile")
 public class ConfigFileModel {
-    @RuleValue("Rule")
-    List<RuleModel> ruleList;
+    @RuleValue
+    private List<RuleModel> ruleList;
 
-    public Rule generateRules() {
+    public Rule generateRules() throws ParsingException {
         RuleBuilder builder = new RuleBuilder();
         for (RuleModel ruleModel : ruleList) {
-
+            ruleModel.generate(builder);
         }
         return null;
     }

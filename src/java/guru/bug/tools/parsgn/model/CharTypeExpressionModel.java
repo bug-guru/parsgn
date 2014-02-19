@@ -22,8 +22,10 @@
 
 package guru.bug.tools.parsgn.model;
 
+import guru.bug.tools.parsgn.RuleBuilder;
 import guru.bug.tools.parsgn.annotations.RuleValue;
 import guru.bug.tools.parsgn.expr.CharType;
+import guru.bug.tools.parsgn.expr.Expression;
 
 /**
  * @author Dimitrijs Fedotovs <dima@fedoto.ws>
@@ -35,4 +37,9 @@ import guru.bug.tools.parsgn.expr.CharType;
 public class CharTypeExpressionModel extends ExpressionModel {
     @RuleValue("Name")
     CharType charType;
+
+    @Override
+    public Expression generate(RuleBuilder builder) {
+        return null;
+    }
 }

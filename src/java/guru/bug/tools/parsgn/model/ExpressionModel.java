@@ -22,7 +22,9 @@
 
 package guru.bug.tools.parsgn.model;
 
+import guru.bug.tools.parsgn.RuleBuilder;
 import guru.bug.tools.parsgn.annotations.RuleValue;
+import guru.bug.tools.parsgn.expr.Expression;
 
 /**
  * @author Dimitrijs Fedotovs <dima@fedoto.ws>
@@ -30,6 +32,9 @@ import guru.bug.tools.parsgn.annotations.RuleValue;
  * @since 1.0.0
  */
 public abstract class ExpressionModel {
-    @RuleValue("ExpressionSuffix")
-    ExpressionRepeatModel repeat;
+    @RuleValue
+    private ExpressionRepeatModel repeat;
+
+
+    public abstract Expression generate(RuleBuilder builder);
 }

@@ -26,21 +26,27 @@ import guru.bug.tools.parsgn.RuleBuilder;
 import guru.bug.tools.parsgn.annotations.RuleValue;
 import guru.bug.tools.parsgn.expr.Expression;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Dimitrijs Fedotovs <dima@fedoto.ws>
  * @version 1.0.0
  * @since 1.0.0
  */
-@RuleValue({"Expression.String",
-        "OneOfExpression.String"})
-public class StringExpressionModel extends ExpressionModel {
+@RuleValue({"ExpressionList",
+        "OneOfVariant1.OneOfVariant2",
+        "OneOfVariant2"})
+public class ExpressionListModel {
     @RuleValue
-    private String expectedValue;
-    @RuleValue("Transform.String")
-    private String actualValue;
+    private List<ExpressionModel> expressions;
 
-    @Override
-    public Expression generate(RuleBuilder builder) {
-        return null;
+    public List<Expression> generate(RuleBuilder builder) {
+        List<Expression> result = new ArrayList<>();
+        for (ExpressionModel exprModel : expressions) {
+            Expression expr = exprModel.generate(builder);
+            result.add(expr);
+        }
+        return result;
     }
 }

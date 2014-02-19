@@ -29,8 +29,8 @@ import guru.bug.tools.parsgn.annotations.RuleValue;
  * @version 1.0.0
  * @since 1.0.0
  */
-@RuleValue("ExpressionSuffix.Quantifier")
+@RuleValue("ExpressionSuffix.Until")
 public class ExpressionRepeatUntilModel extends ExpressionRepeatModel {
-    @RuleValue("Expression")
+    @RuleValue
     private ExpressionModel expression;
 }

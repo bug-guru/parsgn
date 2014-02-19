@@ -22,9 +22,9 @@
 
 package guru.bug.tools.parsgn.model;
 
+import guru.bug.tools.parsgn.RuleBuilder;
 import guru.bug.tools.parsgn.annotations.RuleValue;
-
-import java.util.List;
+import guru.bug.tools.parsgn.expr.Expression;
 
 /**
  * @author Dimitrijs Fedotovs <dima@fedoto.ws>
@@ -33,7 +33,12 @@ import java.util.List;
  */
 @RuleValue({"Expression.Sequence",
         "OneOfExpression.Sequence"})
-public class SequenceExpressionModel {
-    @RuleValue("ExpressionList.Expression")
-    List<ExpressionModel> expressions;
+public class SequenceExpressionModel extends ExpressionModel {
+    @RuleValue
+    private ExpressionListModel expressions;
+
+    @Override
+    public Expression generate(RuleBuilder builder) {
+        return null;
+    }
 }

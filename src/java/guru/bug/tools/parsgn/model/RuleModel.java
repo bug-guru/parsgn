@@ -22,7 +22,10 @@
 
 package guru.bug.tools.parsgn.model;
 
+import guru.bug.tools.parsgn.RuleBuilder;
 import guru.bug.tools.parsgn.annotations.RuleValue;
+import guru.bug.tools.parsgn.exceptions.ParsingException;
+import guru.bug.tools.parsgn.expr.Expression;
 
 import java.util.List;
 
@@ -34,9 +37,12 @@ import java.util.List;
 @RuleValue("Rule")
 public class RuleModel {
     @RuleValue("Name")
-    String name;
-    @RuleValue("Transform")
-    String transform;
-    @RuleValue("ExpressionList.Expression")
-    List<ExpressionModel> expressions;
+    private String name;
+    @RuleValue
+    private ExpressionListModel expressionList;
+
+    public void generate(RuleBuilder builder) throws ParsingException {
+        List<Expression> list = expressionList.generate(builder);
+        builder.rule(name, list);
+    }
 }

@@ -22,11 +22,21 @@
 
 package guru.bug.tools.parsgn.annotations;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  * @author Dimitrijs Fedotovs <dima@fedoto.ws>
  * @version 1.0.0
  * @since 1.0.0
  */
+@Target({ElementType.TYPE,
+        ElementType.FIELD,
+        ElementType.PARAMETER,
+        ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
 public @interface RuleValue {
-    String[] value();
+    String[] value() default {};
 }
