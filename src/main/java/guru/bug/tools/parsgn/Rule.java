@@ -30,8 +30,8 @@ import guru.bug.tools.parsgn.expr.Expression;
  * @since 1.0.0
  */
 public class Rule {
-    private Expression expression;
     private final String name;
+    private Expression expression;
 
     public Rule(String name) {
         this.name = name;

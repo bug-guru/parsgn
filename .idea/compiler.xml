@@ -25,6 +25,9 @@
         <module name="parsgn" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="parsgn" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
 

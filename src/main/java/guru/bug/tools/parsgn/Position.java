@@ -44,14 +44,6 @@ public class Position {
         return new Position(prev.row, prev.col + 1);
     }
 
-    public int getRow() {
-        return row;
-    }
-
-    public int getCol() {
-        return col;
-    }
-
     public static Position max(Position pos1, Position pos2) {
         if (pos1 == null) {
             return pos2;
@@ -62,6 +54,14 @@ public class Position {
         }
 
         return (pos1.row == pos2.row && pos1.col < pos2.col || pos1.row < pos2.row) ? pos2 : pos1;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getCol() {
+        return col;
     }
 
     @Override

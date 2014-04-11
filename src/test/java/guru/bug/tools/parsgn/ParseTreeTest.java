@@ -40,14 +40,18 @@ public class ParseTreeTest {
     private static ParseNode n111 = createNode("n111");
     private static ParseNode n11 = createNode("n11", n111);
     private static ParseNode n12 = createNode("n12");
-    private static ParseNode n21 = createNode("n21");
     private static ParseNode n1 = createNode("n1", n11, n12);
+    private static ParseNode n21 = createNode("n21");
     private static ParseNode n2 = createNode("n2", n21);
     private static ParseNode root = createNode("root", n1, n2);
 
-    private enum Marker {
-        START,
-        END
+    private static ParseNode createNode(String name) {
+        return new ParseNode(name, null, null, fakePos, fakePos);
+    }
+
+    private static ParseNode createNode(String name, ParseNode... children) {
+        List<ParseNode> childList = Arrays.asList(children);
+        return new ParseNode(name, null, childList, fakePos, fakePos);
     }
 
     @Test
@@ -145,12 +149,8 @@ public class ParseTreeTest {
         assertEquals(expected, actual);
     }
 
-    private static ParseNode createNode(String name) {
-        return new ParseNode(name, null, null, fakePos, fakePos);
-    }
-
-    private static ParseNode createNode(String name, ParseNode... children) {
-        List<ParseNode> childList = Arrays.asList(children);
-        return new ParseNode(name, null, childList, fakePos, fakePos);
+    private enum Marker {
+        START,
+        END
     }
 }

@@ -71,6 +71,10 @@ public class EBNFParser extends Parser {
         }
     }
 
+    public EBNFParser() {
+        super(root);
+    }
+
     private static ReferenceExpression generateRules() throws ParsingException {
         RuleBuilder rb = new RuleBuilder();
         rb.rule(CONFIG_FILE,
@@ -79,7 +83,8 @@ public class EBNFParser extends Parser {
                         rb.ref(RULE)
                 ),
                 rb.ref(I),
-                rb.charType(CharType.EOF));
+                rb.charType(CharType.EOF)
+        );
         rb.rule(RULE,
                 rb.ref(NAME),
                 rb.ref(I),
@@ -274,9 +279,5 @@ public class EBNFParser extends Parser {
                 rb.str(")")
         );
         return rb.build(CONFIG_FILE);
-    }
-
-    public EBNFParser() {
-        super(root);
     }
 }
