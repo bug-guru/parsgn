@@ -29,9 +29,9 @@ import java.io.IOException;
 import java.io.Reader;
 
 /**
- * @author Dimitrijs Fedotovs <dima@fedoto.ws>
- * @version 1.0.0
- * @since 1.0.0
+ * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
+ * @version 1.0
+ * @since 1.0
  */
 public class Parser {
     private final ReferenceExpression root;

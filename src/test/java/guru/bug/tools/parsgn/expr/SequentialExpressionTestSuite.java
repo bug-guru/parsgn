@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- * @author Dimitrijs Fedotovs <dima@fedoto.ws>
+ * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({

@@ -25,7 +25,7 @@ package guru.bug.tools.parsgn;
 import guru.bug.tools.parsgn.expr.CharType;
 
 /**
- * @author Dimitrijs Fedotovs <dima@fedoto.ws>
+ * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  */
 public class CharacterTest {
 

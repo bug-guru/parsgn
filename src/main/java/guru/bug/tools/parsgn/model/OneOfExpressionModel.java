@@ -27,9 +27,9 @@ import guru.bug.tools.parsgn.annotations.RuleValue;
 import guru.bug.tools.parsgn.expr.Expression;
 
 /**
- * @author Dimitrijs Fedotovs <dima@fedoto.ws>
- * @version 1.0.0
- * @since 1.0.0
+ * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
+ * @version 1.0
+ * @since 1.0
  */
 @RuleValue("Expression.OneOf")
 public class OneOfExpressionModel extends ExpressionModel {

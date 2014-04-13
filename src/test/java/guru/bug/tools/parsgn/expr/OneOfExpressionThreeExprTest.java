@@ -28,7 +28,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertSame;
 
 /**
- * @author Dimitrijs Fedotovs <dima@fedoto.ws>
+ * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  */
 public class OneOfExpressionThreeExprTest extends OneOfExpressionTestBase {
     private FakeExpression expr1 = new FakeExpression();

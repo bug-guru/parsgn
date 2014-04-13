@@ -30,9 +30,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
- * @author Dimitrijs Fedotovs <dima@fedoto.ws>
- * @version 1.0.0
- * @since 1.0.0
+ * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
+ * @version 1.0
+ * @since 1.0
  */
 public final class ParseTree {
 

@@ -29,7 +29,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertSame;
 
 /**
- * @author Dimitrijs Fedotovs <dima@fedoto.ws>
+ * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  */
 public class OneOfExpressionTest {
     private static final Expression[] ONE = new Expression[]{new FakeExpression()};

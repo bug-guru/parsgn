@@ -35,7 +35,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 /**
- * @author Dimitrijs Fedotovs <dima@fedoto.ws>
+ * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  */
 public class Calculator01Test {
     protected static Parser parser;

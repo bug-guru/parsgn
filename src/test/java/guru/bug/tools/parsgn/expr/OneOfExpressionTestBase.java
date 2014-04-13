@@ -25,7 +25,7 @@ package guru.bug.tools.parsgn.expr;
 import org.junit.Before;
 
 /**
- * @author Dimitrijs Fedotovs <dima@fedoto.ws>
+ * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  */
 public class OneOfExpressionTestBase {
     protected final OneOfExpression expression = new OneOfExpression();
