@@ -51,14 +51,15 @@ public class UntilExpressionTest {
     @Test
     public void testChecker_0x_optional1() throws Exception {
         expression.setMinOccurrences(0);
-        assertSame(cond, checker.next());
+        assertSame(cond, ((UntilExpressionConditionProxy)checker.next()).getConditionExpression());
+        checker.next();
         assertSame(ResultType.ROLLBACK_OPTIONAL, checker.check(ResultType.COMMIT));
     }
 
     @Test
     public void testChecker_0x_optional2() throws Exception {
         expression.setMinOccurrences(0);
-        assertSame(cond, checker.next());
+        assertSame(cond, ((UntilExpressionConditionProxy)checker.next()).getConditionExpression());
         assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         assertSame(loop, checker.next());
         assertSame(ResultType.ROLLBACK_OPTIONAL, checker.check(ResultType.ROLLBACK));
@@ -67,22 +68,22 @@ public class UntilExpressionTest {
     @Test
     public void testChecker_1x_optional1() throws Exception {
         expression.setMinOccurrences(0);
-        assertSame(cond, checker.next());
+        assertSame(cond, ((UntilExpressionConditionProxy)checker.next()).getConditionExpression());
         assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         assertSame(loop, checker.next());
         assertSame(ResultType.CONTINUE, checker.check(ResultType.COMMIT));
-        assertSame(cond, checker.next());
+        assertSame(cond, ((UntilExpressionConditionProxy)checker.next()).getConditionExpression());
         assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
     }
 
     @Test
     public void testChecker_1x_optional2() throws Exception {
         expression.setMinOccurrences(0);
-        assertSame(cond, checker.next());
+        assertSame(cond, ((UntilExpressionConditionProxy)checker.next()).getConditionExpression());
         assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         assertSame(loop, checker.next());
         assertSame(ResultType.CONTINUE, checker.check(ResultType.COMMIT));
-        assertSame(cond, checker.next());
+        assertSame(cond, ((UntilExpressionConditionProxy)checker.next()).getConditionExpression());
         assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
         assertSame(loop, checker.next());
         assertSame(ResultType.COMMIT, checker.check(ResultType.ROLLBACK));

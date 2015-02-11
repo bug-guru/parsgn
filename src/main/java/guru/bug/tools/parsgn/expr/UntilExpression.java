@@ -32,7 +32,7 @@ import guru.bug.tools.parsgn.exceptions.ParsingException;
  */
 public class UntilExpression extends Expression {
     private Expression loopExpression;
-    private Expression conditionExpression;
+    private UntilExpressionConditionProxy conditionExpressionProxy = new UntilExpressionConditionProxy();
     private int minOccurrences;
 
     public Expression getLoopExpression() {
@@ -49,11 +49,11 @@ public class UntilExpression extends Expression {
     }
 
     public Expression getConditionExpression() {
-        return conditionExpression;
+        return conditionExpressionProxy.getConditionExpression();
     }
 
     public void setConditionExpression(Expression conditionExpression) {
-        this.conditionExpression = conditionExpression;
+        this.conditionExpressionProxy.setConditionExpression(conditionExpression);
     }
 
     public UntilExpression condition(Expression conditionExpression) {
@@ -86,7 +86,7 @@ public class UntilExpression extends Expression {
         @Override
         public Expression next() {
             if (checkingEndCondition) {
-                return conditionExpression;
+                return conditionExpressionProxy;
             } else {
                 return loopExpression;
             }

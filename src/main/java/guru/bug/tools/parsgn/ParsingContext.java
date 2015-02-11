@@ -93,8 +93,14 @@ public class ParsingContext<T> {
             switch (prevResult) {
                 case CONTINUE:
                     break loop;
+                case REWIND_AND_COMMIT:
                 case COMMIT:
-                    source.removeMark();
+                    if (prevResult == ResultType.COMMIT) {
+                        source.removeMark();
+                    } else {
+                        source.rewind();
+                        prevResult = ResultType.COMMIT;
+                    }
                     if (branchChecker == null) {
                         stack.pop();
                         leaf.commitResult(stack.peek().getCommittedValue());

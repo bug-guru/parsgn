@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,25 +25,42 @@ package guru.bug.tools.parsgn.expr;
 import guru.bug.tools.parsgn.ResultType;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 
-/**
- * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
- * @version 1.0
- * @since 1.0
- */
-public abstract class BranchExpressionChecker extends ExpressionChecker {
-    public abstract Expression next();
+public class UntilExpressionConditionProxy extends Expression {
+    private Expression conditionExpression;
 
-    public String getGroupName() {
-        return null;
+    public Expression getConditionExpression() {
+        return conditionExpression;
     }
 
-    /**
-     * Checks what should be done next.
-     * @param childResult COMMIT, ROLLBACK or OPTIONAL ROLLBACK. Never REWIND_AND_COMMIT
-     * @return result to be passed to upper level checker
-     * @throws ParsingException if something goes wrong.
-     */
-    public ResultType check(ResultType childResult) throws ParsingException {
-        return childResult;
+    public void setConditionExpression(Expression conditionExpression) {
+        this.conditionExpression = conditionExpression;
+    }
+
+    public UntilExpressionConditionProxy condition(Expression conditionExpression) {
+        setConditionExpression(conditionExpression);
+        return this;
+    }
+
+    @Override
+    public ExpressionChecker checker() {
+        return new Checker();
+    }
+
+    class Checker extends BranchExpressionChecker {
+
+        @Override
+        public Expression next() {
+            return conditionExpression;
+        }
+
+        @Override
+        public ResultType check(ResultType childResult) throws ParsingException {
+            if (childResult == ResultType.COMMIT) {
+                return ResultType.REWIND_AND_COMMIT;
+            } else {
+                return childResult;
+            }
+        }
     }
 }
+

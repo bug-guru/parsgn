@@ -23,13 +23,18 @@
 package guru.bug.tools.parsgn;
 
 import guru.bug.tools.parsgn.expr.CharType;
+import org.junit.Test;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  */
 public class CharacterTest {
 
-    //@Test
+    @Test
+    public void testFake() {
+
+    }
+
     public void testIgnorable() {
         isIdentifierIgnorable(';');
         isIdentifierIgnorable(' ');

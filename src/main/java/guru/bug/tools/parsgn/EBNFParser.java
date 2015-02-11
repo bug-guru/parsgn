@@ -113,7 +113,8 @@ public class EBNFParser extends Parser {
                 rb.repeatUntil(
                         rb.str("*/"),
                         rb.charType(CharType.VALID)
-                )
+                ),
+                rb.str("*/")
         );
         rb.rule(NAME,
                 rb.sequence(
@@ -263,6 +264,7 @@ public class EBNFParser extends Parser {
                                 rb.charType(CharType.VALID)
                         )
                 ),
+                rb.str("\""),
                 rb.zeroOrOne(
                         rb.ref(TRANSFORM)
                 )
