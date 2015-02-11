@@ -56,10 +56,15 @@ public class UntilExpressionConditionProxy extends Expression {
         @Override
         public ResultType check(ResultType childResult) throws ParsingException {
             if (childResult == ResultType.COMMIT) {
-                return ResultType.REWIND_AND_COMMIT;
+                return ResultType.COMMIT;
             } else {
                 return childResult;
             }
+        }
+
+        @Override
+        public boolean isIgnored() {
+            return true;
         }
     }
 }

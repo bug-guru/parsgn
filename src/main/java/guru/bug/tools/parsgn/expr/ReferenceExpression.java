@@ -70,5 +70,10 @@ public class ReferenceExpression extends Expression {
         public String toString() {
             return "ref:" + reference.getName();
         }
+
+        @Override
+        public boolean isHidden() {
+            return ReferenceExpression.this.isHidden() || reference.isHidden();
+        }
     }
 }

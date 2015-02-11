@@ -23,6 +23,9 @@
 package guru.bug.tools.parsgn.expr;
 
 
+import guru.bug.tools.parsgn.ResultType;
+import guru.bug.tools.parsgn.exceptions.ParsingException;
+
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
@@ -44,5 +47,34 @@ public abstract class Expression {
     public Expression hide() {
         setHidden(true);
         return this;
+    }
+
+    public abstract class ExpressionChecker {
+
+        public boolean isIgnored() {
+            return false;
+        }
+
+        public boolean isHidden() {
+            return Expression.this.isHidden();
+        }
+    }
+
+    public abstract class LeafExpressionChecker extends ExpressionChecker {
+        public abstract void commitResult(StringBuilder result);
+
+        public abstract ResultType check(int codePoint) throws ParsingException;
+    }
+
+    public abstract class BranchExpressionChecker extends ExpressionChecker {
+        public abstract Expression next();
+
+        public String getGroupName() {
+            return null;
+        }
+
+        public ResultType check(ResultType childResult) throws ParsingException {
+            return childResult;
+        }
     }
 }

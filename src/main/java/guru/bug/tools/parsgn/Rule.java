@@ -32,6 +32,7 @@ import guru.bug.tools.parsgn.expr.Expression;
 public class Rule {
     private final String name;
     private Expression expression;
+    private boolean hidden;
 
     public Rule(String name) {
         this.name = name;
@@ -47,5 +48,23 @@ public class Rule {
 
     public void setExpression(Expression expression) {
         this.expression = expression;
+    }
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
+    }
+
+    public Rule hide() {
+        setHidden(true);
+        return this;
+    }
+
+    public Rule hide(boolean hide) {
+        setHidden(hide);
+        return this;
     }
 }

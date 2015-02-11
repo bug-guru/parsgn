@@ -34,6 +34,7 @@ import guru.bug.tools.parsgn.expr.ReferenceExpression;
 public class EBNFParser extends Parser {
     public static final String CONFIG_FILE = "ConfigFile";
     public static final String RULE = "Rule";
+    public static final String HIDE_FLAG = "HideFlag";
     public static final String I = "I";
     public static final String SINGLE_LINE_COMMENT = "SingleLineComment";
     public static final String MULTI_LINE_COMMENT = "MultiLineComment";
@@ -86,11 +87,15 @@ public class EBNFParser extends Parser {
                 rb.charType(CharType.EOF)
         );
         rb.rule(RULE,
+                rb.zeroOrOne(rb.ref(HIDE_FLAG)),
                 rb.ref(NAME),
                 rb.ref(I),
                 rb.str(":"),
                 rb.ref(EXPRESSION_LIST),
                 rb.str(";")
+        );
+        rb.rule(HIDE_FLAG,
+                rb.str(".")
         );
         rb.rule(I,
                 rb.zeroOrMore(
@@ -100,7 +105,7 @@ public class EBNFParser extends Parser {
                                 rb.ref(MULTI_LINE_COMMENT)
                         )
                 )
-        );
+        ).hide();
         rb.rule(SINGLE_LINE_COMMENT,
                 rb.str("//"),
                 rb.repeatUntil(
@@ -263,6 +268,9 @@ public class EBNFParser extends Parser {
                                 rb.str("\\\\").transform("\\"),
                                 rb.str("\\n").transform("\n"),
                                 rb.str("\\r").transform("\r"),
+                                rb.str("\\t").transform("\t"),
+                                rb.str("\\f").transform("\f"),
+                                rb.str("\\b").transform("\b"),
                                 rb.charType(CharType.VALID)
                         )
                 ),
@@ -280,6 +288,7 @@ public class EBNFParser extends Parser {
         rb.rule(SEQUENCE,
                 rb.str("("),
                 rb.ref(EXPRESSION_LIST),
+                rb.ref(I),
                 rb.str(")")
         );
         return rb.build(CONFIG_FILE);

@@ -30,7 +30,6 @@ package guru.bug.tools.parsgn;
 public enum ResultType {
     CONTINUE,
     COMMIT,
-    REWIND_AND_COMMIT,
     ROLLBACK,
     ROLLBACK_OPTIONAL
 }

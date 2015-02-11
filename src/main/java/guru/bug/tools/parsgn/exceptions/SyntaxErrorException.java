@@ -24,7 +24,7 @@ package guru.bug.tools.parsgn.exceptions;
 
 
 import guru.bug.tools.parsgn.Position;
-import guru.bug.tools.parsgn.expr.ExpressionChecker;
+import guru.bug.tools.parsgn.expr.Expression;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class SyntaxErrorException extends ParsingException {
     private final Position position;
-    private final List<ExpressionChecker> failedExpressions;
+    private final List<Expression.ExpressionChecker> failedExpressions;
 
     public SyntaxErrorException(Position position) {
         super(String.format("Line %d: syntax error at or near col %d", position.getRow(), position.getCol()));
@@ -43,7 +43,7 @@ public class SyntaxErrorException extends ParsingException {
         this.failedExpressions = null;
     }
 
-    public SyntaxErrorException(Position position, List<ExpressionChecker> failedExpressions) {
+    public SyntaxErrorException(Position position, List<Expression.ExpressionChecker> failedExpressions) {
         super(String.format("Line %d: syntax error at or near col %d. Failed expressions: %s", position.getRow(), position.getCol(), failedExpressions));
         this.position = position;
         this.failedExpressions = failedExpressions;

@@ -34,7 +34,7 @@ import static org.junit.Assert.assertSame;
  */
 public class StringExpressionTest {
     protected final StringExpression expression;
-    protected LeafExpressionChecker checker;
+    protected Expression.LeafExpressionChecker checker;
 
     public StringExpressionTest() {
         expression = new StringExpression();

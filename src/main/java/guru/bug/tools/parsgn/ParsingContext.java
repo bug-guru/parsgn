@@ -25,10 +25,7 @@ package guru.bug.tools.parsgn;
 import guru.bug.tools.parsgn.exceptions.InternalParsingException;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
-import guru.bug.tools.parsgn.expr.BranchExpressionChecker;
 import guru.bug.tools.parsgn.expr.Expression;
-import guru.bug.tools.parsgn.expr.ExpressionChecker;
-import guru.bug.tools.parsgn.expr.LeafExpressionChecker;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,7 +42,7 @@ public class ParsingContext<T> {
     private final Deque<Holder> stack = new LinkedList<>();
     private final ResultBuilder<T> builder;
     private final CodePointSource source;
-    private final List<ExpressionChecker> failedExpressions = new ArrayList<>();
+    private final List<Expression.ExpressionChecker> failedExpressions = new ArrayList<>();
 
     public ParsingContext(Expression root, ResultBuilder<T> builder, CodePointSource source) {
         this.builder = builder;
@@ -68,14 +65,14 @@ public class ParsingContext<T> {
 
     private void completePath() {
         Expression nextExpr;
-        while (stack.peek().checker instanceof BranchExpressionChecker) {
-            nextExpr = ((BranchExpressionChecker) stack.peek().checker).next();
+        while (stack.peek().checker instanceof Expression.BranchExpressionChecker) {
+            nextExpr = ((Expression.BranchExpressionChecker) stack.peek().checker).next();
             pushExpression(nextExpr);
         }
     }
 
     private void pushExpression(Expression nextExpr) {
-        ExpressionChecker nextChecker = nextExpr.checker();
+        Expression.ExpressionChecker nextChecker = nextExpr.checker();
         Holder holder = new Holder();
         holder.checker = nextChecker;
         stack.push(holder);
@@ -86,33 +83,38 @@ public class ParsingContext<T> {
     private void process() throws ParsingException, IOException {
         int codePoint = source.getNext();
         Holder leafHolder = stack.peek();
-        LeafExpressionChecker leaf = ((LeafExpressionChecker) leafHolder.checker);
+        Expression.LeafExpressionChecker leaf = ((Expression.LeafExpressionChecker) leafHolder.checker);
         ResultType prevResult = leaf.check(codePoint);
-        BranchExpressionChecker branchChecker = null;
+        Expression.BranchExpressionChecker branchChecker = null;
         loop:
         while (true) {
             switch (prevResult) {
                 case CONTINUE:
                     break loop;
-                case REWIND_AND_COMMIT:
                 case COMMIT:
                     failedExpressions.clear();
-                    if (prevResult == ResultType.COMMIT) {
-                        source.removeMark();
-                    } else {
-                        source.rewind();
-                        prevResult = ResultType.COMMIT;
-                    }
-                    if (branchChecker == null) {
+                    boolean ignoreFlag = isIgnoreFlagSet(leaf, branchChecker);
+                    boolean hiddenFlag = isHiddenFlagSet(leaf, branchChecker);
+                    if (ignoreFlag || hiddenFlag) {
+                        if (hiddenFlag) {
+                            source.removeMark();
+                        } else {
+                            source.rewind();
+                        }
                         stack.pop();
-                        leaf.commitResult(stack.peek().getCommittedValue());
-                    } else if (branchChecker.getGroupName() == null) {
-                        ParsingContext<T>.Holder top = stack.pop();
-                        stack.peek().merge(top);
                     } else {
-                        ParsingContext<T>.Holder top = stack.pop();
-                        top.end = source.getNextPos();
-                        stack.peek().commitNode(branchChecker.getGroupName(), top);
+                        source.removeMark();
+                        if (branchChecker == null) {
+                            stack.pop();
+                            leaf.commitResult(stack.peek().getCommittedValue());
+                        } else if (branchChecker.getGroupName() == null) {
+                            ParsingContext<T>.Holder top = stack.pop();
+                            stack.peek().merge(top);
+                        } else {
+                            ParsingContext<T>.Holder top = stack.pop();
+                            top.end = source.getNextPos();
+                            stack.peek().commitNode(branchChecker.getGroupName(), top);
+                        }
                     }
                     break;
                 case ROLLBACK:
@@ -131,13 +133,21 @@ public class ParsingContext<T> {
                 break;
             }
             Holder holder = stack.peek();
-            branchChecker = (BranchExpressionChecker) holder.checker;
+            branchChecker = (Expression.BranchExpressionChecker) holder.checker;
             prevResult = branchChecker.check(prevResult);
         }
     }
 
+    private boolean isIgnoreFlagSet(Expression.LeafExpressionChecker leaf, Expression.BranchExpressionChecker branchChecker) {
+        return branchChecker == null && leaf.isIgnored() || branchChecker != null && branchChecker.isIgnored();
+    }
+
+    private boolean isHiddenFlagSet(Expression.LeafExpressionChecker leaf, Expression.BranchExpressionChecker branchChecker) {
+        return branchChecker == null && leaf.isHidden() || branchChecker != null && branchChecker.isHidden();
+    }
+
     private class Holder {
-        ExpressionChecker checker;
+        Expression.ExpressionChecker checker;
         List<T> committedNodes;
         StringBuilder committedValue;
         Position start;

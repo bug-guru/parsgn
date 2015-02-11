@@ -2,9 +2,11 @@ ConfigFile:
     (I Rule)+ I #EOF;
 
 Rule:
-    Name I ":" ExpressionList ";";
+    HideFlag? Name I ":" ExpressionList ";";
 
-I: (#WHITESPACE | SingleLineComment | MultiLineComment)*;
+HideFlag: ".";
+
+.I: (#WHITESPACE | SingleLineComment | MultiLineComment)*;
 
 SingleLineComment: "//" #VALID{#LINE_SEPARATOR};
 
@@ -66,4 +68,4 @@ String: "\"" ("\\\"" -> "\"" | "\\\\" -> "\\" | "\\n" -> "\n" | "\\r" -> "\r" | 
 
 Transform: I "->" I String;
 
-Sequence: "(" ExpressionList ")";
+Sequence: "(" ExpressionList I ")";
