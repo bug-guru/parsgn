@@ -62,7 +62,7 @@ Reference: Name;
 
 CharType: "#" Name; //TODO: list all possible char types
 
-String: "\"" ("\\\"" -> "\"" | "\\\\" -> "\\" | #VALID){"\""} "\"" Transform?;
+String: "\"" ("\\\"" -> "\"" | "\\\\" -> "\\" | "\\n" -> "\n" | "\\r" -> "\r" | #VALID){"\""} "\"" Transform?;
 
 Transform: I "->" I String;
 

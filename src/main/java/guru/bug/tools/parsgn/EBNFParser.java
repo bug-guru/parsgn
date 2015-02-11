@@ -261,6 +261,8 @@ public class EBNFParser extends Parser {
                         rb.oneOf(
                                 rb.str("\\\"").transform("\""),
                                 rb.str("\\\\").transform("\\"),
+                                rb.str("\\n").transform("\n"),
+                                rb.str("\\r").transform("\r"),
                                 rb.charType(CharType.VALID)
                         )
                 ),
