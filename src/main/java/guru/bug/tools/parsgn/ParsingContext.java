@@ -45,6 +45,7 @@ public class ParsingContext<T> {
     private final Deque<Holder> stack = new LinkedList<>();
     private final ResultBuilder<T> builder;
     private final CodePointSource source;
+    private final List<ExpressionChecker> failedExpressions = new ArrayList<>();
 
     public ParsingContext(Expression root, ResultBuilder<T> builder, CodePointSource source) {
         this.builder = builder;
@@ -95,6 +96,7 @@ public class ParsingContext<T> {
                     break loop;
                 case REWIND_AND_COMMIT:
                 case COMMIT:
+                    failedExpressions.clear();
                     if (prevResult == ResultType.COMMIT) {
                         source.removeMark();
                     } else {
@@ -114,11 +116,12 @@ public class ParsingContext<T> {
                     }
                     break;
                 case ROLLBACK:
+                    failedExpressions.add(stack.peek().checker);
                 case ROLLBACK_OPTIONAL:
                     stack.pop();
                     source.rewind();
                     if (stack.size() == 1) {
-                        throw new SyntaxErrorException(source.getMaxPos());
+                        throw new SyntaxErrorException(source.getMaxPos(), failedExpressions);
                     }
                     break;
                 default:
