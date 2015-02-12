@@ -2,9 +2,11 @@ ConfigFile:
     (I Rule)+ I #EOF;
 
 Rule:
-    HideFlag? Name I ":" ExpressionList ";";
+    HideFlag? Name RuleParams? I ":" ExpressionList ";";
 
 HideFlag: ".";
+
+RuleParams: "(" I Name I ")";
 
 .I: (#WHITESPACE | SingleLineComment | MultiLineComment)*;
 
@@ -38,17 +40,16 @@ ZeroOrMore: "*";
 
 Until: "{" I Expression I "}";
 
-ExactlyNTimes: "{" I Number I "}";
+ExactlyNTimes: "{" I QuantifierExpression I "}";
 
-AtLeastMinTimes: "{" I Number I "," I "}";
+QuantifierExpression:
+    Number | ("$(" I CalcExpression I ")");
 
-AtLeastMinButNotMoreThanMaxTimes: "{" I Min I "," I Max I "}";
+AtLeastMinTimes: "{" I QuantifierExpression I "," I "}";
+
+AtLeastMinButNotMoreThanMaxTimes: "{" I QuantifierExpression I "," I QuantifierExpression I "}";
 
 Number: #DIGIT+;
-
-Min: Number;
-
-Max: Number;
 
 OneOf: OneOfVariant1 | OneOfVariant2;
 
@@ -60,7 +61,11 @@ OneOfExpression:
     Reference | CharType | String | Sequence
     ExpressionSuffix?;
 
-Reference: Name;
+Reference: Name ReferenceParams?;
+
+ReferenceParams: "(" I CalcExpression I ")";
+
+CalcExpression: Number | (Name I "+" I Number) | Name;
 
 CharType: "#" Name; //TODO: list all possible char types
 

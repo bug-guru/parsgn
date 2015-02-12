@@ -24,6 +24,7 @@ package guru.bug.tools.parsgn.expr;
 
 import guru.bug.tools.parsgn.ResultType;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
+import guru.bug.tools.parsgn.model.CalcExpression;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -32,8 +33,8 @@ import guru.bug.tools.parsgn.exceptions.ParsingException;
  */
 public class QuantityExpression extends Expression {
     private Expression expression;
-    private int minOccurrences = 0;
-    private int maxOccurrences = 1;
+    private CalcExpression minOccurrences = new CalcExpression(null, 0);
+    private CalcExpression maxOccurrences = new CalcExpression(null, 1);
 
     public Expression getExpression() {
         return expression;
@@ -48,28 +49,28 @@ public class QuantityExpression extends Expression {
         return this;
     }
 
-    public int getMinOccurrences() {
+    public CalcExpression getMinOccurrences() {
         return minOccurrences;
     }
 
-    public void setMinOccurrences(int minOccurrences) {
+    public void setMinOccurrences(CalcExpression minOccurrences) {
         this.minOccurrences = minOccurrences;
     }
 
-    public QuantityExpression minOccurrences(int minOccurrences) {
+    public QuantityExpression minOccurrences(CalcExpression minOccurrences) {
         setMinOccurrences(minOccurrences);
         return this;
     }
 
-    public int getMaxOccurrences() {
+    public CalcExpression getMaxOccurrences() {
         return maxOccurrences;
     }
 
-    public void setMaxOccurrences(int maxOccurrences) {
+    public void setMaxOccurrences(CalcExpression maxOccurrences) {
         this.maxOccurrences = maxOccurrences;
     }
 
-    public QuantityExpression maxOccurrences(int maxOccurrences) {
+    public QuantityExpression maxOccurrences(CalcExpression maxOccurrences) {
         setMaxOccurrences(maxOccurrences);
         return this;
     }

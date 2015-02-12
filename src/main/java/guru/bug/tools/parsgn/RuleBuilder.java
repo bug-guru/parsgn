@@ -27,6 +27,7 @@ import guru.bug.tools.parsgn.exceptions.EmptyExpressionListException;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.exceptions.UnresolvedRuleException;
 import guru.bug.tools.parsgn.expr.*;
+import guru.bug.tools.parsgn.model.CalcExpression;
 
 import java.util.*;
 
@@ -132,6 +133,10 @@ public class RuleBuilder {
     }
 
     public final QuantityExpression repeat(int min, int max, Expression... expressions) throws ParsingException {
+        return repeat(new CalcExpression(null, min), new CalcExpression(null, max), expressions);
+    }
+
+    public final QuantityExpression repeat(CalcExpression min, CalcExpression max, Expression... expressions) throws ParsingException {
         return new QuantityExpression()
                 .loop(wrap(expressions))
                 .minOccurrences(min)

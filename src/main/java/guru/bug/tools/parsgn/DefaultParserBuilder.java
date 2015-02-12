@@ -27,6 +27,7 @@ import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.CharType;
 import guru.bug.tools.parsgn.expr.Expression;
 import guru.bug.tools.parsgn.expr.OneOfExpression;
+import guru.bug.tools.parsgn.model.CalcExpression;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -171,30 +172,30 @@ public class DefaultParserBuilder {
     }
 
     private Expression createQuantityExpression(RuleBuilder rb, ParseNode root, Expression expression) throws ParsingException {
-        int minOccurrences = 1;
-        int maxOccurrences = 1;
+        CalcExpression minOccurrences = new CalcExpression(null, 1);
+        CalcExpression maxOccurrences = new CalcExpression(null, 1);
         for (ParseNode node : root.getChildren()) {
             String nodeName = node.getName();
             switch (nodeName) {
                 case ZERO_OR_ONE:
-                    minOccurrences = 0;
-                    maxOccurrences = 1;
+                    minOccurrences = new CalcExpression(null, 0);
+                    maxOccurrences = new CalcExpression(null, 1);
                     break;
                 case ZERO_OR_MORE:
-                    minOccurrences = 0;
-                    maxOccurrences = Integer.MAX_VALUE;
+                    minOccurrences = new CalcExpression(null, 0);
+                    maxOccurrences = new CalcExpression(null, Integer.MAX_VALUE);
                     break;
                 case ONE_OR_MORE:
-                    minOccurrences = 1;
-                    maxOccurrences = Integer.MAX_VALUE;
+                    minOccurrences = new CalcExpression(null, 1);
+                    maxOccurrences = new CalcExpression(null, Integer.MAX_VALUE);
                     break;
                 case EXACTLY_N_TIMES:
-                    minOccurrences = findNumber(node);
+                    minOccurrences = findCalcExpression(node);
                     maxOccurrences = minOccurrences;
                     break;
                 case AT_LEAST_MIN_TIMES:
-                    minOccurrences = findNumber(node);
-                    maxOccurrences = Integer.MAX_VALUE;
+                    minOccurrences = findCalcExpression(node);
+                    maxOccurrences = new CalcExpression(null, Integer.MAX_VALUE);
                     break;
                 case AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES:
                     Bounds bounds = findBounds(node);
@@ -289,12 +290,15 @@ public class DefaultParserBuilder {
 
     private Expression createReferenceExpression(RuleBuilder rb, ParseNode refNode) throws ParsingException {
         String ruleName = null;
+        CalcExpression calcExpression = null;
         for (ParseNode node : refNode.getChildren()) {
             String nodeName = node.getName();
             switch (nodeName) {
                 case NAME:
                     ruleName = node.getValue();
                     break;
+                case REFERENCE_PARAMS:
+                    calcExpression = parseCalcExpression(node.getChildren().get(0));
                 default:
                     throw new InternalParsingException(nodeName);
             }
@@ -333,7 +337,7 @@ public class DefaultParserBuilder {
     }
 
     private static class Bounds {
-        int min;
-        int max;
+        CalcExpression min;
+        CalcExpression max;
     }
 }

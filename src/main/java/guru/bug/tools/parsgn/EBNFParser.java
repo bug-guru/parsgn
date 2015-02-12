@@ -35,6 +35,7 @@ public class EBNFParser extends Parser {
     public static final String CONFIG_FILE = "ConfigFile";
     public static final String RULE = "Rule";
     public static final String HIDE_FLAG = "HideFlag";
+    public static final String RULE_PARAMS = "RuleParams";
     public static final String I = "I";
     public static final String SINGLE_LINE_COMMENT = "SingleLineComment";
     public static final String MULTI_LINE_COMMENT = "MultiLineComment";
@@ -48,16 +49,17 @@ public class EBNFParser extends Parser {
     public static final String ZERO_OR_MORE = "ZeroOrMore";
     public static final String UNTIL = "Until";
     public static final String EXACTLY_N_TIMES = "ExactlyNTimes";
+    public static final String QUANTIFIER_EXPRESSION = "QuantifierExpression";
     public static final String AT_LEAST_MIN_TIMES = "AtLeastMinTimes";
     public static final String AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES = "AtLeastNButNotMoreThanMTimes";
     public static final String NUMBER = "Number";
-    public static final String MIN = "Min";
-    public static final String MAX = "Max";
     public static final String ONE_OF = "OneOf";
     public static final String ONE_OF_VARIANT1 = "OneOfVariant1";
     public static final String ONE_OF_VARIANT2 = "OneOfVariant2";
     public static final String ONE_OF_EXPRESSION = "OneOfExpression";
     public static final String REFERENCE = "Reference";
+    public static final String REFERENCE_PARAMS = "ReferenceParams";
+    public static final String CALC_EXPRESSION = "CalcExpression";
     public static final String CHAR_TYPE = "CharType";
     public static final String STRING = "String";
     public static final String TRANSFORM = "Transform";
@@ -89,6 +91,7 @@ public class EBNFParser extends Parser {
         rb.rule(RULE,
                 rb.zeroOrOne(rb.ref(HIDE_FLAG)),
                 rb.ref(NAME),
+                rb.zeroOrOne(rb.ref(RULE_PARAMS)),
                 rb.ref(I),
                 rb.str(":"),
                 rb.ref(EXPRESSION_LIST),
@@ -96,6 +99,13 @@ public class EBNFParser extends Parser {
         );
         rb.rule(HIDE_FLAG,
                 rb.str(".")
+        );
+        rb.rule(RULE_PARAMS,
+                rb.str("("),
+                rb.ref(I),
+                rb.ref(NAME),
+                rb.ref(I),
+                rb.str(")")
         );
         rb.rule(I,
                 rb.zeroOrMore(
@@ -184,14 +194,27 @@ public class EBNFParser extends Parser {
         rb.rule(EXACTLY_N_TIMES,
                 rb.str("{"),
                 rb.ref(I),
-                rb.ref(NUMBER),
+                rb.ref(QUANTIFIER_EXPRESSION),
                 rb.ref(I),
                 rb.str("}")
+        );
+        // QuantifierExpression: Number | ("$(" I CalcExpression I ")");
+        rb.rule(QUANTIFIER_EXPRESSION,
+                rb.oneOf(
+                        rb.ref(NUMBER),
+                        rb.sequence(
+                                rb.str("$("),
+                                rb.ref(I),
+                                rb.ref(CALC_EXPRESSION),
+                                rb.ref(I),
+                                rb.str(")")
+                        )
+                )
         );
         rb.rule(AT_LEAST_MIN_TIMES,
                 rb.str("{"),
                 rb.ref(I),
-                rb.ref(NUMBER),
+                rb.ref(QUANTIFIER_EXPRESSION),
                 rb.ref(I),
                 rb.str(","),
                 rb.ref(I),
@@ -200,11 +223,11 @@ public class EBNFParser extends Parser {
         rb.rule(AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES,
                 rb.str("{"),
                 rb.ref(I),
-                rb.ref(MIN),
+                rb.ref(QUANTIFIER_EXPRESSION),
                 rb.ref(I),
                 rb.str(","),
                 rb.ref(I),
-                rb.ref(MAX),
+                rb.ref(QUANTIFIER_EXPRESSION),
                 rb.ref(I),
                 rb.str("}")
         );
@@ -212,12 +235,6 @@ public class EBNFParser extends Parser {
                 rb.oneOrMore(
                         rb.charType(CharType.DIGIT)
                 )
-        );
-        rb.rule(MIN,
-                rb.ref(NUMBER)
-        );
-        rb.rule(MAX,
-                rb.ref(NUMBER)
         );
         rb.rule(ONE_OF,
                 rb.oneOf(
@@ -253,7 +270,29 @@ public class EBNFParser extends Parser {
                 )
         );
         rb.rule(REFERENCE,
-                rb.ref(NAME)
+                rb.ref(NAME),
+                rb.zeroOrOne(rb.ref(REFERENCE_PARAMS))
+        );
+        rb.rule(REFERENCE_PARAMS,
+                rb.str("("),
+                rb.ref(I),
+                rb.ref(CALC_EXPRESSION),
+                rb.ref(I),
+                rb.str(")")
+        );
+        //CalcExpression: Number | (Name I "+" I Number) | Name;
+        rb.rule(CALC_EXPRESSION,
+                rb.oneOf(
+                        rb.ref(NUMBER),
+                        rb.sequence(
+                                rb.ref(NAME),
+                                rb.ref(I),
+                                rb.str("+"),
+                                rb.ref(I),
+                                rb.ref(NUMBER)
+                        ),
+                        rb.ref(NAME)
+                )
         );
         rb.rule(CHAR_TYPE,
                 rb.str("#"),
