@@ -22,7 +22,9 @@
 
 package guru.bug.tools.parsgn.expr;
 
+import guru.bug.tools.parsgn.CalcExpressionContext;
 import guru.bug.tools.parsgn.Rule;
+import guru.bug.tools.parsgn.model.CalcExpression;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -32,6 +34,7 @@ import guru.bug.tools.parsgn.Rule;
 public class ReferenceExpression extends Expression {
     private final String ruleName;
     private Rule reference;
+    private CalcExpression paramExpression;
 
     public ReferenceExpression(String ruleName) {
         this.ruleName = ruleName;
@@ -50,8 +53,17 @@ public class ReferenceExpression extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker() {
+    public ExpressionChecker checker(CalcExpressionContext cCtx) {
+        String paramName = reference.getParamName();
+        if (paramExpression != null && paramName != null) {
+            cCtx.setValue(paramName, paramExpression.evaluate(cCtx));
+        }
         return new Checker();
+    }
+
+    public Expression params(CalcExpression paramExpression) {
+        this.paramExpression = paramExpression;
+        return this;
     }
 
     class Checker extends BranchExpressionChecker {

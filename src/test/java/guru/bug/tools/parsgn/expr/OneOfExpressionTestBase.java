@@ -33,6 +33,6 @@ public class OneOfExpressionTestBase {
 
     @Before
     public void setUp() {
-        checker = (OneOfExpression.Checker) expression.checker();
+        checker = (OneOfExpression.Checker) expression.checker(null);
     }
 }

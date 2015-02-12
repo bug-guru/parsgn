@@ -243,11 +243,11 @@ public class EBNFParser extends Parser {
                 )
         );
         rb.rule(ONE_OF_VARIANT1,
-                rb.str("("),
+                rb.str("["),
                 rb.ref(I),
                 rb.ref(ONE_OF_VARIANT2),
                 rb.ref(I),
-                rb.str(")")
+                rb.str("]")
         );
         rb.rule(ONE_OF_VARIANT2,
                 rb.ref(ONE_OF_EXPRESSION),
@@ -325,10 +325,10 @@ public class EBNFParser extends Parser {
                 rb.ref(STRING)
         );
         rb.rule(SEQUENCE,
-                rb.str("("),
+                rb.str("["),
                 rb.ref(EXPRESSION_LIST),
                 rb.ref(I),
-                rb.str(")")
+                rb.str("]")
         );
         return rb.build(CONFIG_FILE);
     }

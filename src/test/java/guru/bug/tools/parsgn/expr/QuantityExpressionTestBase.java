@@ -38,7 +38,7 @@ public class QuantityExpressionTestBase {
 
     @Before
     public void setUp() {
-        checker = (QuantityExpression.Checker) expression.checker();
+        checker = (QuantityExpression.Checker) expression.checker(null);
     }
 
 }

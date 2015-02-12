@@ -45,7 +45,7 @@ public class UntilExpressionTest {
 
     @Before
     public void setUp() {
-        checker = (UntilExpression.Checker) expression.checker();
+        checker = (UntilExpression.Checker) expression.checker(null);
     }
 
     @Test

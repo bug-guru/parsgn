@@ -22,6 +22,7 @@
 
 package guru.bug.tools.parsgn.expr;
 
+import guru.bug.tools.parsgn.CalcExpressionContext;
 import guru.bug.tools.parsgn.ResultType;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.model.CalcExpression;
@@ -57,6 +58,10 @@ public class QuantityExpression extends Expression {
         this.minOccurrences = minOccurrences;
     }
 
+    public QuantityExpression minOccurrences(int minOccurrences) {
+        return minOccurrences(new CalcExpression(minOccurrences));
+    }
+
     public QuantityExpression minOccurrences(CalcExpression minOccurrences) {
         setMinOccurrences(minOccurrences);
         return this;
@@ -70,18 +75,27 @@ public class QuantityExpression extends Expression {
         this.maxOccurrences = maxOccurrences;
     }
 
+    public QuantityExpression maxOccurrences(int maxOccurrences) {
+        return maxOccurrences(new CalcExpression(maxOccurrences));
+    }
+
     public QuantityExpression maxOccurrences(CalcExpression maxOccurrences) {
         setMaxOccurrences(maxOccurrences);
         return this;
     }
 
     @Override
-    public ExpressionChecker checker() {
-        return new Checker();
+    public ExpressionChecker checker(CalcExpressionContext cCtx) {
+        Checker result = new Checker();
+        result.maxOccurrences = this.maxOccurrences == null ? 0 : this.maxOccurrences.evaluate(cCtx);
+        result.maxOccurrences = this.minOccurrences == null ? 0 : this.minOccurrences.evaluate(cCtx);
+        return result;
     }
 
     class Checker extends BranchExpressionChecker {
         private int turnsPassed = 0;
+        private int minOccurrences;
+        private int maxOccurrences;
 
         @Override
         public Expression next() {

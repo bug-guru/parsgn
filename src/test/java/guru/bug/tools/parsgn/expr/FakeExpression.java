@@ -22,12 +22,14 @@
 
 package guru.bug.tools.parsgn.expr;
 
+import guru.bug.tools.parsgn.CalcExpressionContext;
+
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  */
 public class FakeExpression extends Expression {
     @Override
-    public ExpressionChecker checker() {
+    public ExpressionChecker checker(CalcExpressionContext cCtx) {
         return null;
     }
 }

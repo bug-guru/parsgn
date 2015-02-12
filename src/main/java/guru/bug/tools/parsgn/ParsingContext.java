@@ -28,17 +28,14 @@ import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
 import guru.bug.tools.parsgn.expr.Expression;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class ParsingContext<T> {
+public class ParsingContext<T> implements CalcExpressionContext {
     private final Deque<Holder> stack = new LinkedList<>();
     private final ResultBuilder<T> builder;
     private final CodePointSource source;
@@ -72,7 +69,7 @@ public class ParsingContext<T> {
     }
 
     private void pushExpression(Expression nextExpr) {
-        Expression.ExpressionChecker nextChecker = nextExpr.checker();
+        Expression.ExpressionChecker nextChecker = nextExpr.checker(this);
         Holder holder = new Holder();
         holder.checker = nextChecker;
         stack.push(holder);
@@ -146,7 +143,25 @@ public class ParsingContext<T> {
         return branchChecker == null && leaf.isHidden() || branchChecker != null && branchChecker.isHidden();
     }
 
+    @Override
+    public Integer getValue(String name) {
+        Integer result = null;
+        for (Holder h : stack) {
+            result = h.variables.get(name);
+            if (result != null) {
+                break;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public void setValue(String name, Integer value) {
+        stack.peek().variables.put(name, value);
+    }
+
     private class Holder {
+        Map<String, Integer> variables = new HashMap<>();
         Expression.ExpressionChecker checker;
         List<T> committedNodes;
         StringBuilder committedValue;

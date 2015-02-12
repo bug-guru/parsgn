@@ -215,12 +215,42 @@ public class DefaultParserBuilder {
         Bounds result = new Bounds();
         for (ParseNode node : root.getChildren()) {
             String nodeName = node.getName();
+            CalcExpression calcExpression = null;
             switch (nodeName) {
-                case MIN:
-                    result.min = findNumber(node);
+                case QUANTIFIER_EXPRESSION:
+                    calcExpression = findCalcExpression(node);
+                case I:
                     break;
-                case MAX:
-                    result.max = findNumber(node);
+                default:
+                    throw new InternalParsingException(nodeName);
+            }
+            if (calcExpression == null) {
+                continue;
+            }
+            if (result.min == null) {
+                result.min = calcExpression;
+            } else if (result.max == null) {
+                result.max = calcExpression;
+            } else {
+                break;
+            }
+        }
+        return result;
+    }
+
+    private CalcExpression findCalcExpression(ParseNode root) throws InternalParsingException {
+        Integer number = null;
+        String name = null;
+        for (ParseNode node : root.getChildren()) {
+            String nodeName = node.getName();
+            switch (nodeName) {
+                case QUANTIFIER_EXPRESSION:
+                    return findCalcExpression(node);
+                case NUMBER:
+                    number = Integer.parseInt(node.getValue());
+                    break;
+                case NAME:
+                    name = node.getValue();
                     break;
                 case I:
                     break;
@@ -228,7 +258,10 @@ public class DefaultParserBuilder {
                     throw new InternalParsingException(nodeName);
             }
         }
-        return result;
+        if (number == null && name == null) {
+            throw new InternalParsingException("Calc Expression was expected");
+        }
+        return new CalcExpression(name, number);
     }
 
     private int findNumber(ParseNode root) throws InternalParsingException {
@@ -298,12 +331,13 @@ public class DefaultParserBuilder {
                     ruleName = node.getValue();
                     break;
                 case REFERENCE_PARAMS:
-                    calcExpression = parseCalcExpression(node.getChildren().get(0));
+                    calcExpression = findCalcExpression(node);
+                    break;
                 default:
                     throw new InternalParsingException(nodeName);
             }
         }
-        return rb.ref(ruleName);
+        return rb.ref(ruleName).params(calcExpression);
     }
 
     private OneOfExpression createOneOfExpression(RuleBuilder rb, ParseNode oneOfNode) throws ParsingException {

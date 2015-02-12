@@ -22,14 +22,54 @@
 
 package guru.bug.tools.parsgn.model;
 
+import guru.bug.tools.parsgn.CalcExpressionContext;
+
 public class CalcExpression {
-    private final String variable;
-    private final Integer offset;
+    private String variable;
+    private Integer offset;
+
+    public CalcExpression(String variable) {
+        this(variable, null);
+    }
+
+    public CalcExpression(Integer offset) {
+        this(null, offset);
+    }
 
     public CalcExpression(String variable, Integer offset) {
         this.variable = variable;
         this.offset = offset;
     }
 
-    public int evaluate()
+    public CalcExpression() {
+
+    }
+
+    public String getVariable() {
+        return variable;
+    }
+
+    public void setVariable(String variable) {
+        this.variable = variable;
+    }
+
+    public Integer getOffset() {
+        return offset;
+    }
+
+    public void setOffset(Integer offset) {
+        this.offset = offset;
+    }
+
+    public int evaluate(CalcExpressionContext cCtx) {
+        Integer varVal = null;
+        if (variable != null) {
+           varVal = cCtx.getValue(variable);
+        }
+        if (varVal == null) {
+            varVal = 0;
+        }
+        int ofs = offset == null ? 0 : offset;
+        return varVal + ofs;
+    }
 }

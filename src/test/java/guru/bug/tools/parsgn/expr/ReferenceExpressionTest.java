@@ -44,7 +44,7 @@ public class ReferenceExpressionTest {
         expression.setReference(rule);
         expr = new FakeExpression();
         rule.setExpression(expr);
-        checker = (ReferenceExpression.Checker) expression.checker();
+        checker = (ReferenceExpression.Checker) expression.checker(new FakeCalcExpressionContext());
     }
 
     @Test

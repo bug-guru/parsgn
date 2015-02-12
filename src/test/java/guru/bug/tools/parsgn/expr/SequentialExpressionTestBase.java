@@ -37,7 +37,7 @@ public class SequentialExpressionTestBase {
 
     @Before
     public void setUp() {
-        checker = (SequentialExpression.Checker) expression.checker();
+        checker = (SequentialExpression.Checker) expression.checker(null);
     }
 
 }

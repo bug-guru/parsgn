@@ -42,7 +42,7 @@ public class StringExpressionTest {
 
     @Before
     public void setUp() {
-        checker = (StringExpression.Checker) expression.checker();
+        checker = (StringExpression.Checker) expression.checker(null);
     }
 
     @Test

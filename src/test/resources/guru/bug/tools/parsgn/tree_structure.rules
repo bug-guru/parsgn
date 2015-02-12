@@ -1,4 +1,4 @@
-Root: Line(0){(EOL* #EOF)} EOL* #EOF;
+Root: Line(0){[EOL* #EOF]} EOL* #EOF;
 Line(level): Indent(level) #VALID{EOL} EOL;
-.Indent(level): (" "{4} | "\t"){$(level)};
-.EOL: " "* ("\r\n" | "\r" | "\n");
+.Indent(level): [" "{4} | "\t"]{$(level)};
+.EOL: " "* ["\r\n" | "\r" | "\n"];

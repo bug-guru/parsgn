@@ -40,7 +40,7 @@ public class OneOfExpressionTest {
 
     @Before
     public void createChecker() {
-        checker = (OneOfExpression.Checker) expression.checker();
+        checker = (OneOfExpression.Checker) expression.checker(null);
     }
 
     @Test
