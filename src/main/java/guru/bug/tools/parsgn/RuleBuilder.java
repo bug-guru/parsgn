@@ -38,17 +38,16 @@ import java.util.*;
  */
 public class RuleBuilder {
     private Map<String, Rule> ruleDefinitions = new HashMap<>();
-    private Map<String, ReferenceExpression> unresolved = new HashMap<>();
-    private Map<String, ReferenceExpression> resolved = new HashMap<>();
+    private List<ReferenceExpression> unresolved = new LinkedList<>();
 
     private Expression wrap(Expression... expressions) throws ParsingException {
         if (expressions == null || expressions.length == 0) {
             throw new EmptyExpressionListException();
         }
-        if (expressions.length > 1) {
-            return sequence(expressions);
-        } else {
+        if (expressions.length == 1) {
             return expressions[0];
+        } else {
+            return sequence(expressions);
         }
     }
 
@@ -100,11 +99,8 @@ public class RuleBuilder {
     }
 
     public final ReferenceExpression ref(String ruleName) {
-        ReferenceExpression result = unresolved.get(ruleName);
-        if (result == null) {
-            result = new ReferenceExpression(ruleName);
-            unresolved.put(ruleName, result);
-        }
+        ReferenceExpression result = new ReferenceExpression(ruleName);
+        unresolved.add(result);
         return result;
     }
 
@@ -167,23 +163,14 @@ public class RuleBuilder {
     }
 
     public final ReferenceExpression build(String name) throws UnresolvedRuleException {
+        ReferenceExpression result = ref(name);
         resolveReferences();
-        ReferenceExpression result = resolved.get(name);
-        if (result == null) {
-            Rule rule = ruleDefinitions.get(name);
-            if (rule == null) {
-                throw new UnresolvedRuleException(name);
-            }
-            result = new ReferenceExpression(name);
-            result.setReference(rule);
-            resolved.put(name, result);
-        }
         return result;
     }
 
     private void resolveReferences() throws UnresolvedRuleException {
-        Iterator<ReferenceExpression> iterator = unresolved.values().iterator();
-        List<String> unresolvedNames = new ArrayList<>();
+        Iterator<ReferenceExpression> iterator = unresolved.iterator();
+        Set<String> unresolvedNames = new TreeSet<>();
         while (iterator.hasNext()) {
             ReferenceExpression ref = iterator.next();
             String ruleName = ref.getRuleName();
@@ -193,7 +180,6 @@ public class RuleBuilder {
                 continue;
             }
             ref.setReference(rule);
-            resolved.put(ruleName, ref);
             iterator.remove();
         }
         if (!unresolvedNames.isEmpty()) {

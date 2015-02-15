@@ -47,6 +47,11 @@ public class CharacterExpression extends Expression {
         return new Checker();
     }
 
+    @Override
+    public String toString() {
+        return "#" + charType.toString();
+    }
+
     class Checker extends LeafExpressionChecker {
         private int result;
 
@@ -66,12 +71,6 @@ public class CharacterExpression extends Expression {
                 return ResultType.ROLLBACK;
             }
         }
-
-        @Override
-        public String toString() {
-            return charType.toString();
-        }
-
     }
 
 

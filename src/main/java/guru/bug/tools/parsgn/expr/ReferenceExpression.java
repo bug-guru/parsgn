@@ -55,10 +55,13 @@ public class ReferenceExpression extends Expression {
     @Override
     public ExpressionChecker checker(CalcExpressionContext cCtx) {
         String paramName = reference.getParamName();
+        Checker result = new Checker();
         if (paramExpression != null && paramName != null) {
-            cCtx.setValue(paramName, paramExpression.evaluate(cCtx));
+            int value = paramExpression.evaluate(cCtx);
+            cCtx.setValue(paramName, value);
+            result.paramValue = value;
         }
-        return new Checker();
+        return result;
     }
 
     public Expression params(CalcExpression paramExpression) {
@@ -66,7 +69,23 @@ public class ReferenceExpression extends Expression {
         return this;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append(ruleName);
+        if (paramExpression != null) {
+            Integer intConst = paramExpression.isConstant();
+            if (intConst == null) {
+                result.append("(").append(paramExpression).append(")");
+            } else {
+                result.append("(").append(intConst).append(")");
+            }
+        }
+        return result.toString();
+    }
+
     class Checker extends BranchExpressionChecker {
+        private Integer paramValue;
 
         @Override
         public Expression next() {
@@ -79,13 +98,18 @@ public class ReferenceExpression extends Expression {
         }
 
         @Override
-        public String toString() {
-            return "ref:" + reference.getName();
+        public boolean isHidden() {
+            return ReferenceExpression.this.isHidden() || reference.isHidden();
         }
 
         @Override
-        public boolean isHidden() {
-            return ReferenceExpression.this.isHidden() || reference.isHidden();
+        public String toString() {
+            StringBuilder result = new StringBuilder();
+            result.append(ruleName);
+            if (paramValue != null) {
+                result.append("(").append(paramValue).append(")");
+            }
+            return result.toString();
         }
     }
 }

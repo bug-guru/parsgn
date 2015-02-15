@@ -71,6 +71,16 @@ public class StringExpression extends Expression {
         return new Checker();
     }
 
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append("\"").append(StringUtils.escape(value)).append("\"");
+        if (transform != null) {
+            result.append(" -> \"").append(StringUtils.escape(transform)).append("\"");
+        }
+        return result.toString();
+    }
+
     class Checker extends LeafExpressionChecker {
         private int offset;
 
@@ -93,11 +103,6 @@ public class StringExpression extends Expression {
                     return ResultType.CONTINUE;
                 }
             }
-        }
-
-        @Override
-        public String toString() {
-            return "str:" + value;
         }
     }
 }

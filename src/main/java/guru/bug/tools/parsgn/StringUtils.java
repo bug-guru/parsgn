@@ -85,4 +85,62 @@ public final class StringUtils {
         }
     }
 
+    public static String codePointToString(int codePoint) {
+        switch (codePoint) {
+            case -1:
+                return "#EOF";
+            case '\\':
+                return "\\\\";
+            case '\t':
+                return "\\t";
+            case '\b':
+                return "\\b";
+            case '\n':
+                return "\\n";
+            case '\r':
+                return "\\r";
+            case '\f':
+                return "\\f";
+            case '\"':
+                return "\\\"";
+            default:
+                return new String(new char[]{(char) codePoint});
+        }
+    }
+
+    public static String escape(String value) {
+        int offset = 0;
+        int len = value.length();
+        StringBuilder result = new StringBuilder();
+        while (offset < len) {
+            int codePoint = value.codePointAt(offset);
+            offset += Character.charCount(codePoint);
+            switch (codePoint) {
+                case '\\':
+                    result.append("\\\\");
+                    break;
+                case '\t':
+                    result.append("\\t");
+                    break;
+                case '\b':
+                    result.append("\\b");
+                    break;
+                case '\n':
+                    result.append("\\n");
+                    break;
+                case '\r':
+                    result.append("\\r");
+                    break;
+                case '\f':
+                    result.append("\\f");
+                    break;
+                case '\"':
+                    result.append("\\\"");
+                    break;
+                default:
+                    result.append((char) codePoint);
+            }
+        }
+        return result.toString();
+    }
 }

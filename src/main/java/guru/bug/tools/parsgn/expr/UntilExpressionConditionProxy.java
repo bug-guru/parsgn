@@ -47,6 +47,11 @@ public class UntilExpressionConditionProxy extends Expression {
         return new Checker();
     }
 
+    @Override
+    public String toString() {
+        return "proxy:" + conditionExpression.toString();
+    }
+
     class Checker extends BranchExpressionChecker {
 
         @Override

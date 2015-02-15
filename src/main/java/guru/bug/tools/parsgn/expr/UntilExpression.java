@@ -80,6 +80,11 @@ public class UntilExpression extends Expression {
         return new Checker();
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(loopExpression) + "{" + conditionExpressionProxy + "}";
+    }
+
     class Checker extends BranchExpressionChecker {
         private boolean checkingEndCondition = true;
         private int turnsPassed = 0;
@@ -126,11 +131,5 @@ public class UntilExpression extends Expression {
                 return ResultType.ROLLBACK;
             }
         }
-
-        @Override
-        public String toString() {
-            return "until";
-        }
-
     }
 }

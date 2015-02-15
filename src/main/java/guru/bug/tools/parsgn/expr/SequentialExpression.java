@@ -61,6 +61,18 @@ public class SequentialExpression extends Expression {
         return new Checker();
     }
 
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append("[");
+        for(Expression e : expressions) {
+            result.append(e).append(" ");
+        }
+        result.setLength(result.length() - 1);
+        result.append("]");
+        return result.toString();
+    }
+
     class Checker extends BranchExpressionChecker {
         private final Iterator<Expression> expressions = getExpressions().iterator();
         private Expression curExpr;
@@ -95,11 +107,6 @@ public class SequentialExpression extends Expression {
             } else {
                 return ResultType.COMMIT;
             }
-        }
-
-        @Override
-        public String toString() {
-            return "seq";
         }
     }
 }

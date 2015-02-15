@@ -64,7 +64,7 @@ public class CalcExpression {
     public int evaluate(CalcExpressionContext cCtx) {
         Integer varVal = null;
         if (variable != null) {
-           varVal = cCtx.getValue(variable);
+            varVal = cCtx.getValue(variable);
         }
         if (varVal == null) {
             varVal = 0;
@@ -72,4 +72,23 @@ public class CalcExpression {
         int ofs = offset == null ? 0 : offset;
         return varVal + ofs;
     }
+
+    @Override
+    public String toString() {
+        if (variable == null) {
+            return offset.toString();
+        }
+        StringBuilder result = new StringBuilder();
+        result.append("$(").append(variable);
+        if (offset != null) {
+            result.append(" + ").append(offset);
+        }
+        result.append(")");
+        return result.toString();
+    }
+
+    public Integer isConstant() {
+        return variable == null ? offset : null;
+    }
+
 }

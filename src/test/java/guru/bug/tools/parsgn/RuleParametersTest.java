@@ -24,9 +24,7 @@ package guru.bug.tools.parsgn;
 
 import org.junit.Test;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 
 public class RuleParametersTest {
 
@@ -43,6 +41,15 @@ public class RuleParametersTest {
     @Test
     public void testParameters() throws Exception {
         Parser parser = createParser();
-
+        try (
+                InputStream tree = getClass().getResourceAsStream("tree.txt");
+                BufferedInputStream buf = new BufferedInputStream(tree);
+                InputStreamReader reader = new InputStreamReader(buf)
+        ) {
+            ParseTreeResultBuilder resultBuilder = new ParseTreeResultBuilder();
+            parser.parse(reader, resultBuilder);
+            StringWriter writer = new StringWriter();
+            ParseTree.serialize(resultBuilder.getRoot(), writer);
+            System.out.println(writer.toString());        }
     }
 }

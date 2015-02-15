@@ -70,6 +70,7 @@ public class DefaultParserBuilder {
     private Rule createRule(RuleBuilder rb, ParseNode ruleNode) throws ParsingException {
         String name = null;
         List<Expression> expressions = null;
+        String ruleParam = null;
         boolean hide = false;
         for (ParseNode node : ruleNode.getChildren()) {
             String nodeName = node.getName();
@@ -83,11 +84,28 @@ public class DefaultParserBuilder {
                 case HIDE_FLAG:
                     hide = true;
                     break;
+                case RULE_PARAMS:
+                    ruleParam = findName(node);
+                    break;
                 default:
                     throw new InternalParsingException(nodeName);
             }
         }
-        return rb.rule(name, expressions).hide(hide);
+        return rb.rule(name, expressions).hide(hide).paramName(ruleParam);
+    }
+
+    private String findName(ParseNode root) throws InternalParsingException {
+        for (ParseNode node : root.getChildren()) {
+            switch (node.getName()) {
+                case NAME:
+                    return node.getValue();
+                case I:
+                    break;
+                default:
+                    throw new InternalParsingException(node.getName());
+            }
+        }
+        throw new InternalParsingException("Name was expected");
     }
 
     private List<Expression> parseExpressionList(RuleBuilder rb, ParseNode listNode) throws ParsingException {
@@ -252,6 +270,8 @@ public class DefaultParserBuilder {
                 case NAME:
                     name = node.getValue();
                     break;
+                case CALC_EXPRESSION:
+                    return findCalcExpression(node);
                 case I:
                     break;
                 default:

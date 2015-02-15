@@ -29,6 +29,8 @@ import guru.bug.tools.parsgn.expr.Expression;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -36,6 +38,7 @@ import java.util.*;
  * @since 1.0
  */
 public class ParsingContext<T> implements CalcExpressionContext {
+    private static final Logger logger = Logger.getLogger(ParsingContext.class.getSimpleName());
     private final Deque<Holder> stack = new LinkedList<>();
     private final ResultBuilder<T> builder;
     private final CodePointSource source;
@@ -69,22 +72,27 @@ public class ParsingContext<T> implements CalcExpressionContext {
     }
 
     private void pushExpression(Expression nextExpr) {
-        Expression.ExpressionChecker nextChecker = nextExpr.checker(this);
         Holder holder = new Holder();
-        holder.checker = nextChecker;
         stack.push(holder);
+        holder.checker = nextExpr.checker(this);
         source.mark();
         holder.start = source.getNextPos();
     }
 
     private void process() throws ParsingException, IOException {
+        Position lastPos = source.getNextPos();
         int codePoint = source.getNext();
         Holder leafHolder = stack.peek();
         Expression.LeafExpressionChecker leaf = ((Expression.LeafExpressionChecker) leafHolder.checker);
+        if (logger.isLoggable(Level.FINER)) {
+            logger.log(Level.FINER, "Expr stack: {0}", stack);
+            logger.log(Level.FINER, "checking: {0}; codePoint {1} at: {2}", new Object[]{StringUtils.codePointToString(codePoint), codePoint, lastPos});
+        }
         ResultType prevResult = leaf.check(codePoint);
         Expression.BranchExpressionChecker branchChecker = null;
         loop:
         while (true) {
+            logger.log(Level.FINER, "result: {0}", prevResult);
             switch (prevResult) {
                 case CONTINUE:
                     break loop;
@@ -120,6 +128,7 @@ public class ParsingContext<T> implements CalcExpressionContext {
                     stack.pop();
                     source.rewind();
                     if (stack.size() == 1) {
+                        logger.log(Level.SEVERE, "Syntax error: {0}, {1}", new Object[]{source.getMaxPos(), failedExpressions});
                         throw new SyntaxErrorException(source.getMaxPos(), failedExpressions);
                     }
                     break;
@@ -132,6 +141,7 @@ public class ParsingContext<T> implements CalcExpressionContext {
             Holder holder = stack.peek();
             branchChecker = (Expression.BranchExpressionChecker) holder.checker;
             prevResult = branchChecker.check(prevResult);
+            logger.log(Level.FINER, "Expr stack: {0}", stack);
         }
     }
 

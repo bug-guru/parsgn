@@ -87,10 +87,38 @@ public class QuantityExpression extends Expression {
     @Override
     public ExpressionChecker checker(CalcExpressionContext cCtx) {
         Checker result = new Checker();
+        result.minOccurrences = this.minOccurrences == null ? 0 : this.minOccurrences.evaluate(cCtx);
         result.maxOccurrences = this.maxOccurrences == null ? 0 : this.maxOccurrences.evaluate(cCtx);
-        result.maxOccurrences = this.minOccurrences == null ? 0 : this.minOccurrences.evaluate(cCtx);
         return result;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        Integer minConst = minOccurrences.isConstant();
+        Integer maxConst = maxOccurrences.isConstant();
+        result.append(expression);
+        if (minConst != null && maxConst != null) {
+            if (minConst.equals(maxConst)) {
+                result.append("{").append(minConst).append("}");
+            } else if (minConst == 0 && maxConst == Integer.MAX_VALUE) {
+                result.append("*");
+            } else if (minConst == 1 && maxConst == Integer.MAX_VALUE) {
+                result.append("+");
+            } else if (minConst == 0 && maxConst == 1) {
+                result.append("?");
+            } else if (maxConst == Integer.MAX_VALUE) {
+                result.append("{").append(minConst).append(",}");
+            } else  {
+                result.append("{").append(minConst).append(", ").append(maxConst).append("}");
+            }
+        } else if (maxConst != null && maxConst == Integer.MAX_VALUE) {
+            result.append("{").append(minOccurrences).append(",}");
+        } else {
+            result.append("{").append(minOccurrences).append(", ").append(maxOccurrences).append("}");
+        }
+        return result.toString();
+   }
 
     class Checker extends BranchExpressionChecker {
         private int turnsPassed = 0;
@@ -116,7 +144,9 @@ public class QuantityExpression extends Expression {
         }
 
         private ResultType doCommitOrRollback() throws ParsingException {
-            if (minOccurrences == 0 && turnsPassed == 0) {
+            if (minOccurrences == 0 && maxOccurrences == 0 && turnsPassed == 0) {
+                return ResultType.COMMIT;
+            } else if (minOccurrences == 0 && turnsPassed == 0) {
                 return ResultType.ROLLBACK_OPTIONAL;
             } else if (turnsPassed >= minOccurrences) {
                 return ResultType.COMMIT;
@@ -127,7 +157,9 @@ public class QuantityExpression extends Expression {
 
         private ResultType doCommitOrContinue() throws ParsingException {
             turnsPassed++;
-            if (maxOccurrences == turnsPassed) {
+            if (maxOccurrences < turnsPassed) {
+                return ResultType.ROLLBACK;
+            } else if (maxOccurrences == turnsPassed) {
                 return ResultType.COMMIT;
             } else {
                 return ResultType.CONTINUE;
@@ -136,7 +168,22 @@ public class QuantityExpression extends Expression {
 
         @Override
         public String toString() {
-            return "Quantity";
+            StringBuilder result = new StringBuilder();
+            result.append(expression);
+            if (minOccurrences == maxOccurrences) {
+                result.append("{").append(minOccurrences).append("}");
+            } else if (minOccurrences == 0 && maxOccurrences == Integer.MAX_VALUE) {
+                result.append("*");
+            } else if (minOccurrences == 1 && maxOccurrences == Integer.MAX_VALUE) {
+                result.append("+");
+            } else if (minOccurrences == 0 && maxOccurrences == 1) {
+                result.append("?");
+            } else if (minOccurrences == Integer.MAX_VALUE) {
+                result.append("{").append(minOccurrences).append(",}");
+            } else  {
+                result.append("{").append(minOccurrences).append(", ").append(maxOccurrences).append("}");
+            }
+            return result.toString();
         }
     }
 }

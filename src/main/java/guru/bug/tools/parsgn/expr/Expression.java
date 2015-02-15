@@ -59,12 +59,24 @@ public abstract class Expression {
         public boolean isHidden() {
             return Expression.this.isHidden();
         }
+
+        @Override
+        public String toString() {
+            return Expression.this.toString();
+        }
     }
 
     public abstract class LeafExpressionChecker extends ExpressionChecker {
         public abstract void commitResult(StringBuilder result);
 
         public abstract ResultType check(int codePoint) throws ParsingException;
+
+
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
     }
 
     public abstract class BranchExpressionChecker extends ExpressionChecker {

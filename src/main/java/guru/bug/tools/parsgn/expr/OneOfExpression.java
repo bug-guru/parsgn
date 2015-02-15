@@ -66,6 +66,18 @@ public class OneOfExpression extends Expression {
         return new Checker();
     }
 
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append("[");
+        for(Expression e : expressions) {
+            result.append(e).append(" | ");
+        }
+        result.setLength(result.length() - 3);
+        result.append("]");
+        return result.toString();
+    }
+
     class Checker extends BranchExpressionChecker {
         private Iterator<Expression> exprIterator;
 
@@ -96,11 +108,6 @@ public class OneOfExpression extends Expression {
             } else {
                 return ResultType.ROLLBACK;
             }
-        }
-
-        @Override
-        public String toString() {
-            return "OneOf";
         }
     }
 }

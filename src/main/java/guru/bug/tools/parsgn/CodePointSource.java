@@ -136,6 +136,10 @@ public class CodePointSource {
         return next.pos;
     }
 
+    public Position getLastPos() {
+        return last == null ? null : last.pos;
+    }
+
     private static class CodePoint {
         private final int codePoint;
         private final Position pos;
