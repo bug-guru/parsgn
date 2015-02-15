@@ -22,53 +22,53 @@
 
 package guru.bug.tools.parsgn.model;
 
-import guru.bug.tools.parsgn.annotations.RuleValue;
+import guru.bug.tools.parsgn.annotations.RootRule;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-@RuleValue("ExpressionSuffix.Quantifier")
-public class ExpressionRepeatQuantifierModel extends ExpressionRepeatModel {
+@RootRule("ExpressionSuffix.Quantifier")
+public class ExpressionSuffixQuantifierModel extends ExpressionSuffixModel {
     private int min;
     private int max;
 
-    public ExpressionRepeatQuantifierModel(int min, int max) {
+    public ExpressionSuffixQuantifierModel(int min, int max) {
         this.min = min;
         this.max = max;
     }
 
-    @RuleValue("ZeroOrOne")
-    public static ExpressionRepeatQuantifierModel createZeroOrOne() {
-        return new ExpressionRepeatQuantifierModel(0, 1);
+    @RootRule("ZeroOrOne")
+    public static ExpressionSuffixQuantifierModel createZeroOrOne() {
+        return new ExpressionSuffixQuantifierModel(0, 1);
     }
 
-    @RuleValue("OneOrMore")
-    public static ExpressionRepeatQuantifierModel createOneOrMore() {
-        return new ExpressionRepeatQuantifierModel(1, Integer.MAX_VALUE);
+    @RootRule("OneOrMore")
+    public static ExpressionSuffixQuantifierModel createOneOrMore() {
+        return new ExpressionSuffixQuantifierModel(1, Integer.MAX_VALUE);
     }
 
-    @RuleValue("ZeroOrMore")
-    public static ExpressionRepeatQuantifierModel createZeroOrMore() {
-        return new ExpressionRepeatQuantifierModel(0, Integer.MAX_VALUE);
+    @RootRule("ZeroOrMore")
+    public static ExpressionSuffixQuantifierModel createZeroOrMore() {
+        return new ExpressionSuffixQuantifierModel(0, Integer.MAX_VALUE);
     }
 
-    @RuleValue("ExactlyNTimes")
-    public static ExpressionRepeatQuantifierModel createExactlyNTimes(@RuleValue("Number") int num) {
-        return new ExpressionRepeatQuantifierModel(num, num);
+    @RootRule("ExactlyNTimes")
+    public static ExpressionSuffixQuantifierModel createExactlyNTimes(@RootRule("Number") int num) {
+        return new ExpressionSuffixQuantifierModel(num, num);
     }
 
-    @RuleValue("AtLeastMinTimes")
-    public static ExpressionRepeatQuantifierModel createAtLeastNTimes(@RuleValue("Number") int num) {
-        return new ExpressionRepeatQuantifierModel(num, Integer.MAX_VALUE);
+    @RootRule("AtLeastMinTimes")
+    public static ExpressionSuffixQuantifierModel createAtLeastNTimes(@RootRule("Number") int num) {
+        return new ExpressionSuffixQuantifierModel(num, Integer.MAX_VALUE);
     }
 
-    @RuleValue("AtLeastMinButNorMoreThanMaxTimes")
-    public static ExpressionRepeatQuantifierModel createAtLeastButNotMoreThanMaxTimes(
-            @RuleValue("Min.Number") int min,
-            @RuleValue("Max.Number") int max) {
-        return new ExpressionRepeatQuantifierModel(min, max);
+    @RootRule("AtLeastMinButNorMoreThanMaxTimes")
+    public static ExpressionSuffixQuantifierModel createAtLeastButNotMoreThanMaxTimes(
+            @RootRule("Min.Number") int min,
+            @RootRule("Max.Number") int max) {
+        return new ExpressionSuffixQuantifierModel(min, max);
     }
 
 }

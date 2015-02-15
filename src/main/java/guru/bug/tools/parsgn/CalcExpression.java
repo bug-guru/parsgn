@@ -20,9 +20,7 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.model;
-
-import guru.bug.tools.parsgn.CalcExpressionContext;
+package guru.bug.tools.parsgn;
 
 public class CalcExpression {
     private String variable;

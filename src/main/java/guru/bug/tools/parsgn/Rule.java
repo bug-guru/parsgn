@@ -24,6 +24,11 @@ package guru.bug.tools.parsgn;
 
 import guru.bug.tools.parsgn.expr.Expression;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
@@ -32,7 +37,7 @@ import guru.bug.tools.parsgn.expr.Expression;
 public class Rule {
     private final String name;
     private Expression expression;
-    private String paramName;
+    private List<String> params = new ArrayList<>(2);
     private boolean hidden;
 
     public Rule(String name) {
@@ -59,6 +64,11 @@ public class Rule {
         this.hidden = hidden;
     }
 
+    public Rule hidden(boolean hidden) {
+        setHidden(hidden);
+        return this;
+    }
+
     public Rule hide() {
         setHidden(true);
         return this;
@@ -69,16 +79,22 @@ public class Rule {
         return this;
     }
 
-    public Rule paramName(String paramName) {
-        this.paramName = paramName;
+    public List<String> getParams() {
+        return Collections.unmodifiableList(params);
+    }
+
+    public void setParams(List<String> params) {
+        this.params.clear();
+        this.params.addAll(params);
+    }
+
+    public Rule params(List<String> params) {
+        setParams(params);
         return this;
     }
 
-    public String getParamName() {
-        return paramName;
-    }
-
-    public void setParamName(String paramName) {
-        this.paramName = paramName;
+    public Rule params(String... params) {
+        setParams(Arrays.asList(params));
+        return this;
     }
 }

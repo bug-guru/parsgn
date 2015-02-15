@@ -23,26 +23,39 @@
 package guru.bug.tools.parsgn.model;
 
 import guru.bug.tools.parsgn.RuleBuilder;
-import guru.bug.tools.parsgn.annotations.RuleValue;
+import guru.bug.tools.parsgn.annotations.IfExists;
+import guru.bug.tools.parsgn.annotations.ListOf;
+import guru.bug.tools.parsgn.annotations.ValueOf;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.Expression;
+import guru.bug.tools.parsgn.model.utils.BooleanSubstituteAdapter;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.List;
+
+import static guru.bug.tools.parsgn.model.RuleNames.*;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-@RuleValue("Rule")
 public class RuleModel {
-    @RuleValue("Name")
+    @XmlElement(name = NAME)
     private String name;
-    @RuleValue
+    @XmlElement(name = HIDE_FLAG)
+    @XmlJavaTypeAdapter(BooleanSubstituteAdapter.class)
+    private boolean hidden;
+    @XmlElement(name = NAME)
+    @XmlElementWrapper(name = RULE_PARAMS)
+    private RuleParamsModel ruleParams;
+    @XmlElement(name = EXPRESSION_LIST)
     private ExpressionListModel expressionList;
 
     public void generate(RuleBuilder builder) throws ParsingException {
-        List<Expression> list = expressionList.generate(builder);
-        builder.rule(name, list);
+        List<Expression> expr = expressionList.generate(builder);
+        builder.rule(name, expr).hidden(hidden).params(ruleParams.generate());
     }
 }

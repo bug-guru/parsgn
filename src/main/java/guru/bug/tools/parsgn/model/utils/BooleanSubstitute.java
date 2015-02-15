@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,27 +20,12 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.exceptions;
+package guru.bug.tools.parsgn.model.utils;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class ParsingException extends RuntimeException {
-    public ParsingException() {
-    }
-
-    public ParsingException(String message) {
-        super(message);
-    }
-
-    public ParsingException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ParsingException(Throwable cause) {
-        super(cause);
-    }
-
+public class BooleanSubstitute {
 }

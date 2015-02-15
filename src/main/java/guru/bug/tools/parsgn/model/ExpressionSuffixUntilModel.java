@@ -20,43 +20,17 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.builder;
+package guru.bug.tools.parsgn.model;
 
-import guru.bug.tools.parsgn.annotations.RuleValue;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
+import guru.bug.tools.parsgn.annotations.RootRule;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class ModelBuilderFactory {
-
-
-    public static ModelBuilderFactory newInstance(Class<?>... classes) {
-        ModelBuilderFactory result = new ModelBuilderFactory();
-        for (Class<?> clazz : classes) {
-            result.add(clazz);
-        }
-        return result;
-    }
-
-    private void add(Class<?> clazz) {
-        RuleValue ruleName = clazz.getAnnotation(RuleValue.class);
-        List<ObjectBuilder> builders = new ArrayList<>();
-        for (Method method : clazz.getMethods()) {
-            RuleValue methodRuleName = method.getAnnotation(RuleValue.class);
-            if (methodRuleName == null || !Modifier.isStatic(method.getModifiers())) {
-                continue;
-            }
-            ObjectBuilder builder = new ObjectBuilder(clazz, ruleName.value(), methodRuleName);
-            builders.add(builder);
-        }
-    }
-
-
+@RootRule("ExpressionSuffix.Until")
+public class ExpressionSuffixUntilModel extends ExpressionSuffixModel {
+    @RootRule
+    private ExpressionModel expression;
 }

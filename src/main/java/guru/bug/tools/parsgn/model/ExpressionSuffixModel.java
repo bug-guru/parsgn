@@ -27,5 +27,5 @@ package guru.bug.tools.parsgn.model;
  * @version 1.0
  * @since 1.0
  */
-public abstract class ExpressionRepeatModel {
+public abstract class ExpressionSuffixModel {
 }

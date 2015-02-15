@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,30 +23,23 @@
 package guru.bug.tools.parsgn.model;
 
 import guru.bug.tools.parsgn.RuleBuilder;
-import guru.bug.tools.parsgn.annotations.RuleValue;
+import guru.bug.tools.parsgn.annotations.ListOf;
 import guru.bug.tools.parsgn.expr.Expression;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static guru.bug.tools.parsgn.model.RuleNames.EXPRESSION;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-@RuleValue({"ExpressionList",
-        "OneOfVariant1.OneOfVariant2",
-        "OneOfVariant2"})
 public class ExpressionListModel {
-    @RuleValue
-    private List<ExpressionModel> expressions;
+    @ListOf(EXPRESSION)
+    private List<Expression> expressions;
 
     public List<Expression> generate(RuleBuilder builder) {
-        List<Expression> result = new ArrayList<>();
-        for (ExpressionModel exprModel : expressions) {
-            Expression expr = exprModel.generate(builder);
-            result.add(expr);
-        }
-        return result;
-    }
+        return expressions.stream().map(m -> m.generate(builder)).collect(Collectors.toList())    }
 }

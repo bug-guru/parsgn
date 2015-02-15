@@ -24,7 +24,7 @@ package guru.bug.tools.parsgn.expr;
 
 import guru.bug.tools.parsgn.CalcExpressionContext;
 import guru.bug.tools.parsgn.Rule;
-import guru.bug.tools.parsgn.model.CalcExpression;
+import guru.bug.tools.parsgn.CalcExpression;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>

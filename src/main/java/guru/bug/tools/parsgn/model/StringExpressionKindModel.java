@@ -22,15 +22,25 @@
 
 package guru.bug.tools.parsgn.model;
 
-import guru.bug.tools.parsgn.annotations.RuleValue;
+import guru.bug.tools.parsgn.RuleBuilder;
+import guru.bug.tools.parsgn.annotations.RootRule;
+import guru.bug.tools.parsgn.expr.Expression;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-@RuleValue("ExpressionSuffix.Until")
-public class ExpressionRepeatUntilModel extends ExpressionRepeatModel {
-    @RuleValue
-    private ExpressionModel expression;
+@RootRule({"Expression.String",
+        "OneOfExpression.String"})
+public class StringExpressionKindModel extends ExpressionKindModel {
+    @RootRule
+    private String expectedValue;
+    @RootRule("Transform.String")
+    private String actualValue;
+
+    @Override
+    public Expression generate(RuleBuilder builder) {
+        return null;
+    }
 }

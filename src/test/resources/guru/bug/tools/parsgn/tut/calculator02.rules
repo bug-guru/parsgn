@@ -6,7 +6,7 @@ operand: sign number;
 
 operator: addition | subtraction | multiplication | division;
 
-sign: (negative | positive)?;
+sign: [negative | positive]?;
 
 number: #DIGIT+;
 

@@ -22,12 +22,16 @@
 
 package guru.bug.tools.parsgn.model;
 
-import guru.bug.tools.parsgn.Rule;
 import guru.bug.tools.parsgn.RuleBuilder;
-import guru.bug.tools.parsgn.annotations.RuleValue;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
+import guru.bug.tools.parsgn.expr.ReferenceExpression;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
+
+import static guru.bug.tools.parsgn.model.RuleNames.CONFIG_FILE;
+import static guru.bug.tools.parsgn.model.RuleNames.RULE;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -35,16 +39,14 @@ import java.util.List;
  * @since 1.0
  */
 
-@RuleValue("ConfigFile")
+@XmlRootElement(name = CONFIG_FILE)
 public class ConfigFileModel {
-    @RuleValue
+    @XmlElement(name = RULE)
     private List<RuleModel> ruleList;
 
-    public Rule generateRules() throws ParsingException {
+    public ReferenceExpression generateRules() throws ParsingException {
         RuleBuilder builder = new RuleBuilder();
-        for (RuleModel ruleModel : ruleList) {
-            ruleModel.generate(builder);
-        }
-        return null;
+        ruleList.forEach(m -> m.generate(builder));
+        return builder.build(CONFIG_FILE);
     }
 }

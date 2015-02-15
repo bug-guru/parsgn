@@ -27,7 +27,6 @@ import guru.bug.tools.parsgn.exceptions.EmptyExpressionListException;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.exceptions.UnresolvedRuleException;
 import guru.bug.tools.parsgn.expr.*;
-import guru.bug.tools.parsgn.model.CalcExpression;
 
 import java.util.*;
 
@@ -162,8 +161,8 @@ public class RuleBuilder {
         return result;
     }
 
-    public final ReferenceExpression build(String name) throws UnresolvedRuleException {
-        ReferenceExpression result = ref(name);
+    public final ReferenceExpression build(String rootRuleName) throws UnresolvedRuleException {
+        ReferenceExpression result = ref(rootRuleName);
         resolveReferences();
         return result;
     }

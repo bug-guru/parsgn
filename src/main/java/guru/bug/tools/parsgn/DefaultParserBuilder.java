@@ -27,7 +27,6 @@ import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.CharType;
 import guru.bug.tools.parsgn.expr.Expression;
 import guru.bug.tools.parsgn.expr.OneOfExpression;
-import guru.bug.tools.parsgn.model.CalcExpression;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -264,9 +263,6 @@ public class DefaultParserBuilder {
             switch (nodeName) {
                 case QUANTIFIER_EXPRESSION:
                     return findCalcExpression(node);
-                case NUMBER:
-                    number = Integer.parseInt(node.getValue());
-                    break;
                 case NAME:
                     name = node.getValue();
                     break;
@@ -282,19 +278,6 @@ public class DefaultParserBuilder {
             throw new InternalParsingException("Calc Expression was expected");
         }
         return new CalcExpression(name, number);
-    }
-
-    private int findNumber(ParseNode root) throws InternalParsingException {
-        for (ParseNode node : root.getChildren()) {
-            String nodeName = node.getName();
-            switch (nodeName) {
-                case NUMBER:
-                    return Integer.parseInt(node.getValue());
-                default:
-                    throw new InternalParsingException(nodeName);
-            }
-        }
-        throw new InternalParsingException("Number was expected");
     }
 
     private Expression createSequenceExpression(RuleBuilder rb, ParseNode seqNode) throws ParsingException {

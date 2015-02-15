@@ -23,7 +23,7 @@
 package guru.bug.tools.parsgn.model;
 
 import guru.bug.tools.parsgn.RuleBuilder;
-import guru.bug.tools.parsgn.annotations.RuleValue;
+import guru.bug.tools.parsgn.annotations.RootRule;
 import guru.bug.tools.parsgn.expr.Expression;
 
 /**
@@ -31,9 +31,10 @@ import guru.bug.tools.parsgn.expr.Expression;
  * @version 1.0
  * @since 1.0
  */
-@RuleValue("Expression.OneOf")
-public class OneOfExpressionModel extends ExpressionModel {
-    @RuleValue
+@RootRule({"Expression.Sequence",
+        "OneOfExpression.Sequence"})
+public class SequenceExpressionKindModel extends ExpressionKindModel {
+    @RootRule
     private ExpressionListModel expressions;
 
     @Override

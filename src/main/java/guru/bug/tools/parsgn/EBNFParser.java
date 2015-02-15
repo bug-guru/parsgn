@@ -25,45 +25,14 @@ package guru.bug.tools.parsgn;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.CharType;
 import guru.bug.tools.parsgn.expr.ReferenceExpression;
+import guru.bug.tools.parsgn.model.RuleNames;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class EBNFParser extends Parser {
-    public static final String CONFIG_FILE = "ConfigFile";
-    public static final String RULE = "Rule";
-    public static final String HIDE_FLAG = "HideFlag";
-    public static final String RULE_PARAMS = "RuleParams";
-    public static final String I = "I";
-    public static final String SINGLE_LINE_COMMENT = "SingleLineComment";
-    public static final String MULTI_LINE_COMMENT = "MultiLineComment";
-    public static final String NAME = "Name";
-    public static final String EXPRESSION = "Expression";
-    public static final String EXPRESSION_LIST = "ExpressionList";
-    public static final String EXPRESSION_SUFFIX = "ExpressionSuffix";
-    public static final String QUANTIFIER = "Quantifier";
-    public static final String ZERO_OR_ONE = "ZeroOrOne";
-    public static final String ONE_OR_MORE = "OneOrMore";
-    public static final String ZERO_OR_MORE = "ZeroOrMore";
-    public static final String UNTIL = "Until";
-    public static final String EXACTLY_N_TIMES = "ExactlyNTimes";
-    public static final String QUANTIFIER_EXPRESSION = "QuantifierExpression";
-    public static final String AT_LEAST_MIN_TIMES = "AtLeastMinTimes";
-    public static final String AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES = "AtLeastNButNotMoreThanMTimes";
-    public static final String NUMBER = "Number";
-    public static final String ONE_OF = "OneOf";
-    public static final String ONE_OF_VARIANT1 = "OneOfVariant1";
-    public static final String ONE_OF_VARIANT2 = "OneOfVariant2";
-    public static final String ONE_OF_EXPRESSION = "OneOfExpression";
-    public static final String REFERENCE = "Reference";
-    public static final String REFERENCE_PARAMS = "ReferenceParams";
-    public static final String CALC_EXPRESSION = "CalcExpression";
-    public static final String CHAR_TYPE = "CharType";
-    public static final String STRING = "String";
-    public static final String TRANSFORM = "Transform";
-    public static final String SEQUENCE = "Sequence";
+public class EBNFParser extends Parser implements RuleNames {
     private static final ReferenceExpression root;
 
     static {
@@ -185,36 +154,22 @@ public class EBNFParser extends Parser {
                 rb.str("*")
         );
         rb.rule(UNTIL,
-                rb.str("{"),
+                rb.str(">"),
                 rb.ref(I),
                 rb.ref(EXPRESSION),
-                rb.ref(I),
-                rb.str("}")
+                rb.ref(I)
         );
         rb.rule(EXACTLY_N_TIMES,
                 rb.str("{"),
                 rb.ref(I),
-                rb.ref(QUANTIFIER_EXPRESSION),
+                rb.ref(CALC_EXPRESSION),
                 rb.ref(I),
                 rb.str("}")
-        );
-        // QuantifierExpression: Number | ("$(" I CalcExpression I ")");
-        rb.rule(QUANTIFIER_EXPRESSION,
-                rb.oneOf(
-                        rb.ref(NUMBER),
-                        rb.sequence(
-                                rb.str("$("),
-                                rb.ref(I),
-                                rb.ref(CALC_EXPRESSION),
-                                rb.ref(I),
-                                rb.str(")")
-                        )
-                )
         );
         rb.rule(AT_LEAST_MIN_TIMES,
                 rb.str("{"),
                 rb.ref(I),
-                rb.ref(QUANTIFIER_EXPRESSION),
+                rb.ref(CALC_EXPRESSION),
                 rb.ref(I),
                 rb.str(","),
                 rb.ref(I),
@@ -223,18 +178,13 @@ public class EBNFParser extends Parser {
         rb.rule(AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES,
                 rb.str("{"),
                 rb.ref(I),
-                rb.ref(QUANTIFIER_EXPRESSION),
+                rb.ref(CALC_EXPRESSION),
                 rb.ref(I),
                 rb.str(","),
                 rb.ref(I),
-                rb.ref(QUANTIFIER_EXPRESSION),
+                rb.ref(CALC_EXPRESSION),
                 rb.ref(I),
                 rb.str("}")
-        );
-        rb.rule(NUMBER,
-                rb.oneOrMore(
-                        rb.charType(CharType.DIGIT)
-                )
         );
         rb.rule(ONE_OF,
                 rb.oneOf(
@@ -280,20 +230,6 @@ public class EBNFParser extends Parser {
                 rb.ref(I),
                 rb.str(")")
         );
-        //CalcExpression: Number | (Name I "+" I Number) | Name;
-        rb.rule(CALC_EXPRESSION,
-                rb.oneOf(
-                        rb.ref(NUMBER),
-                        rb.sequence(
-                                rb.ref(NAME),
-                                rb.ref(I),
-                                rb.str("+"),
-                                rb.ref(I),
-                                rb.ref(NUMBER)
-                        ),
-                        rb.ref(NAME)
-                )
-        );
         rb.rule(CHAR_TYPE,
                 rb.str("#"),
                 rb.ref(NAME)
@@ -330,6 +266,54 @@ public class EBNFParser extends Parser {
                 rb.ref(I),
                 rb.str("]")
         );
+
+        // CALCULATION EXPRESSION
+
+        // CalcExpression: I Term I Operator I Term [I Operator I Term]* I;
+        rb.rule(CALC_EXPRESSION,
+                rb.ref(I),
+                rb.ref(TERM),
+                rb.zeroOrMore(
+                        rb.ref(I),
+                        rb.ref(OPERATOR),
+                        rb.ref(I),
+                        rb.ref(TERM)),
+                rb.ref(I)
+        );
+        // Term: ["(" CalcExpression ")"] | Name | Constant;
+        rb.rule(TERM,
+                rb.oneOf(
+                        rb.sequence(
+                                rb.str("("),
+                                rb.ref(CALC_EXPRESSION),
+                                rb.str(")")),
+                        rb.ref(NAME),
+                        rb.ref(CONSTANT)
+                ));
+        // Constant: Integer;
+        rb.rule(CONSTANT,
+                rb.ref(INTEGER)
+        );
+        // Integer: #DIGIT+;
+        rb.rule(INTEGER,
+                rb.oneOrMore(rb.charType(CharType.DIGIT))
+        );
+        // Operator: Addition | Subtraction | Multiplication | Division;
+        rb.rule(OPERATOR,
+                rb.oneOf(
+                        rb.ref(ADDITION),
+                        rb.ref(SUBTRACTION),
+                        rb.ref(MULTIPLICATION),
+                        rb.ref(DIVISION))
+        );
+        // Addition: "+";
+        rb.rule(ADDITION, rb.str("+"));
+        // Subtraction: "-";
+        rb.rule(SUBTRACTION, rb.str("-"));
+        // Multiplication: "*";
+        rb.rule(MULTIPLICATION, rb.str("*"));
+        // Division: "/";
+        rb.rule(DIVISION, rb.str("/"));
         return rb.build(CONFIG_FILE);
     }
 }

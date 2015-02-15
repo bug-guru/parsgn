@@ -23,18 +23,24 @@
 package guru.bug.tools.parsgn.model;
 
 import guru.bug.tools.parsgn.RuleBuilder;
-import guru.bug.tools.parsgn.annotations.RuleValue;
+import guru.bug.tools.parsgn.annotations.ValueOf;
 import guru.bug.tools.parsgn.expr.Expression;
+
+import static guru.bug.tools.parsgn.model.RuleNames.*;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public abstract class ExpressionModel {
-    @RuleValue
-    private ExpressionRepeatModel repeat;
+public class ExpressionModel {
+    @ValueOf({ONE_OF, REFERENCE, CHAR_TYPE, STRING, SEQUENCE})
+    private ExpressionKindModel expressionKind;
+    @ValueOf(RuleNames.EXPRESSION_SUFFIX)
+    private ExpressionSuffixModel suffix;
 
 
-    public abstract Expression generate(RuleBuilder builder);
+    public Expression generate(RuleBuilder builder) {
+        if
+    }
 }

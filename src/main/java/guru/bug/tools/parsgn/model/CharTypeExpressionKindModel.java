@@ -20,23 +20,24 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.annotations;
+package guru.bug.tools.parsgn.model;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import guru.bug.tools.parsgn.RuleBuilder;
+import guru.bug.tools.parsgn.annotations.ValueOf;
+import guru.bug.tools.parsgn.expr.CharType;
+import guru.bug.tools.parsgn.expr.Expression;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-@Target({ElementType.TYPE,
-        ElementType.FIELD,
-        ElementType.PARAMETER,
-        ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface RuleValue {
-    String[] value() default {};
+public class CharTypeExpressionKindModel extends ExpressionKindModel {
+    @ValueOf(RuleNames.NAME)
+    CharType charType;
+
+    @Override
+    public Expression generate(RuleBuilder builder) {
+        return null;
+    }
 }
