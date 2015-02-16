@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,10 +20,9 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.model;
+package guru.bug.tools.parsgn.model.suffixes;
 
 import guru.bug.tools.parsgn.RuleBuilder;
-import guru.bug.tools.parsgn.annotations.RootRule;
 import guru.bug.tools.parsgn.expr.Expression;
 
 /**
@@ -31,16 +30,9 @@ import guru.bug.tools.parsgn.expr.Expression;
  * @version 1.0
  * @since 1.0
  */
-@RootRule({"Expression.String",
-        "OneOfExpression.String"})
-public class StringExpressionKindModel extends ExpressionKindModel {
-    @RootRule
-    private String expectedValue;
-    @RootRule("Transform.String")
-    private String actualValue;
-
+public class ZeroOrMoreExpressionSuffixModel extends  ExpressionSuffixModel {
     @Override
-    public Expression generate(RuleBuilder builder) {
-        return null;
+    public Expression generate(RuleBuilder rb, Expression expr) {
+        return rb.zeroOrMore(expr);
     }
 }

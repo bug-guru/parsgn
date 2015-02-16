@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,25 +20,12 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.model;
-
-import guru.bug.tools.parsgn.RuleBuilder;
-import guru.bug.tools.parsgn.annotations.RootRule;
-import guru.bug.tools.parsgn.expr.Expression;
+package guru.bug.tools.parsgn.model.suffixes;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-@RootRule({"Expression.Reference",
-        "OneOfExpression.Reference"})
-public class ReferenceExpressionKindModel extends ExpressionKindModel {
-    @RootRule("Name")
-    private String name;
-
-    @Override
-    public Expression generate(RuleBuilder builder) {
-        return null;
-    }
+public class ExactlyNTimesExpressionSuffixModel extends ExpressionSuffixModel {
 }

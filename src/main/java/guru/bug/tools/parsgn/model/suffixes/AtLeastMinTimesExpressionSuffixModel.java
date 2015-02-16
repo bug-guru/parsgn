@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,12 +20,26 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.model;
+package guru.bug.tools.parsgn.model.suffixes;
+
+import guru.bug.tools.parsgn.RuleBuilder;
+import guru.bug.tools.parsgn.expr.Expression;
+import guru.bug.tools.parsgn.model.CalcExpressionModel;
+import guru.bug.tools.parsgn.model.RuleNames;
+
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public abstract class ExpressionSuffixModel {
+public class AtLeastMinTimesExpressionSuffixModel extends ExpressionSuffixModel {
+    @XmlElement(name = RuleNames.CALC_EXPRESSION)
+    private CalcExpressionModel calcExpressionModel;
+
+    @Override
+    public Expression generate(RuleBuilder rb, Expression expr) {
+
+    }
 }

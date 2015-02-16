@@ -20,17 +20,17 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.model;
+package guru.bug.tools.parsgn.model.suffixes;
 
 import guru.bug.tools.parsgn.annotations.RootRule;
+import guru.bug.tools.parsgn.model.ExpressionParentModel;
+import guru.bug.tools.parsgn.model.ExpressionSuffixParentModel;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-@RootRule("ExpressionSuffix.Until")
-public class ExpressionSuffixUntilModel extends ExpressionSuffixModel {
-    @RootRule
-    private ExpressionModel expression;
+public class UntilExpressionSuffixModel extends ExpressionSuffixModel {
+    private ExpressionParentModel expression;
 }

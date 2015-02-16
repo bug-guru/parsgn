@@ -20,26 +20,12 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.model;
-
-import guru.bug.tools.parsgn.RuleBuilder;
-import guru.bug.tools.parsgn.annotations.ListOf;
-import guru.bug.tools.parsgn.expr.Expression;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static guru.bug.tools.parsgn.model.RuleNames.EXPRESSION;
+package guru.bug.tools.parsgn.model.suffixes;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class ExpressionListModel {
-    @ListOf(EXPRESSION)
-    private List<Expression> expressions;
-
-    public List<Expression> generate(RuleBuilder builder) {
-        return expressions.stream().map(m -> m.generate(builder)).collect(Collectors.toList())    }
+public class AtLeastNButNotMoreThanMTimesExpressionSuffixModel extends ExpressionSuffixModel {
 }

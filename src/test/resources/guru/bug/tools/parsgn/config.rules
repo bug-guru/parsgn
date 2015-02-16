@@ -22,15 +22,13 @@ Expression:
     OneOf | Reference | CharType | String | Sequence
     ExpressionSuffix?;
 
-ExpressionSuffix: I [Quantifier | Until] I;
-
-Quantifier:
-      ZeroOrOne
-    | OneOrMore
-    | ZeroOrMore
-    | ExactlyNTimes
-    | AtLeastMinTimes
-    | AtLeastMinButNotMoreThanMaxTimes;
+ExpressionSuffix: I [ZeroOrOne
+                   | OneOrMore
+                   | ZeroOrMore
+                   | ExactlyNTimes
+                   | AtLeastMinTimes
+                   | AtLeastMinButNotMoreThanMaxTimes
+                   | Until] I;
 
 ZeroOrOne: "?";
 

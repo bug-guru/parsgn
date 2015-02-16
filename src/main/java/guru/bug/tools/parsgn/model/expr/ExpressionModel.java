@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,10 +20,10 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.model;
+package guru.bug.tools.parsgn.model.expr;
 
 import guru.bug.tools.parsgn.RuleBuilder;
-import guru.bug.tools.parsgn.annotations.ValueOf;
+import guru.bug.tools.parsgn.exceptions.InternalParsingException;
 import guru.bug.tools.parsgn.expr.Expression;
 
 import static guru.bug.tools.parsgn.model.RuleNames.*;
@@ -33,14 +33,23 @@ import static guru.bug.tools.parsgn.model.RuleNames.*;
  * @version 1.0
  * @since 1.0
  */
-public class ExpressionModel {
-    @ValueOf({ONE_OF, REFERENCE, CHAR_TYPE, STRING, SEQUENCE})
-    private ExpressionKindModel expressionKind;
-    @ValueOf(RuleNames.EXPRESSION_SUFFIX)
-    private ExpressionSuffixModel suffix;
-
-
-    public Expression generate(RuleBuilder builder) {
-        if
+public abstract class ExpressionModel {
+    ExpressionModel build(String name) {
+        switch (name) {
+            case ONE_OF:
+                return new OneOfExpressionModel();
+            case REFERENCE:
+                return new ReferenceExpressionModel();
+            case CHAR_TYPE:
+                return new CharTypeExpressionModel();
+            case STRING:
+                return new StringExpressionModel();
+            case SEQUENCE:
+                return new SequenceExpressionModel();
+            default:
+                throw new InternalParsingException("Unsupported " + name);
+        }
     }
+
+    public abstract Expression generate(RuleBuilder builder);
 }

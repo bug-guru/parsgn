@@ -20,11 +20,10 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.model;
+package guru.bug.tools.parsgn.model.expr;
 
 import guru.bug.tools.parsgn.RuleBuilder;
-import guru.bug.tools.parsgn.annotations.ValueOf;
-import guru.bug.tools.parsgn.expr.CharType;
+import guru.bug.tools.parsgn.annotations.RootRule;
 import guru.bug.tools.parsgn.expr.Expression;
 
 /**
@@ -32,9 +31,11 @@ import guru.bug.tools.parsgn.expr.Expression;
  * @version 1.0
  * @since 1.0
  */
-public class CharTypeExpressionKindModel extends ExpressionKindModel {
-    @ValueOf(RuleNames.NAME)
-    CharType charType;
+@RootRule({"Expression.Reference",
+        "OneOfExpression.Reference"})
+public class ReferenceExpressionModel extends ExpressionModel {
+    @RootRule("Name")
+    private String name;
 
     @Override
     public Expression generate(RuleBuilder builder) {

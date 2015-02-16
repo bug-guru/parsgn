@@ -23,15 +23,11 @@
 package guru.bug.tools.parsgn.model;
 
 import guru.bug.tools.parsgn.RuleBuilder;
-import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.Expression;
-import guru.bug.tools.parsgn.model.utils.BooleanSubstituteAdapter;
+import guru.bug.tools.parsgn.model.expr.*;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.xml.bind.annotation.XmlElements;
 
 import static guru.bug.tools.parsgn.model.RuleNames.*;
 
@@ -40,21 +36,24 @@ import static guru.bug.tools.parsgn.model.RuleNames.*;
  * @version 1.0
  * @since 1.0
  */
-public class RuleModel {
-    @XmlElement(name = NAME)
-    private String name;
-    @XmlElement(name = HIDE_FLAG)
-    @XmlJavaTypeAdapter(BooleanSubstituteAdapter.class)
-    private boolean hidden;
-    @XmlElement(name = NAME)
-    @XmlElementWrapper(name = RULE_PARAMS)
-    private List<String> ruleParams;
-    @XmlElement(name = EXPRESSION)
-    @XmlElementWrapper(name = EXPRESSION_LIST)
-    private List<ExpressionParentModel> expressionList;
+public class ExpressionParentModel {
+    @XmlElements({
+            @XmlElement(name = ONE_OF, type = OneOfExpressionModel.class),
+            @XmlElement(name = REFERENCE, type = ReferenceExpressionModel.class),
+            @XmlElement(name = CHAR_TYPE, type = CharTypeExpressionModel.class),
+            @XmlElement(name = STRING, type = StringExpressionModel.class),
+            @XmlElement(name = SEQUENCE, type = SequenceExpressionModel.class)
+    })
+    private ExpressionModel expression;
+    @XmlElement(name = EXPRESSION_SUFFIX)
+    private ExpressionSuffixParentModel suffix;
 
-    public void generate(RuleBuilder builder) throws ParsingException {
-        List<Expression> exprList = expressionList.stream().map(m -> m.generate(builder)).collect(Collectors.toList());
-        builder.rule(name, exprList).hidden(hidden).params(ruleParams);
+
+    public Expression generate(RuleBuilder builder) {
+        Expression expr = expression.generate(builder);
+        if (suffix == null) {
+            return expr;
+        }
+        return suffix.generate(builder, expr);
     }
 }

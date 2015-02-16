@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,36 +20,26 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.model;
+package guru.bug.tools.parsgn.model.expr;
 
 import guru.bug.tools.parsgn.RuleBuilder;
-import guru.bug.tools.parsgn.exceptions.InternalParsingException;
+import guru.bug.tools.parsgn.expr.CharType;
 import guru.bug.tools.parsgn.expr.Expression;
+import guru.bug.tools.parsgn.model.RuleNames;
 
-import static guru.bug.tools.parsgn.model.RuleNames.*;
+import javax.xml.bind.annotation.XmlElement;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public abstract class ExpressionKindModel {
-    ExpressionKindModel build(String name) {
-        switch (name) {
-            case ONE_OF:
-                return new OneOfExpressionKindModel();
-            case REFERENCE:
-                return new ReferenceExpressionKindModel();
-            case CHAR_TYPE:
-                return new CharTypeExpressionKindModel();
-            case STRING:
-                return new StringExpressionKindModel();
-            case SEQUENCE:
-                return new SequenceExpressionKindModel();
-            default:
-                throw new InternalParsingException("Unsupported " + name);
-        }
-    }
+public class CharTypeExpressionModel extends ExpressionModel {
+    @XmlElement(name = RuleNames.NAME)
+    private String charType;
 
-    public abstract Expression generate(RuleBuilder builder);
+    @Override
+    public Expression generate(RuleBuilder builder) {
+        return builder.charType(CharType.valueOf(charType));
+    }
 }

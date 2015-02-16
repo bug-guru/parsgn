@@ -85,6 +85,9 @@ public class Rule {
 
     public void setParams(List<String> params) {
         this.params.clear();
+        if (params == null) {
+            return;
+        }
         this.params.addAll(params);
     }
 

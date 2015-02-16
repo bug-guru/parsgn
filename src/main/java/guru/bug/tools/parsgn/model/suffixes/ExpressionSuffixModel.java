@@ -20,41 +20,16 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.model;
+package guru.bug.tools.parsgn.model.suffixes;
 
 import guru.bug.tools.parsgn.RuleBuilder;
-import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.Expression;
-import guru.bug.tools.parsgn.model.utils.BooleanSubstituteAdapter;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static guru.bug.tools.parsgn.model.RuleNames.*;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class RuleModel {
-    @XmlElement(name = NAME)
-    private String name;
-    @XmlElement(name = HIDE_FLAG)
-    @XmlJavaTypeAdapter(BooleanSubstituteAdapter.class)
-    private boolean hidden;
-    @XmlElement(name = NAME)
-    @XmlElementWrapper(name = RULE_PARAMS)
-    private List<String> ruleParams;
-    @XmlElement(name = EXPRESSION)
-    @XmlElementWrapper(name = EXPRESSION_LIST)
-    private List<ExpressionParentModel> expressionList;
-
-    public void generate(RuleBuilder builder) throws ParsingException {
-        List<Expression> exprList = expressionList.stream().map(m -> m.generate(builder)).collect(Collectors.toList());
-        builder.rule(name, exprList).hidden(hidden).params(ruleParams);
-    }
+public abstract class ExpressionSuffixModel {
+    public abstract Expression generate(RuleBuilder rb, Expression expr);
 }
