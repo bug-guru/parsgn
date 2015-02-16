@@ -20,39 +20,53 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.ebnf.builder.calc;
 
-import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
-import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
-import org.junit.Assert;
-import org.junit.Test;
+import guru.bug.tools.parsgn.calc.Operator;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import javax.xml.bind.annotation.XmlEnum;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
+ * @version 1.0
+ * @since 1.0
  */
-public class ErrorProcessingTest {
+@XmlType
+@XmlEnum(String.class)
+public abstract class OperatorBuilder {
 
-    private Parser createParser(String fileName) throws Exception {
-        try (
-                InputStream input = getClass().getResourceAsStream(fileName);
-                BufferedInputStream bufInput = new BufferedInputStream(input);
-                InputStreamReader reader = new InputStreamReader(bufInput)) {
-            DefaultParserBuilder builder = new DefaultParserBuilder();
-            return builder.createParser(reader);
+    public abstract Operator build();
+
+    public static class AddOperatorBuilder extends OperatorBuilder {
+
+        @Override
+        public Operator build() {
+            return Operator.ADD;
         }
     }
 
-    @Test
-    public void testEBNFError() throws Exception {
-        try {
-            createParser("ebnf_error01.rules");
-        } catch (SyntaxErrorException ex) {
-            Assert.assertEquals(5, ex.getPosition().getRow());
-            Assert.assertEquals(5, ex.getPosition().getCol());
+    public static class SubOperatorBuilder extends OperatorBuilder {
+
+        @Override
+        public Operator build() {
+            return Operator.SUB;
+        }
+    }
+
+    public static class MulOperatorBuilder extends OperatorBuilder {
+
+        @Override
+        public Operator build() {
+            return Operator.MUL;
+        }
+    }
+
+    public static class DivOperatorBuilder extends OperatorBuilder {
+
+        @Override
+        public Operator build() {
+            return Operator.DIV;
         }
     }
 }

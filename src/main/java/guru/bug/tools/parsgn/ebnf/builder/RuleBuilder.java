@@ -20,58 +20,45 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.expr;
+package guru.bug.tools.parsgn.ebnf.builder;
 
-import guru.bug.tools.parsgn.ResultType;
-import guru.bug.tools.parsgn.calc.CalcExpressionContext;
+import guru.bug.tools.parsgn.RuleFactory;
+import guru.bug.tools.parsgn.ebnf.builder.utils.BooleanSubstituteAdapter;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
+import guru.bug.tools.parsgn.expr.Expression;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class CharacterExpression extends Expression {
-    private CharType charType;
+@XmlType
+public class RuleBuilder {
+    @XmlElement(name = RuleNames.NAME)
+    private String name;
+    @XmlElement(name = RuleNames.HIDE_FLAG)
+    @XmlJavaTypeAdapter(BooleanSubstituteAdapter.class)
+    private Boolean hidden;
+    @XmlElement(name = RuleNames.NAME)
+    @XmlElementWrapper(name = RuleNames.RULE_PARAMS)
+    private List<String> ruleParams;
+    @XmlElement(name = RuleNames.EXPRESSION)
+    @XmlElementWrapper(name = RuleNames.EXPRESSION_LIST)
+    private List<ExpressionParentBuilder> expressionList;
 
-    public CharType getCharType() {
-        return charType;
+    public String getName() {
+        return name;
     }
 
-    public void setCharType(CharType charType) {
-        this.charType = charType;
+    public void build(RuleFactory builder) throws ParsingException {
+        List<Expression> exprList = expressionList.stream().map(m -> m.build(builder)).collect(Collectors.toList());
+        builder.rule(name, exprList).hidden(hidden == null ? false : hidden).params(ruleParams);
     }
-
-    @Override
-    public ExpressionChecker checker(CalcExpressionContext cCtx) {
-        return new Checker();
-    }
-
-    @Override
-    public String toString() {
-        return "#" + charType.toString();
-    }
-
-    class Checker extends LeafExpressionChecker {
-        private int result;
-
-        @Override
-        public void commitResult(StringBuilder sb) {
-            if (Character.isValidCodePoint(result)) {
-                sb.appendCodePoint(result);
-            }
-        }
-
-        @Override
-        public ResultType check(int codePoint) throws ParsingException {
-            if (charType.apply(codePoint)) {
-                result = codePoint;
-                return ResultType.COMMIT;
-            } else {
-                return ResultType.ROLLBACK;
-            }
-        }
-    }
-
-
 }

@@ -20,39 +20,23 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.ebnf.builder.utils;
 
-import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
-import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
+ * @version 1.0
+ * @since 1.0
  */
-public class ErrorProcessingTest {
-
-    private Parser createParser(String fileName) throws Exception {
-        try (
-                InputStream input = getClass().getResourceAsStream(fileName);
-                BufferedInputStream bufInput = new BufferedInputStream(input);
-                InputStreamReader reader = new InputStreamReader(bufInput)) {
-            DefaultParserBuilder builder = new DefaultParserBuilder();
-            return builder.createParser(reader);
-        }
+public class BooleanSubstituteAdapter extends XmlAdapter<BooleanSubstitute, Boolean> {
+    @Override
+    public Boolean unmarshal(BooleanSubstitute v) throws Exception {
+        return true;
     }
 
-    @Test
-    public void testEBNFError() throws Exception {
-        try {
-            createParser("ebnf_error01.rules");
-        } catch (SyntaxErrorException ex) {
-            Assert.assertEquals(5, ex.getPosition().getRow());
-            Assert.assertEquals(5, ex.getPosition().getCol());
-        }
+    @Override
+    public BooleanSubstitute marshal(Boolean v) throws Exception {
+        return v != null && v ? new BooleanSubstitute() : null;
     }
 }

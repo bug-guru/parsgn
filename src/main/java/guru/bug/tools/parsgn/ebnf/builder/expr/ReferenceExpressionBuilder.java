@@ -20,39 +20,40 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.ebnf.builder.expr;
 
-import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
-import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
-import org.junit.Assert;
-import org.junit.Test;
+import guru.bug.tools.parsgn.RuleFactory;
+import guru.bug.tools.parsgn.calc.Term;
+import guru.bug.tools.parsgn.ebnf.builder.RuleNames;
+import guru.bug.tools.parsgn.ebnf.builder.calc.CalcExpressionBuilder;
+import guru.bug.tools.parsgn.expr.Expression;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlType;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
+ * @version 1.0
+ * @since 1.0
  */
-public class ErrorProcessingTest {
+@XmlType
+public class ReferenceExpressionBuilder extends ExpressionBuilder {
+    @XmlElement(name = RuleNames.NAME)
+    private String name;
+    @XmlElement(name = RuleNames.CALC_EXPRESSION)
+    @XmlElementWrapper(name = RuleNames.REFERENCE_PARAMS)
+    private List<CalcExpressionBuilder> ruleParamsBuilders;
 
-    private Parser createParser(String fileName) throws Exception {
-        try (
-                InputStream input = getClass().getResourceAsStream(fileName);
-                BufferedInputStream bufInput = new BufferedInputStream(input);
-                InputStreamReader reader = new InputStreamReader(bufInput)) {
-            DefaultParserBuilder builder = new DefaultParserBuilder();
-            return builder.createParser(reader);
-        }
-    }
 
-    @Test
-    public void testEBNFError() throws Exception {
-        try {
-            createParser("ebnf_error01.rules");
-        } catch (SyntaxErrorException ex) {
-            Assert.assertEquals(5, ex.getPosition().getRow());
-            Assert.assertEquals(5, ex.getPosition().getCol());
+    @Override
+    public Expression build(RuleFactory rf) {
+        List<Term> ruleParams = null;
+        if (ruleParamsBuilders != null) {
+            ruleParams = ruleParamsBuilders.stream().map(CalcExpressionBuilder::build).collect(Collectors.toList());
         }
+        return rf.ref(name).params(ruleParams);
     }
 }

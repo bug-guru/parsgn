@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 package guru.bug.tools.parsgn;
 
+import guru.bug.tools.parsgn.calc.CalcExpressionContext;
 import guru.bug.tools.parsgn.exceptions.InternalParsingException;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
@@ -154,8 +155,8 @@ public class ParsingContext<T> implements CalcExpressionContext {
     }
 
     @Override
-    public Integer getValue(String name) {
-        Integer result = null;
+    public Object getValue(String name) {
+        Object result = null;
         for (Holder h : stack) {
             result = h.variables.get(name);
             if (result != null) {
@@ -166,12 +167,12 @@ public class ParsingContext<T> implements CalcExpressionContext {
     }
 
     @Override
-    public void setValue(String name, Integer value) {
+    public void setValue(String name, Object value) {
         stack.peek().variables.put(name, value);
     }
 
     private class Holder {
-        Map<String, Integer> variables = new HashMap<>();
+        Map<String, Object> variables = new HashMap<>();
         Expression.ExpressionChecker checker;
         List<T> committedNodes;
         StringBuilder committedValue;

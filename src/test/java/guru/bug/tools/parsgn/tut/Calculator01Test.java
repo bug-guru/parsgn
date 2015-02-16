@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,10 @@
 
 package guru.bug.tools.parsgn.tut;
 
-import guru.bug.tools.parsgn.DefaultParserBuilder;
 import guru.bug.tools.parsgn.ParseTree;
 import guru.bug.tools.parsgn.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.Parser;
+import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

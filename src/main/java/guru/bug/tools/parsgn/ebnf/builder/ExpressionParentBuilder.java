@@ -20,39 +20,40 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.ebnf.builder;
 
-import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
-import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
-import org.junit.Assert;
-import org.junit.Test;
+import guru.bug.tools.parsgn.RuleFactory;
+import guru.bug.tools.parsgn.ebnf.builder.expr.*;
+import guru.bug.tools.parsgn.expr.Expression;
 
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
+ * @version 1.0
+ * @since 1.0
  */
-public class ErrorProcessingTest {
+@XmlType
+public class ExpressionParentBuilder {
+    @XmlElements({
+            @XmlElement(name = RuleNames.ONE_OF, type = OneOfExpressionBuilder.class),
+            @XmlElement(name = RuleNames.REFERENCE, type = ReferenceExpressionBuilder.class),
+            @XmlElement(name = RuleNames.CHAR_TYPE, type = CharTypeExpressionBuilder.class),
+            @XmlElement(name = RuleNames.STRING, type = StringExpressionBuilder.class),
+            @XmlElement(name = RuleNames.SEQUENCE, type = SequenceExpressionBuilder.class)
+    })
+    private ExpressionBuilder expression;
+    @XmlElement(name = RuleNames.EXPRESSION_SUFFIX)
+    private SuffixParentBuilder suffix;
 
-    private Parser createParser(String fileName) throws Exception {
-        try (
-                InputStream input = getClass().getResourceAsStream(fileName);
-                BufferedInputStream bufInput = new BufferedInputStream(input);
-                InputStreamReader reader = new InputStreamReader(bufInput)) {
-            DefaultParserBuilder builder = new DefaultParserBuilder();
-            return builder.createParser(reader);
-        }
-    }
 
-    @Test
-    public void testEBNFError() throws Exception {
-        try {
-            createParser("ebnf_error01.rules");
-        } catch (SyntaxErrorException ex) {
-            Assert.assertEquals(5, ex.getPosition().getRow());
-            Assert.assertEquals(5, ex.getPosition().getCol());
+    public Expression build(RuleFactory builder) {
+        Expression expr = expression.build(builder);
+        if (suffix == null) {
+            return expr;
         }
+        return suffix.generate(builder, expr);
     }
 }

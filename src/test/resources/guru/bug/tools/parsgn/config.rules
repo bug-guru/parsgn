@@ -2,7 +2,7 @@ ConfigFile:
     [I Rule]+ I #EOF;
 
 Rule:
-    HideFlag? Name RuleParams? I ":" ExpressionList ";";
+    HideFlag? I Name I RuleParams? I ":" ExpressionList ";";
 
 HideFlag: ".";
 
@@ -44,11 +44,7 @@ AtLeastMinTimes: "{" I CalcExpression I "," I "}";
 
 AtLeastMinButNotMoreThanMaxTimes: "{" I CalcExpression I "," I CalcExpression I "}";
 
-OneOf: OneOfVariant1 | OneOfVariant2;
-
-OneOfVariant1: "[" I OneOfVariant2 I "]";
-
-OneOfVariant2: OneOfExpression [I "|" I OneOfExpression]+;
+OneOf: ["[" I OneOfExpression [I "|" I OneOfExpression]+ I "]"] | [OneOfExpression [I "|" I OneOfExpression]+];
 
 OneOfExpression:
     Reference | CharType | String | Sequence
@@ -56,13 +52,13 @@ OneOfExpression:
 
 Reference: Name ReferenceParams?;
 
-ReferenceParams: "(" I CalcExpression I ")";
+ReferenceParams: "(" I CalcExpression [I "," I CalcExpression]* I ")";
 
 CharType: "#" Name; //TODO: list all possible char types
 
-String: "\"" ["\\\"" -> "\"" | "\\\\" -> "\\" | "\\n" -> "\n" | "\\r" -> "\r" | #VALID]>"\"" "\"" Transform?;
+String: StringConstant [I "->" I StringConstant]?;
 
-Transform: I "->" I String;
+StringConstant: "\"" ["\\\"" -> "\"" | "\\\\" -> "\\" | "\\n" -> "\n" | "\\r" -> "\r" | #VALID]>"\"" "\"";
 
 Sequence: "[" ExpressionList I "]";
 
@@ -70,9 +66,11 @@ Sequence: "[" ExpressionList I "]";
 
 CalcExpression: I Term [I Operator I Term]* I;
 
-Term: ["(" CalcExpression ")"] | Name | Constant;
+Term: ["(" CalcExpression ")"] | Variable | Constant;
 
 Constant: Integer;
+
+Variable: Name;
 
 Integer: #DIGIT+;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,10 @@
 
 package guru.bug.tools.parsgn.expr;
 
-import guru.bug.tools.parsgn.CalcExpressionContext;
 import guru.bug.tools.parsgn.ResultType;
+import guru.bug.tools.parsgn.calc.CalcExpressionContext;
+import guru.bug.tools.parsgn.calc.Term;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
-import guru.bug.tools.parsgn.CalcExpression;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -34,14 +34,17 @@ import guru.bug.tools.parsgn.CalcExpression;
  */
 public class QuantityExpression extends Expression {
     private Expression expression;
-    private CalcExpression minOccurrences = new CalcExpression(null, 0);
-    private CalcExpression maxOccurrences = new CalcExpression(null, 1);
+    private Term minOccurrences = Term.constant(0);
+    private Term maxOccurrences = Term.constant(1);
 
     public Expression getExpression() {
         return expression;
     }
 
     public void setExpression(Expression expression) {
+        if (expression == null) {
+            throw new NullPointerException("expression");
+        }
         this.expression = expression;
     }
 
@@ -50,36 +53,42 @@ public class QuantityExpression extends Expression {
         return this;
     }
 
-    public CalcExpression getMinOccurrences() {
+    public Term getMinOccurrences() {
         return minOccurrences;
     }
 
-    public void setMinOccurrences(CalcExpression minOccurrences) {
+    public void setMinOccurrences(Term minOccurrences) {
+        if (minOccurrences == null) {
+            throw new NullPointerException("minOccurrences");
+        }
         this.minOccurrences = minOccurrences;
     }
 
     public QuantityExpression minOccurrences(int minOccurrences) {
-        return minOccurrences(new CalcExpression(minOccurrences));
+        return minOccurrences(Term.constant(minOccurrences));
     }
 
-    public QuantityExpression minOccurrences(CalcExpression minOccurrences) {
+    public QuantityExpression minOccurrences(Term minOccurrences) {
         setMinOccurrences(minOccurrences);
         return this;
     }
 
-    public CalcExpression getMaxOccurrences() {
+    public Term getMaxOccurrences() {
         return maxOccurrences;
     }
 
-    public void setMaxOccurrences(CalcExpression maxOccurrences) {
+    public void setMaxOccurrences(Term maxOccurrences) {
+        if (maxOccurrences == null) {
+            throw new NullPointerException("maxOccurrences");
+        }
         this.maxOccurrences = maxOccurrences;
     }
 
     public QuantityExpression maxOccurrences(int maxOccurrences) {
-        return maxOccurrences(new CalcExpression(maxOccurrences));
+        return maxOccurrences(Term.constant(maxOccurrences));
     }
 
-    public QuantityExpression maxOccurrences(CalcExpression maxOccurrences) {
+    public QuantityExpression maxOccurrences(Term maxOccurrences) {
         setMaxOccurrences(maxOccurrences);
         return this;
     }
@@ -87,19 +96,23 @@ public class QuantityExpression extends Expression {
     @Override
     public ExpressionChecker checker(CalcExpressionContext cCtx) {
         Checker result = new Checker();
-        result.minOccurrences = this.minOccurrences == null ? 0 : this.minOccurrences.evaluate(cCtx);
-        result.maxOccurrences = this.maxOccurrences == null ? 0 : this.maxOccurrences.evaluate(cCtx);
+        Integer min = (Integer) this.minOccurrences.evaluate(cCtx);
+        Integer max = (Integer) this.maxOccurrences.evaluate(cCtx);
+        result.minOccurrences = min;
+        result.maxOccurrences = max;
         return result;
     }
-    
+
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        Integer minConst = minOccurrences.isConstant();
-        Integer maxConst = maxOccurrences.isConstant();
         result.append(expression);
-        if (minConst != null && maxConst != null) {
-            if (minConst.equals(maxConst)) {
+        boolean isMinConst = minOccurrences.isConstant();
+        boolean isMaxConst = maxOccurrences.isConstant();
+        if (isMinConst && isMaxConst) {
+            int minConst = (int) minOccurrences.evaluate(null);
+            int maxConst = (int) maxOccurrences.evaluate(null);
+            if (minConst == maxConst) {
                 result.append("{").append(minConst).append("}");
             } else if (minConst == 0 && maxConst == Integer.MAX_VALUE) {
                 result.append("*");
@@ -109,16 +122,16 @@ public class QuantityExpression extends Expression {
                 result.append("?");
             } else if (maxConst == Integer.MAX_VALUE) {
                 result.append("{").append(minConst).append(",}");
-            } else  {
+            } else {
                 result.append("{").append(minConst).append(", ").append(maxConst).append("}");
             }
-        } else if (maxConst != null && maxConst == Integer.MAX_VALUE) {
+        } else if (isMaxConst && ((int) maxOccurrences.evaluate(null)) == Integer.MAX_VALUE) {
             result.append("{").append(minOccurrences).append(",}");
         } else {
             result.append("{").append(minOccurrences).append(", ").append(maxOccurrences).append("}");
         }
         return result.toString();
-   }
+    }
 
     class Checker extends BranchExpressionChecker {
         private int turnsPassed = 0;
@@ -180,7 +193,7 @@ public class QuantityExpression extends Expression {
                 result.append("?");
             } else if (minOccurrences == Integer.MAX_VALUE) {
                 result.append("{").append(minOccurrences).append(",}");
-            } else  {
+            } else {
                 result.append("{").append(minOccurrences).append(", ").append(maxOccurrences).append("}");
             }
             return result.toString();

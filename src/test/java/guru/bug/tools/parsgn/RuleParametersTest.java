@@ -22,9 +22,13 @@
 
 package guru.bug.tools.parsgn;
 
+import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 
 public class RuleParametersTest {
 

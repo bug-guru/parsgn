@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,13 @@
 
 package guru.bug.tools.parsgn.expr;
 
-import guru.bug.tools.parsgn.CalcExpressionContext;
 import guru.bug.tools.parsgn.Rule;
-import guru.bug.tools.parsgn.CalcExpression;
+import guru.bug.tools.parsgn.calc.CalcExpressionContext;
+import guru.bug.tools.parsgn.calc.Term;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -34,7 +38,7 @@ import guru.bug.tools.parsgn.CalcExpression;
 public class ReferenceExpression extends Expression {
     private final String ruleName;
     private Rule reference;
-    private CalcExpression paramExpression;
+    private List<Term> paramExpressions;
 
     public ReferenceExpression(String ruleName) {
         this.ruleName = ruleName;
@@ -54,18 +58,30 @@ public class ReferenceExpression extends Expression {
 
     @Override
     public ExpressionChecker checker(CalcExpressionContext cCtx) {
-        String paramName = reference.getParamName();
+        List<String> paramNames = reference.getParams();
         Checker result = new Checker();
-        if (paramExpression != null && paramName != null) {
-            int value = paramExpression.evaluate(cCtx);
-            cCtx.setValue(paramName, value);
-            result.paramValue = value;
+        if (paramExpressions != null && !paramNames.isEmpty()) {
+            Iterator<Term> expressionIterator = paramExpressions.iterator();
+            Iterator<String> namesIterator = paramNames.iterator();
+            List<Object> values = new ArrayList<>(Math.min(paramNames.size(), paramExpressions.size()));
+            while (namesIterator.hasNext() && expressionIterator.hasNext()) {
+                Term expr = expressionIterator.next();
+                String name = namesIterator.next();
+                Object value = expr.evaluate(cCtx);
+                cCtx.setValue(name, value);
+                values.add(value);
+            }
+            result.paramValues = values;
         }
         return result;
     }
 
-    public Expression params(CalcExpression paramExpression) {
-        this.paramExpression = paramExpression;
+    public Expression params(List<Term> paramExpressions) {
+        if (paramExpressions == null) {
+            this.paramExpressions = null;
+        } else {
+            this.paramExpressions = new ArrayList<>(paramExpressions);
+        }
         return this;
     }
 
@@ -73,19 +89,19 @@ public class ReferenceExpression extends Expression {
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append(ruleName);
-        if (paramExpression != null) {
-            Integer intConst = paramExpression.isConstant();
-            if (intConst == null) {
-                result.append("(").append(paramExpression).append(")");
-            } else {
-                result.append("(").append(intConst).append(")");
+        if (paramExpressions != null) {
+            result.append("(");
+            for (Term e : paramExpressions) {
+                result.append(e).append(", ");
             }
+            result.setLength(result.length() - 2);
+            result.append(")");
         }
         return result.toString();
     }
 
     class Checker extends BranchExpressionChecker {
-        private Integer paramValue;
+        private List<Object> paramValues;
 
         @Override
         public Expression next() {
@@ -106,8 +122,11 @@ public class ReferenceExpression extends Expression {
         public String toString() {
             StringBuilder result = new StringBuilder();
             result.append(ruleName);
-            if (paramValue != null) {
-                result.append("(").append(paramValue).append(")");
+            if (paramValues != null) {
+                result.append("(");
+                paramValues.forEach(p -> result.append(p).append(", "));
+                result.setLength(result.length() - 2);
+                result.append(")");
             }
             return result.toString();
         }

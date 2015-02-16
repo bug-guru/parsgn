@@ -20,23 +20,35 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.expr;
+package guru.bug.tools.parsgn.ebnf.builder;
 
-import guru.bug.tools.parsgn.calc.CalcExpressionContext;
+import guru.bug.tools.parsgn.RuleFactory;
+import guru.bug.tools.parsgn.ebnf.builder.suffixes.*;
+import guru.bug.tools.parsgn.expr.Expression;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class FakeCalcExpressionContext implements CalcExpressionContext {
-    @Override
-    public Object getValue(String name) {
-        return null;
-    }
+@XmlType
+public class SuffixParentBuilder {
+    @XmlElements({
+            @XmlElement(name = RuleNames.ZERO_OR_ONE, type = ZeroOrOneSuffixBuilder.class),
+            @XmlElement(name = RuleNames.ONE_OR_MORE, type = OneOrMoreSuffixBuilder.class),
+            @XmlElement(name = RuleNames.ZERO_OR_MORE, type = ZeroOrMoreSuffixBuilder.class),
+            @XmlElement(name = RuleNames.EXACTLY_N_TIMES, type = ExactlyNTimesSuffixBuilder.class),
+            @XmlElement(name = RuleNames.AT_LEAST_MIN_TIMES, type = AtLeastMinTimesSuffixBuilder.class),
+            @XmlElement(name = RuleNames.AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES, type = AtLeastNButNotMoreThanMTimesSuffixBuilder.class),
+            @XmlElement(name = RuleNames.UNTIL, type = UntilSuffixBuilder.class)
+    })
+    private SuffixBuilder suffix;
 
-    @Override
-    public void setValue(String name, Object value) {
-
+    public Expression generate(RuleFactory rb, Expression expr) {
+        return suffix.build(rb, expr);
     }
 }
