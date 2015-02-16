@@ -22,10 +22,10 @@
 
 package guru.bug.tools.parsgn.expr;
 
-import guru.bug.tools.parsgn.ResultType;
-import guru.bug.tools.parsgn.StringUtils;
-import guru.bug.tools.parsgn.calc.CalcExpressionContext;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
+import guru.bug.tools.parsgn.expr.calc.CalculationContext;
+import guru.bug.tools.parsgn.processing.ResultType;
+import guru.bug.tools.parsgn.utils.StringUtils;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -67,7 +67,7 @@ public class StringExpression extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker(CalcExpressionContext cCtx) {
+    public ExpressionChecker checker(CalculationContext cCtx) {
         return new Checker();
     }
 

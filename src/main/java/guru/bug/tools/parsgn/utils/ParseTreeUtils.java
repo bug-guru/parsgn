@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.utils;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -34,7 +34,7 @@ import java.util.LinkedList;
  * @version 1.0
  * @since 1.0
  */
-public final class ParseTree {
+public final class ParseTreeUtils {
 
     public static void walk(ParseNode root, boolean skipRoot, ParseNodeVisitor visitor) {
         Deque<NodeHolder> stack = new LinkedList<>();

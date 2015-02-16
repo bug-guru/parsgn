@@ -23,10 +23,10 @@
 package guru.bug.tools.parsgn.ebnf.builder.suffixes;
 
 import guru.bug.tools.parsgn.RuleFactory;
-import guru.bug.tools.parsgn.calc.Term;
-import guru.bug.tools.parsgn.ebnf.builder.RuleNames;
+import guru.bug.tools.parsgn.ebnf.RuleNames;
 import guru.bug.tools.parsgn.ebnf.builder.calc.CalcExpressionBuilder;
 import guru.bug.tools.parsgn.expr.Expression;
+import guru.bug.tools.parsgn.expr.calc.Term;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
@@ -39,7 +39,7 @@ import java.util.List;
  */
 @XmlType
 public class AtLeastNButNotMoreThanMTimesSuffixBuilder extends SuffixBuilder {
-    @XmlElement(name = RuleNames.CALC_EXPRESSION)
+    @XmlElement(name = RuleNames.CALCULATION)
     private List<CalcExpressionBuilder> calcExpressionBuilders;
 
     @Override

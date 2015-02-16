@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.List;
 
-import static guru.bug.tools.parsgn.ebnf.builder.RuleNames.STRING_CONSTANT;
+import static guru.bug.tools.parsgn.ebnf.RuleNames.STRING_CONSTANT;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>

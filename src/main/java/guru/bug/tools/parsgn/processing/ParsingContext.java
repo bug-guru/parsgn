@@ -20,13 +20,15 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.processing;
 
-import guru.bug.tools.parsgn.calc.CalcExpressionContext;
+import guru.bug.tools.parsgn.ResultBuilder;
 import guru.bug.tools.parsgn.exceptions.InternalParsingException;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
 import guru.bug.tools.parsgn.expr.Expression;
+import guru.bug.tools.parsgn.expr.calc.CalculationContext;
+import guru.bug.tools.parsgn.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -38,7 +40,7 @@ import java.util.logging.Logger;
  * @version 1.0
  * @since 1.0
  */
-public class ParsingContext<T> implements CalcExpressionContext {
+public class ParsingContext<T> implements CalculationContext {
     private static final Logger logger = Logger.getLogger(ParsingContext.class.getSimpleName());
     private final Deque<Holder> stack = new LinkedList<>();
     private final ResultBuilder<T> builder;

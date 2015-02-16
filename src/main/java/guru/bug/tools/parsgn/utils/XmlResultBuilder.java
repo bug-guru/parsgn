@@ -20,10 +20,18 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.utils;
 
+import guru.bug.tools.parsgn.ResultBuilder;
 import guru.bug.tools.parsgn.processing.Position;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.util.List;
 
 /**
@@ -31,18 +39,38 @@ import java.util.List;
  * @version 1.0
  * @since 1.0
  */
-public abstract class ResultBuilder<T> {
-    private boolean finished = false;
+public class XmlResultBuilder extends ResultBuilder<Node> {
+    private Document result;
 
-    public abstract T createNode(String name, String value, List<T> children, Position startPos, Position endPos);
-
-    public abstract void committedRoot(T root);
-
-    public boolean isFinished() {
-        return finished;
+    public XmlResultBuilder() throws ParserConfigurationException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        result = db.newDocument();
     }
 
-    public void setFinished(boolean finished) {
-        this.finished = finished;
+    public XmlResultBuilder(DocumentBuilder builder) {
+        result = builder.newDocument();
+    }
+
+    @Override
+    public Node createNode(String name, String value, List<Node> children, Position start, Position end) {
+        Element node = result.createElement(name);
+        if (value != null) {
+            Text txt = result.createTextNode(value);
+            node.appendChild(txt);
+        }
+        if (children != null) {
+            children.forEach(node::appendChild);
+        }
+        return node;
+    }
+
+    @Override
+    public void committedRoot(Node root) {
+        result.appendChild(root);
+    }
+
+    public Document getResult() {
+        return result;
     }
 }

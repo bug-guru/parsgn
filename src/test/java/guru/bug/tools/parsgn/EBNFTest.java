@@ -24,6 +24,9 @@ package guru.bug.tools.parsgn;
 
 import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
 import guru.bug.tools.parsgn.ebnf.EBNFParser;
+import guru.bug.tools.parsgn.utils.ParseNode;
+import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
+import guru.bug.tools.parsgn.utils.XmlResultBuilder;
 import org.junit.Test;
 
 import javax.xml.transform.OutputKeys;
@@ -53,9 +56,9 @@ public class EBNFTest {
         }
     }
 
-    private ParseNode parseToTree(Parser parser) throws Exception {
+    private ParseNode parseToTree(Parser parser, String resName) throws Exception {
         try (
-                InputStream input = getClass().getResourceAsStream("config.rules");
+                InputStream input = getClass().getResourceAsStream(resName);
                 BufferedInputStream buf = new BufferedInputStream(input);
                 InputStreamReader reader = new InputStreamReader(buf)
         ) {
@@ -69,13 +72,18 @@ public class EBNFTest {
     public void compareGeneratedAndBuiltIn() throws Exception {
         Parser generated = generateDefaultParser();
         Parser builtIn = new EBNFParser();
-        ParseNode generatedTree = parseToTree(generated);
-        ParseNode builtInTree = parseToTree(builtIn);
+        doTest(generated, builtIn, "config.rules");
+        doTest(generated, builtIn, "tree_structure.rules");
+    }
+
+    private void doTest(Parser generated, Parser builtIn, String resName) throws Exception {
+        ParseNode generatedTree = parseToTree(generated, resName);
+        ParseNode builtInTree = parseToTree(builtIn, resName);
         assertEquals(builtInTree, generatedTree);
     }
 
 
-    @Test
+    //    @Test
     public void printXml() throws Exception {
         Parser parser = new EBNFParser();
         try (

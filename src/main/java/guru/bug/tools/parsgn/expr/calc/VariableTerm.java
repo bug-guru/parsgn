@@ -20,55 +20,32 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.Text;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.util.List;
+package guru.bug.tools.parsgn.expr.calc;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class XmlResultBuilder extends ResultBuilder<Node> {
-    private Document result;
+class VariableTerm extends Term {
+    private String name;
 
-    public XmlResultBuilder() throws ParserConfigurationException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        result = db.newDocument();
-    }
-
-    public XmlResultBuilder(DocumentBuilder builder) {
-        result = builder.newDocument();
+    public VariableTerm(String name) {
+        this.name = name;
     }
 
     @Override
-    protected Node createNode(String name, String value, List<Node> children, Position start, Position end) {
-        Element node = result.createElement(name);
-        if (value != null) {
-            Text txt = result.createTextNode(value);
-            node.appendChild(txt);
-        }
-        if (children != null) {
-            children.forEach(node::appendChild);
-        }
-        return node;
+    public Object evaluate(CalculationContext ctx) {
+        return ctx.getValue(name);
     }
 
     @Override
-    protected void committedRoot(Node root) {
-        result.appendChild(root);
+    public boolean isConstant() {
+        return false;
     }
 
-    public Document getResult() {
-        return result;
+    @Override
+    public String toString() {
+        return name;
     }
 }

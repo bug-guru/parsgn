@@ -24,7 +24,6 @@ package guru.bug.tools.parsgn.ebnf;
 
 import guru.bug.tools.parsgn.Parser;
 import guru.bug.tools.parsgn.RuleFactory;
-import guru.bug.tools.parsgn.ebnf.builder.RuleNames;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.CharType;
 import guru.bug.tools.parsgn.expr.ReferenceExpression;
@@ -189,7 +188,7 @@ public class EBNFParser extends Parser implements RuleNames {
         rb.rule(EXACTLY_N_TIMES,
                 rb.str("{"),
                 rb.ref(I),
-                rb.ref(CALC_EXPRESSION),
+                rb.ref(CALCULATION),
                 rb.ref(I),
                 rb.str("}")
         );
@@ -197,7 +196,7 @@ public class EBNFParser extends Parser implements RuleNames {
         rb.rule(AT_LEAST_MIN_TIMES,
                 rb.str("{"),
                 rb.ref(I),
-                rb.ref(CALC_EXPRESSION),
+                rb.ref(CALCULATION),
                 rb.ref(I),
                 rb.str(","),
                 rb.ref(I),
@@ -207,11 +206,11 @@ public class EBNFParser extends Parser implements RuleNames {
         rb.rule(AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES,
                 rb.str("{"),
                 rb.ref(I),
-                rb.ref(CALC_EXPRESSION),
+                rb.ref(CALCULATION),
                 rb.ref(I),
                 rb.str(","),
                 rb.ref(I),
-                rb.ref(CALC_EXPRESSION),
+                rb.ref(CALCULATION),
                 rb.ref(I),
                 rb.str("}")
         );
@@ -266,12 +265,12 @@ public class EBNFParser extends Parser implements RuleNames {
         rb.rule(REFERENCE_PARAMS,
                 rb.str("("),
                 rb.ref(I),
-                rb.ref(CALC_EXPRESSION),
+                rb.ref(CALCULATION),
                 rb.zeroOrMore(
                         rb.ref(I),
                         rb.str(","),
                         rb.ref(I),
-                        rb.ref(CALC_EXPRESSION)
+                        rb.ref(CALCULATION)
                 ),
                 rb.ref(I),
                 rb.str(")")
@@ -292,13 +291,16 @@ public class EBNFParser extends Parser implements RuleNames {
                 )
         );
         // StringConstant: "\""
-        //            [    "\\\"" -> "\""
-        //               | "\\\\" -> "\\"
-        //               | "\\n" -> "\n"
-        //               | "\\r" -> "\r"
-        //               | #VALID
-        //            ] > "\""
-        //                "\"";
+        //                 [   "\\\"" -> "\""
+        //                   | "\\\\" -> "\\"
+        //                   | "\\n" -> "\n"
+        //                   | "\\r" -> "\r"
+        //                   | "\\t" -> "\t"
+        //                   | "\\f" -> "\f"
+        //                   | "\\b" -> "\b"
+        //                   | #VALID
+        //                 ] > "\""
+        //                 "\"";
         rb.rule(STRING_CONSTANT,
                 rb.str("\""),
                 rb.repeatUntil(
@@ -327,7 +329,7 @@ public class EBNFParser extends Parser implements RuleNames {
         // CALCULATION EXPRESSION
 
         // CalcExpression: I Term [I Operator I Term]* I;
-        rb.rule(CALC_EXPRESSION,
+        rb.rule(CALCULATION,
                 rb.ref(I),
                 rb.ref(TERM),
                 rb.zeroOrMore(
@@ -342,7 +344,7 @@ public class EBNFParser extends Parser implements RuleNames {
                 rb.oneOf(
                         rb.sequence(
                                 rb.str("("),
-                                rb.ref(CALC_EXPRESSION),
+                                rb.ref(CALCULATION),
                                 rb.str(")")),
                         rb.ref(VARIABLE),
                         rb.ref(CONSTANT))

@@ -23,6 +23,7 @@
 package guru.bug.tools.parsgn.ebnf.builder;
 
 import guru.bug.tools.parsgn.RuleFactory;
+import guru.bug.tools.parsgn.ebnf.RuleNames;
 import guru.bug.tools.parsgn.ebnf.builder.utils.BooleanSubstituteAdapter;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.Expression;

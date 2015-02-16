@@ -22,9 +22,9 @@
 
 package guru.bug.tools.parsgn.expr;
 
-import guru.bug.tools.parsgn.ResultType;
-import guru.bug.tools.parsgn.calc.CalcExpressionContext;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
+import guru.bug.tools.parsgn.expr.calc.CalculationContext;
+import guru.bug.tools.parsgn.processing.ResultType;
 
 public class UntilExpressionConditionProxy extends Expression {
     private Expression conditionExpression;
@@ -43,7 +43,7 @@ public class UntilExpressionConditionProxy extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker(CalcExpressionContext cCtx) {
+    public ExpressionChecker checker(CalculationContext cCtx) {
         return new Checker();
     }
 

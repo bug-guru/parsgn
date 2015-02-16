@@ -23,10 +23,10 @@
 package guru.bug.tools.parsgn.ebnf;
 
 import guru.bug.tools.parsgn.Parser;
-import guru.bug.tools.parsgn.XmlResultBuilder;
 import guru.bug.tools.parsgn.ebnf.builder.ConfigFileBuilder;
 import guru.bug.tools.parsgn.exceptions.InternalParsingException;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
+import guru.bug.tools.parsgn.utils.XmlResultBuilder;
 import org.w3c.dom.Document;
 
 import javax.xml.bind.JAXBContext;

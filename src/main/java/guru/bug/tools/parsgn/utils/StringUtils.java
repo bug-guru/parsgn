@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.utils;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -51,7 +51,7 @@ public final class StringUtils {
         return result;
     }
 
-    static void escape(Writer result, String value) throws IOException {
+    public static void escape(Writer result, String value) throws IOException {
         int offset = 0;
         int len = value.length();
         while (offset < len) {

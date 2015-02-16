@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,8 @@ package guru.bug.tools.parsgn;
 
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.ReferenceExpression;
+import guru.bug.tools.parsgn.processing.CodePointSource;
+import guru.bug.tools.parsgn.processing.ParsingContext;
 
 import java.io.IOException;
 import java.io.Reader;

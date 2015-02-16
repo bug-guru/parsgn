@@ -23,6 +23,8 @@
 package guru.bug.tools.parsgn;
 
 import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
+import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
+import guru.bug.tools.parsgn.utils.ParseTreeUtils;
 import org.junit.Test;
 
 import java.io.BufferedInputStream;
@@ -53,7 +55,7 @@ public class RuleParametersTest {
             ParseTreeResultBuilder resultBuilder = new ParseTreeResultBuilder();
             parser.parse(reader, resultBuilder);
             StringWriter writer = new StringWriter();
-            ParseTree.serialize(resultBuilder.getRoot(), writer);
+            ParseTreeUtils.serialize(resultBuilder.getRoot(), writer);
             System.out.println(writer.toString());        }
     }
 }

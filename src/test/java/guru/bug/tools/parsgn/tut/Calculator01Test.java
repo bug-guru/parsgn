@@ -22,10 +22,10 @@
 
 package guru.bug.tools.parsgn.tut;
 
-import guru.bug.tools.parsgn.ParseTree;
-import guru.bug.tools.parsgn.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.Parser;
 import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
+import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
+import guru.bug.tools.parsgn.utils.ParseTreeUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -71,7 +71,7 @@ public class Calculator01Test {
             ParseTreeResultBuilder builder = new ParseTreeResultBuilder();
             parser.parse(bufReader, builder);
             StringWriter out = new StringWriter(2048);
-            ParseTree.serialize(builder.getRoot(), out);
+            ParseTreeUtils.serialize(builder.getRoot(), out);
             System.out.println(out.toString());
         }
     }

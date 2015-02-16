@@ -22,9 +22,8 @@
 
 package guru.bug.tools.parsgn.expr;
 
-import guru.bug.tools.parsgn.Rule;
-import guru.bug.tools.parsgn.calc.CalcExpressionContext;
-import guru.bug.tools.parsgn.calc.Term;
+import guru.bug.tools.parsgn.expr.calc.CalculationContext;
+import guru.bug.tools.parsgn.expr.calc.Term;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -57,7 +56,7 @@ public class ReferenceExpression extends Expression {
     }
 
     @Override
-    public ExpressionChecker checker(CalcExpressionContext cCtx) {
+    public ExpressionChecker checker(CalculationContext cCtx) {
         List<String> paramNames = reference.getParams();
         Checker result = new Checker();
         if (paramExpressions != null && !paramNames.isEmpty()) {

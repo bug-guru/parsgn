@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,9 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.utils;
+
+import guru.bug.tools.parsgn.processing.Position;
 
 import java.util.Collections;
 import java.util.List;
@@ -60,14 +62,19 @@ public class ParseNode {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        result.append(name);
+        toString("", result);
+        return result.toString();
+    }
+
+    private void toString(String level, StringBuilder result) {
+        result.append(level).append(name);
         if (value != null) {
             result.append('=').append(value);
         }
+        result.append('\n');
         if (!children.isEmpty()) {
-            result.append(children);
+            children.forEach(n -> n.toString(level + "   ", result));
         }
-        return result.toString();
     }
 
     public Position getStart() {
@@ -85,13 +92,13 @@ public class ParseNode {
 
         ParseNode parseNode = (ParseNode) o;
 
-        if (!children.equals(parseNode.children)) return false;
-        if (!end.equals(parseNode.end)) return false;
-        if (!name.equals(parseNode.name)) return false;
-        if (!start.equals(parseNode.start)) return false;
-        if (value != null ? !value.equals(parseNode.value) : parseNode.value != null) return false;
-
-        return true;
+        return children.equals(parseNode.children)
+                && end.equals(parseNode.end)
+                && name.equals(parseNode.name)
+                && start.equals(parseNode.start)
+                && !(value != null
+                ? !value.equals(parseNode.value)
+                : parseNode.value != null);
     }
 
     @Override

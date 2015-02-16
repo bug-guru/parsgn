@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,9 +20,7 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
-
-import guru.bug.tools.parsgn.expr.Expression;
+package guru.bug.tools.parsgn.expr;
 
 import java.util.ArrayList;
 import java.util.Arrays;

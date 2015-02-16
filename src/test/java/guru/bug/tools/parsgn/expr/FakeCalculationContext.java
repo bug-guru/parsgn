@@ -22,14 +22,14 @@
 
 package guru.bug.tools.parsgn.expr;
 
-import guru.bug.tools.parsgn.calc.CalcExpressionContext;
+import guru.bug.tools.parsgn.expr.calc.CalculationContext;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class FakeCalcExpressionContext implements CalcExpressionContext {
+public class FakeCalculationContext implements CalculationContext {
     @Override
     public Object getValue(String name) {
         return null;

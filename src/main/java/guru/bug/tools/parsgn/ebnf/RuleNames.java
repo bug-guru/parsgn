@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.ebnf.builder;
+package guru.bug.tools.parsgn.ebnf;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -53,7 +53,7 @@ public interface RuleNames {
     public static final String CHAR_TYPE = "CharType";
     public static final String STRING = "String";
     public static final String SEQUENCE = "Sequence";
-    public static final String CALC_EXPRESSION = "CalcExpression";
+    public static final String CALCULATION = "Calculation";
     public static final String TERM = "Term";
     public static final String OPERATOR = "Operator";
     public static final String CONSTANT = "Constant";

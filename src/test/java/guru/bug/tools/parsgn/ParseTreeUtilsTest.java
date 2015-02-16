@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,11 @@
 
 package guru.bug.tools.parsgn;
 
+import guru.bug.tools.parsgn.processing.Position;
+import guru.bug.tools.parsgn.utils.ParseNode;
+import guru.bug.tools.parsgn.utils.ParseNodeVisitResult;
+import guru.bug.tools.parsgn.utils.ParseNodeVisitor;
+import guru.bug.tools.parsgn.utils.ParseTreeUtils;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -35,7 +40,7 @@ import static org.junit.Assert.assertEquals;
  * @version 1.0
  * @since 1.0
  */
-public class ParseTreeTest {
+public class ParseTreeUtilsTest {
     private static final Position fakePos = new Position(1, 1);
     private static ParseNode n111 = createNode("n111");
     private static ParseNode n11 = createNode("n11", n111);
@@ -60,7 +65,7 @@ public class ParseTreeTest {
                 Marker.START, n111, Marker.END, n111, Marker.END, n11, Marker.START, n12, Marker.END, n12, Marker.END, n1,
                 Marker.START, n2, Marker.START, n21, Marker.END, n21, Marker.END, n2, Marker.END, root);
         final List<Object> actual = new ArrayList<>();
-        ParseTree.walk(root, false, new ParseNodeVisitor() {
+        ParseTreeUtils.walk(root, false, new ParseNodeVisitor() {
             @Override
             public ParseNodeVisitResult startNode(ParseNode node) {
                 actual.add(Marker.START);
@@ -84,7 +89,7 @@ public class ParseTreeTest {
                 Marker.START, n111, Marker.END, n111, Marker.END, n11, Marker.START, n12, Marker.END, n12, Marker.END, n1,
                 Marker.START, n2, Marker.START, n21, Marker.END, n21, Marker.END, n2);
         final List<Object> actual = new ArrayList<>();
-        ParseTree.walk(root, true, new ParseNodeVisitor() {
+        ParseTreeUtils.walk(root, true, new ParseNodeVisitor() {
             @Override
             public ParseNodeVisitResult startNode(ParseNode node) {
                 actual.add(Marker.START);
@@ -108,7 +113,7 @@ public class ParseTreeTest {
                 Marker.END, n11, Marker.START, n12, Marker.END, n12, Marker.END, n1,
                 Marker.START, n2, Marker.START, n21, Marker.END, n21, Marker.END, n2, Marker.END, root);
         final List<Object> actual = new ArrayList<>();
-        ParseTree.walk(root, false, new ParseNodeVisitor() {
+        ParseTreeUtils.walk(root, false, new ParseNodeVisitor() {
             @Override
             public ParseNodeVisitResult startNode(ParseNode node) {
                 actual.add(Marker.START);
@@ -131,7 +136,7 @@ public class ParseTreeTest {
         List<Object> expected = Arrays.asList(Marker.START, root, Marker.START, n1,
                 Marker.START, n11, Marker.END, n11, Marker.END, n1, Marker.END, root);
         final List<Object> actual = new ArrayList<>();
-        ParseTree.walk(root, false, new ParseNodeVisitor() {
+        ParseTreeUtils.walk(root, false, new ParseNodeVisitor() {
             @Override
             public ParseNodeVisitResult startNode(ParseNode node) {
                 actual.add(Marker.START);

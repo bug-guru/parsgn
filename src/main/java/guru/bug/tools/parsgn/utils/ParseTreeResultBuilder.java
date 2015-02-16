@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,33 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.utils;
+
+import guru.bug.tools.parsgn.ResultBuilder;
+import guru.bug.tools.parsgn.processing.Position;
+
+import java.util.List;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public interface ParseNodeVisitor {
-    public ParseNodeVisitResult startNode(ParseNode node);
+public class ParseTreeResultBuilder extends ResultBuilder<ParseNode> {
 
-    public void endNode(ParseNode node);
+    private ParseNode root;
+
+    @Override
+    public ParseNode createNode(String name, String value, List<ParseNode> children, Position start, Position end) {
+        return new ParseNode(name, value, children, start, end);
+    }
+
+    @Override
+    public void committedRoot(ParseNode root) {
+        this.root = root;
+    }
+
+    public ParseNode getRoot() {
+        return root;
+    }
 }

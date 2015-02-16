@@ -22,12 +22,12 @@
 
 package guru.bug.tools.parsgn;
 
-import guru.bug.tools.parsgn.calc.Term;
 import guru.bug.tools.parsgn.exceptions.DuplicateRuleNameException;
 import guru.bug.tools.parsgn.exceptions.EmptyExpressionListException;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.exceptions.UnresolvedRuleException;
 import guru.bug.tools.parsgn.expr.*;
+import guru.bug.tools.parsgn.expr.calc.Term;
 
 import java.util.*;
 

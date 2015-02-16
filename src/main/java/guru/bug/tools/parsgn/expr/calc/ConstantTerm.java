@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,30 +20,33 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
-
-import java.util.List;
+package guru.bug.tools.parsgn.expr.calc;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class ParseTreeResultBuilder extends ResultBuilder<ParseNode> {
+class ConstantTerm extends Term {
 
-    private ParseNode root;
+    private final Object value;
 
-    @Override
-    protected ParseNode createNode(String name, String value, List<ParseNode> children, Position start, Position end) {
-        return new ParseNode(name, value, children, start, end);
+    public ConstantTerm(Object value) {
+        this.value = value;
     }
 
     @Override
-    protected void committedRoot(ParseNode root) {
-        this.root = root;
+    public Object evaluate(CalculationContext ctx) {
+        return value;
     }
 
-    public ParseNode getRoot() {
-        return root;
+    @Override
+    public boolean isConstant() {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
     }
 }

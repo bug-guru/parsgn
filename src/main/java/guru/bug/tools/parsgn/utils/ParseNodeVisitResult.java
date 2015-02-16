@@ -20,26 +20,15 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.calc;
+package guru.bug.tools.parsgn.utils;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public enum Operator {
-    ADD("+"),
-    SUB("-"),
-    MUL("*"),
-    DIV("/");
-
-    private final String opSign;
-
-    Operator(String opSign) {
-        this.opSign = opSign;
-    }
-
-    public String opSign() {
-        return opSign;
-    }
+public enum ParseNodeVisitResult {
+    CONTINUE,
+    SKIP_SUBTREE,
+    TERMINATE
 }

@@ -22,7 +22,7 @@
 
 package guru.bug.tools.parsgn.ebnf.builder.calc;
 
-import guru.bug.tools.parsgn.calc.Term;
+import guru.bug.tools.parsgn.expr.calc.Term;
 
 import javax.xml.bind.annotation.XmlType;
 

@@ -22,12 +22,12 @@
 
 package guru.bug.tools.parsgn.ebnf.builder.calc;
 
-import guru.bug.tools.parsgn.calc.Term;
+import guru.bug.tools.parsgn.expr.calc.Term;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
-import static guru.bug.tools.parsgn.ebnf.builder.RuleNames.NAME;
+import static guru.bug.tools.parsgn.ebnf.RuleNames.NAME;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>

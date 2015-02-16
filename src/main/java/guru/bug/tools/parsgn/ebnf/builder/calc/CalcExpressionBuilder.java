@@ -22,16 +22,16 @@
 
 package guru.bug.tools.parsgn.ebnf.builder.calc;
 
-import guru.bug.tools.parsgn.calc.Operator;
-import guru.bug.tools.parsgn.calc.Term;
+import guru.bug.tools.parsgn.expr.calc.Operator;
+import guru.bug.tools.parsgn.expr.calc.Term;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static guru.bug.tools.parsgn.ebnf.builder.RuleNames.OPERATOR;
-import static guru.bug.tools.parsgn.ebnf.builder.RuleNames.TERM;
+import static guru.bug.tools.parsgn.ebnf.RuleNames.OPERATOR;
+import static guru.bug.tools.parsgn.ebnf.RuleNames.TERM;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>

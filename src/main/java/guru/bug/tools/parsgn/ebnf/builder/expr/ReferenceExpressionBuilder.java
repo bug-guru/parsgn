@@ -23,10 +23,10 @@
 package guru.bug.tools.parsgn.ebnf.builder.expr;
 
 import guru.bug.tools.parsgn.RuleFactory;
-import guru.bug.tools.parsgn.calc.Term;
-import guru.bug.tools.parsgn.ebnf.builder.RuleNames;
+import guru.bug.tools.parsgn.ebnf.RuleNames;
 import guru.bug.tools.parsgn.ebnf.builder.calc.CalcExpressionBuilder;
 import guru.bug.tools.parsgn.expr.Expression;
+import guru.bug.tools.parsgn.expr.calc.Term;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 public class ReferenceExpressionBuilder extends ExpressionBuilder {
     @XmlElement(name = RuleNames.NAME)
     private String name;
-    @XmlElement(name = RuleNames.CALC_EXPRESSION)
+    @XmlElement(name = RuleNames.CALCULATION)
     @XmlElementWrapper(name = RuleNames.REFERENCE_PARAMS)
     private List<CalcExpressionBuilder> ruleParamsBuilders;
 

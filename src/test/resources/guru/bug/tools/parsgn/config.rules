@@ -38,11 +38,11 @@ ZeroOrMore: "*";
 
 Until: ">" I Expression I;
 
-ExactlyNTimes: "{" I CalcExpression I "}";
+ExactlyNTimes: "{" I Calculation I "}";
 
-AtLeastMinTimes: "{" I CalcExpression I "," I "}";
+AtLeastMinTimes: "{" I Calculation I "," I "}";
 
-AtLeastMinButNotMoreThanMaxTimes: "{" I CalcExpression I "," I CalcExpression I "}";
+AtLeastMinButNotMoreThanMaxTimes: "{" I Calculation I "," I Calculation I "}";
 
 OneOf: ["[" I OneOfExpression [I "|" I OneOfExpression]+ I "]"] | [OneOfExpression [I "|" I OneOfExpression]+];
 
@@ -52,21 +52,31 @@ OneOfExpression:
 
 Reference: Name ReferenceParams?;
 
-ReferenceParams: "(" I CalcExpression [I "," I CalcExpression]* I ")";
+ReferenceParams: "(" I Calculation [I "," I Calculation]* I ")";
 
 CharType: "#" Name; //TODO: list all possible char types
 
 String: StringConstant [I "->" I StringConstant]?;
 
-StringConstant: "\"" ["\\\"" -> "\"" | "\\\\" -> "\\" | "\\n" -> "\n" | "\\r" -> "\r" | #VALID]>"\"" "\"";
+StringConstant: "\""
+                    [   "\\\"" -> "\""
+                      | "\\\\" -> "\\"
+                      | "\\n" -> "\n"
+                      | "\\r" -> "\r"
+                      | "\\t" -> "\t"
+                      | "\\f" -> "\f"
+                      | "\\b" -> "\b"
+                      | #VALID
+                    ] > "\""
+                "\"";
 
 Sequence: "[" ExpressionList I "]";
 
 // CALCULATION EXPRESSION
 
-CalcExpression: I Term [I Operator I Term]* I;
+Calculation: I Term [I Operator I Term]* I;
 
-Term: ["(" CalcExpression ")"] | Variable | Constant;
+Term: ["(" Calculation ")"] | Variable | Constant;
 
 Constant: Integer;
 

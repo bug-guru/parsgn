@@ -20,53 +20,26 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.ebnf.builder.calc;
-
-import guru.bug.tools.parsgn.expr.calc.Operator;
-
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlType;
+package guru.bug.tools.parsgn.expr.calc;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-@XmlType
-@XmlEnum(String.class)
-public abstract class OperatorBuilder {
+public enum Operator {
+    ADD("+"),
+    SUB("-"),
+    MUL("*"),
+    DIV("/");
 
-    public abstract Operator build();
+    private final String opSign;
 
-    public static class AddOperatorBuilder extends OperatorBuilder {
-
-        @Override
-        public Operator build() {
-            return Operator.ADD;
-        }
+    Operator(String opSign) {
+        this.opSign = opSign;
     }
 
-    public static class SubOperatorBuilder extends OperatorBuilder {
-
-        @Override
-        public Operator build() {
-            return Operator.SUB;
-        }
-    }
-
-    public static class MulOperatorBuilder extends OperatorBuilder {
-
-        @Override
-        public Operator build() {
-            return Operator.MUL;
-        }
-    }
-
-    public static class DivOperatorBuilder extends OperatorBuilder {
-
-        @Override
-        public Operator build() {
-            return Operator.DIV;
-        }
+    public String opSign() {
+        return opSign;
     }
 }

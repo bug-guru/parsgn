@@ -20,14 +20,14 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.calc;
+package guru.bug.tools.parsgn.expr.calc;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public interface CalcExpressionContext {
+public interface CalculationContext {
     public Object getValue(String name);
 
     public void setValue(String name, Object value);

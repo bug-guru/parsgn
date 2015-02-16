@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,7 @@
 
 package guru.bug.tools.parsgn.expr;
 
-import guru.bug.tools.parsgn.ResultType;
-import guru.bug.tools.parsgn.Rule;
+import guru.bug.tools.parsgn.processing.ResultType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,7 +43,7 @@ public class ReferenceExpressionTest {
         expression.setReference(rule);
         expr = new FakeExpression();
         rule.setExpression(expr);
-        checker = (ReferenceExpression.Checker) expression.checker(new FakeCalcExpressionContext());
+        checker = (ReferenceExpression.Checker) expression.checker(new FakeCalculationContext());
     }
 
     @Test
