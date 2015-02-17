@@ -23,6 +23,7 @@
 package guru.bug.tools.parsgn.utils;
 
 import guru.bug.tools.parsgn.ResultBuilder;
+import guru.bug.tools.parsgn.exceptions.InternalParsingException;
 import guru.bug.tools.parsgn.processing.Position;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -42,10 +43,14 @@ import java.util.List;
 public class XmlResultBuilder extends ResultBuilder<Node> {
     private Document result;
 
-    public XmlResultBuilder() throws ParserConfigurationException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        result = db.newDocument();
+    public XmlResultBuilder() {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            result = db.newDocument();
+        } catch (ParserConfigurationException e) {
+            throw new InternalParsingException("Can't instantiate XmlResultBuilder", e);
+        }
     }
 
     public XmlResultBuilder(DocumentBuilder builder) {

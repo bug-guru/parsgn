@@ -32,13 +32,16 @@ import org.w3c.dom.Document;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
 import java.io.Reader;
 
 /**
+ * This builder can be used to read your EBNF file and create the {@link guru.bug.tools.parsgn.Parser},
+ * which further will be used against files of format described by the EBNF.
+ * Instance of the {@code DefaultParserBuilder} is threadsafe. So it can be used to create multiple different parsers even in parallel.
+ *
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
@@ -47,6 +50,9 @@ public class DefaultParserBuilder {
     private final Parser EBNF_PARSER = new EBNFParser();
     private final JAXBContext jaxbContext;
 
+    /**
+     * Creates new instance of {@code DefaultParserBuilder}.
+     */
     public DefaultParserBuilder() {
         try {
             jaxbContext = JAXBContext.newInstance(ConfigFileBuilder.class);
@@ -55,7 +61,15 @@ public class DefaultParserBuilder {
         }
     }
 
-    public Parser createParser(Reader input) throws IOException, ParsingException, ParserConfigurationException {
+    /**
+     * Creates the parser reading EBNF from a reader.
+     *
+     * @param input reader with EBNF data. Is used as instructions to build new parser.
+     * @return parser built according to provided EBNF.
+     * @throws IOException      if something wrong reading the input.
+     * @throws ParsingException if input cannot be parsed.
+     */
+    public Parser createParser(Reader input) throws IOException, ParsingException {
         try {
             XmlResultBuilder builder = new XmlResultBuilder();
             EBNF_PARSER.parse(input, builder);
