@@ -20,13 +20,9 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.utils;
 
 import guru.bug.tools.parsgn.processing.Position;
-import guru.bug.tools.parsgn.utils.ParseNode;
-import guru.bug.tools.parsgn.utils.ParseNodeVisitResult;
-import guru.bug.tools.parsgn.utils.ParseNodeVisitor;
-import guru.bug.tools.parsgn.utils.ParseTreeUtils;
 import org.junit.Test;
 
 import java.util.ArrayList;

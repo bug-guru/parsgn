@@ -1,0 +1,12 @@
+text: header+;
+
+header: line underscore | semiunderscore;
+
+line: #VALID > eol eol;
+
+underscore: "_"{4,} eol;
+
+semiunderscore: "_"{2,} eol;
+
+eol: "\r\n" | "\r" | "\n" | #EOF;
+

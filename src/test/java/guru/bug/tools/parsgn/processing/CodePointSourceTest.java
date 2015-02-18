@@ -20,9 +20,8 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.processing;
 
-import guru.bug.tools.parsgn.processing.CodePointSource;
 import org.junit.Test;
 
 import java.io.StringReader;
