@@ -22,10 +22,7 @@
 
 package guru.bug.tools.parsgn;
 
-import guru.bug.tools.parsgn.exceptions.DuplicateRuleNameException;
-import guru.bug.tools.parsgn.exceptions.EmptyExpressionListException;
-import guru.bug.tools.parsgn.exceptions.ParsingException;
-import guru.bug.tools.parsgn.exceptions.UnresolvedRuleException;
+import guru.bug.tools.parsgn.exceptions.*;
 import guru.bug.tools.parsgn.expr.*;
 import guru.bug.tools.parsgn.expr.calc.Term;
 
@@ -182,13 +179,13 @@ public class RuleFactory {
         return result;
     }
 
-    public final ReferenceExpression build(String rootRuleName) throws UnresolvedRuleException {
+    public final ReferenceExpression build(String rootRuleName) throws UnresolvedRuleException, NumberOfParametersException {
         ReferenceExpression result = ref(rootRuleName);
         resolveReferences();
         return result;
     }
 
-    private void resolveReferences() throws UnresolvedRuleException {
+    private void resolveReferences() throws UnresolvedRuleException, NumberOfParametersException {
         Iterator<ReferenceExpression> iterator = unresolved.iterator();
         Set<String> unresolvedNames = new TreeSet<>();
         while (iterator.hasNext()) {

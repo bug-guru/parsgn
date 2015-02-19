@@ -22,6 +22,7 @@
 
 package guru.bug.tools.parsgn.expr;
 
+import guru.bug.tools.parsgn.exceptions.NumberOfParametersException;
 import guru.bug.tools.parsgn.expr.calc.CalculationContext;
 import guru.bug.tools.parsgn.expr.calc.Term;
 
@@ -51,8 +52,18 @@ public class ReferenceExpression extends Expression {
         return reference;
     }
 
-    public void setReference(Rule reference) {
+    public void setReference(Rule reference) throws NumberOfParametersException {
         this.reference = reference;
+        validate();
+    }
+
+    private void validate() throws NumberOfParametersException {
+        List<String> paramNames = reference.getParams();
+        int exprCount = paramExpressions == null ? 0 : paramExpressions.size();
+        int paramCount = paramNames == null ? 0 : paramNames.size();
+        if (exprCount != paramCount) {
+            throw new NumberOfParametersException("ruleName");
+        }
     }
 
     @Override
