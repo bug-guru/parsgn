@@ -91,14 +91,14 @@ public class EBNFParser extends Parser implements RuleNames {
                 rb.ref(I),
                 rb.str(")")
         );
-        // .I: [#WHITESPACE | SingleLineComment | MultiLineComment]*;
+        // I: [#WHITESPACE | SingleLineComment | MultiLineComment]*;
         rb.rule(I,
                 rb.zeroOrMore(rb.oneOf(
                         rb.charType(CharType.WHITESPACE),
                         rb.ref(SINGLE_LINE_COMMENT),
                         rb.ref(MULTI_LINE_COMMENT)
                 ))
-        ).hide();
+        );
         // SingleLineComment: "//" #VALID>#LINE_SEPARATOR;
         rb.rule(SINGLE_LINE_COMMENT,
                 rb.str("//"),

@@ -30,7 +30,7 @@ HideFlag: ".";
 
 RuleParams: "(" I Name [I "," I Name]* I ")";
 
-.I: [#WHITESPACE | SingleLineComment | MultiLineComment]*;
+I: [#WHITESPACE | SingleLineComment | MultiLineComment]*;
 
 SingleLineComment: "//" #VALID>#LINE_SEPARATOR;
 

@@ -27,7 +27,7 @@ package guru.bug.tools.parsgn.processing;
  * @version 1.0
  * @since 1.0
  */
-public class Position {
+public class Position implements Comparable<Position> {
     private final int row;
     private final int col;
 
@@ -87,5 +87,14 @@ public class Position {
                 "row=" + row +
                 ", col=" + col +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Position o) {
+        int result = this.row - o.row;
+        if (result == 0) {
+            result = this.col - o.col;
+        }
+        return result;
     }
 }

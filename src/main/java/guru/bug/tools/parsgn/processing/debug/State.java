@@ -20,37 +20,40 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.processing.debug;
 
-import guru.bug.tools.parsgn.exceptions.ParsingException;
-import guru.bug.tools.parsgn.expr.ReferenceExpression;
-import guru.bug.tools.parsgn.processing.CodePointSource;
-import guru.bug.tools.parsgn.processing.ParsingContext;
-import guru.bug.tools.parsgn.processing.debug.Debugger;
+import guru.bug.tools.parsgn.processing.Position;
+import guru.bug.tools.parsgn.processing.ResultType;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class Parser {
-    private final ReferenceExpression root;
+public class State {
+    private final List<StackElement> stack;
+    private final Position currentPosition;
+    private final ResultType result;
 
-    public Parser(ReferenceExpression root) {
-        this.root = root;
+    public State(List<StackElement> stack, Position currentPosition, ResultType result) {
+        this.stack = Collections.unmodifiableList(new ArrayList<>(stack));
+        this.currentPosition = currentPosition;
+        this.result = result;
     }
 
-    public <T> void parse(Reader input, ResultBuilder<T> builder) throws ParsingException, IOException {
-        this.parse(input, builder, null);
+    public List<StackElement> getStack() {
+        return stack;
     }
 
-    public <T> void parse(Reader input, ResultBuilder<T> builder, Debugger debugger) throws ParsingException, IOException {
-        CodePointSource src = new CodePointSource(input);
-        ParsingContext<T> ctx = new ParsingContext<>(root, builder, src);
-        ctx.parse(debugger);
+    public Position getCurrentPosition() {
+        return currentPosition;
     }
 
+    public ResultType getResult() {
+        return result;
+    }
 }

@@ -28,12 +28,16 @@ import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
 import guru.bug.tools.parsgn.expr.Expression;
 import guru.bug.tools.parsgn.expr.calc.CalculationContext;
+import guru.bug.tools.parsgn.processing.debug.Debugger;
+import guru.bug.tools.parsgn.processing.debug.StackElement;
+import guru.bug.tools.parsgn.processing.debug.State;
 import guru.bug.tools.parsgn.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -46,6 +50,7 @@ public class ParsingContext<T> implements CalculationContext {
     private final ResultBuilder<T> builder;
     private final CodePointSource source;
     private final List<Expression.ExpressionChecker> failedExpressions = new ArrayList<>();
+    private Debugger debugger;
 
     public ParsingContext(Expression root, ResultBuilder<T> builder, CodePointSource source) {
         this.builder = builder;
@@ -55,9 +60,16 @@ public class ParsingContext<T> implements CalculationContext {
         pushExpression(root);
     }
 
-    public void parse() throws IOException, ParsingException {
+    public void parse(Debugger debugger) throws IOException, ParsingException {
+        this.debugger = debugger;
+        if (debugger != null) {
+            debugger.onStart();
+        }
         while (!builder.isFinished()) {
             next();
+        }
+        if (debugger != null) {
+            debugger.onFinish();
         }
     }
 
@@ -92,6 +104,7 @@ public class ParsingContext<T> implements CalculationContext {
             logger.log(Level.FINER, "checking: {0}; codePoint {1} at: {2}", new Object[]{StringUtils.codePointToString(codePoint), codePoint, lastPos});
         }
         ResultType prevResult = leaf.check(codePoint);
+        afterCheck(prevResult);
         Expression.BranchExpressionChecker branchChecker = null;
         loop:
         while (true) {
@@ -144,8 +157,23 @@ public class ParsingContext<T> implements CalculationContext {
             Holder holder = stack.peek();
             branchChecker = (Expression.BranchExpressionChecker) holder.checker;
             prevResult = branchChecker.check(prevResult);
+            afterCheck(prevResult);
             logger.log(Level.FINER, "Expr stack: {0}", stack);
         }
+    }
+
+    private void afterCheck(ResultType prevResult) {
+        if (debugger != null) {
+            State state = buildPublicState(prevResult);
+            debugger.afterCheck(state);
+        }
+    }
+
+    private State buildPublicState(ResultType prevResult) {
+        List<StackElement> result = stack.stream()
+                .map(n -> new StackElement(n.start, n.toString()))
+                .collect(Collectors.toList());
+        return new State(result, source.getLastPos(), prevResult);
     }
 
     private boolean isIgnoreFlagSet(Expression.LeafExpressionChecker leaf, Expression.BranchExpressionChecker branchChecker) {

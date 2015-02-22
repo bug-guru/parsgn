@@ -20,13 +20,14 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.ebnf;
 
-import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
-import guru.bug.tools.parsgn.ebnf.EBNFParser;
+import guru.bug.tools.parsgn.Parser;
 import guru.bug.tools.parsgn.utils.ParseNode;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
+import guru.bug.tools.parsgn.utils.ParseTreeUtils;
 import guru.bug.tools.parsgn.utils.XmlResultBuilder;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.transform.OutputKeys;
@@ -37,6 +38,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 
 import static org.junit.Assert.assertEquals;
 
@@ -83,7 +85,8 @@ public class EBNFTest {
     }
 
 
-    //    @Test
+    @Ignore
+    @Test
     public void printXml() throws Exception {
         Parser parser = new EBNFParser();
         try (
@@ -100,6 +103,23 @@ public class EBNFTest {
             StreamResult result = new StreamResult(System.out);
             DOMSource source = new DOMSource(resultBuilder.getResult());
             transformer.transform(source, result);
+        }
+    }
+
+    @Ignore
+    @Test
+    public void printParseTree() throws Exception {
+        Parser parser = new EBNFParser();
+        try (
+                InputStream input = getClass().getResourceAsStream("config.rules");
+                BufferedInputStream buf = new BufferedInputStream(input);
+                InputStreamReader reader = new InputStreamReader(buf)
+        ) {
+            ParseTreeResultBuilder resultBuilder = new ParseTreeResultBuilder();
+            parser.parse(reader, resultBuilder);
+            StringWriter writer = new StringWriter(2048);
+            ParseTreeUtils.serialize(resultBuilder.getRoot(), writer);
+            System.out.println(writer.toString());
         }
     }
 }
