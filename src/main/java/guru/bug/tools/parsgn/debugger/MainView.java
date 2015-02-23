@@ -36,8 +36,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -52,6 +50,7 @@ import java.util.List;
  */
 public class MainView extends VBox {
 
+    public static final String HIGHLIGHT = "highlight";
     @FXML
     private TextFlow sourceText;
     @FXML
@@ -70,10 +69,12 @@ public class MainView extends VBox {
     private Label resultLabel;
     @FXML
     private Slider indexSlider;
+    @FXML
+    private Label sourceRowLabel;
+    @FXML
+    private Label sourceColLabel;
 
     private ProcessDebugger debugger;
-    private Font textFont = Font.font("Monospaced");
-    private Font specFont = Font.font("Monospaced", textFont.getSize() / 2.0);
 
     public MainView(ProcessDebugger debugger) {
         this.debugger = debugger;
@@ -195,38 +196,37 @@ public class MainView extends VBox {
 
     private Position createCharText(Position pos, char ch, List<Text> flow) {
         Text text = new SourceChar(String.valueOf(ch), pos);
-        text.setFont(textFont);
         flow.add(text);
         return Position.newCol(pos);
     }
 
     private Position createTabText(Position pos, List<Text> flow) {
-        Text text1 = new SourceChar("\\t       ", pos);
-        text1.setFont(specFont);
-        flow.add(text1);
+        Text text = new SourceChar("\\t       ", pos);
+        text.getStyleClass().add("specChar");
+        flow.add(text);
         return Position.newCol(pos);
     }
 
     private Position createLFText(Position pos, List<Text> flow) {
         Text text = new SourceChar("\\n\n", pos);
-        text.setFont(specFont);
+        text.getStyleClass().add("specChar");
         flow.add(text);
         return Position.newRow(pos);
     }
 
     private Position createCRText(Position pos, List<Text> flow) {
         Text text = new SourceChar("\\r\n", pos);
-        text.setFont(textFont);
+        text.getStyleClass().add("specChar");
         flow.add(text);
         return Position.newRow(pos);
     }
 
     private Position createCRLFText(Position pos, List<Text> flow) {
         Text text1 = new SourceChar("\\r", pos);
-        text1.setFont(specFont);
+        text1.getStyleClass().add("specChar");
         flow.add(text1);
         Text text2 = new SourceChar("\\n\n", Position.newCol(pos));
-        text2.setFont(specFont);
+        text2.getStyleClass().add("specChar");
         flow.add(text2);
         return Position.newRow(pos);
     }
@@ -251,21 +251,28 @@ public class MainView extends VBox {
         debugger.last();
     }
 
-    private static class SourceChar extends Text {
+
+    private class SourceChar extends Text {
         private Position position;
 
         public SourceChar(String text, Position position) {
             super(text);
             this.position = position;
+            getStyleClass().add("char");
+            this.setOnMouseEntered(e -> {
+                sourceRowLabel.setText(String.valueOf(position.getRow()));
+                sourceColLabel.setText(String.valueOf(position.getCol()));
+            });
+            this.setOnMouseClicked(e -> {
+                System.out.println("Clicked on " + position);
+            });
         }
 
         public void highlight(boolean highlight) {
             if (highlight) {
-                setFill(Color.RED);
-                setStyle("-fx-underline: true");
+                getStyleClass().add(HIGHLIGHT);
             } else {
-                setFill(Color.BLACK);
-                setStyle("-fx-underline: false");
+                getStyleClass().remove(HIGHLIGHT);
             }
         }
     }

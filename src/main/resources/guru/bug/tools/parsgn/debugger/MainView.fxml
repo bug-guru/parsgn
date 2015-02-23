@@ -22,14 +22,14 @@
   ~ THE SOFTWARE.
   -->
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.TextFlow?>
 <fx:root maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="600.0"
-         prefHeight="600.0" prefWidth="960.0" type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8"
-         xmlns:fx="http://javafx.com/fxml/1">
+         prefHeight="600.0" prefWidth="960.0" stylesheets="@MainView.css" type="javafx.scene.layout.VBox"
+         xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <MenuBar VBox.vgrow="NEVER">
             <menus>
@@ -92,8 +92,6 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="42.0"
-                           prefWidth="110.0"/>
             </items>
         </ToolBar>
         <SplitPane dividerPositions="0.75" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
@@ -177,5 +175,30 @@
                 </TitledPane>
             </items>
         </SplitPane>
+        <HBox fillHeight="false" maxWidth="1.7976931348623157E308" VBox.vgrow="NEVER">
+            <children>
+                <Label text="Row:">
+                    <HBox.margin>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    </HBox.margin>
+                </Label>
+                <Label fx:id="sourceRowLabel" alignment="CENTER_RIGHT" minWidth="50.0" text="?" textAlignment="RIGHT">
+                    <HBox.margin>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    </HBox.margin>
+                </Label>
+                <Label text="Col:">
+                    <HBox.margin>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    </HBox.margin>
+                </Label>
+                <Label fx:id="sourceColLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" minWidth="50.0" text="?"
+                       textAlignment="JUSTIFY">
+                    <HBox.margin>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                    </HBox.margin>
+                </Label>
+            </children>
+        </HBox>
     </children>
 </fx:root>
