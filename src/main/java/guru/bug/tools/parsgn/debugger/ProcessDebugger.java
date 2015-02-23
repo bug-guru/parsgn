@@ -27,23 +27,9 @@ import guru.bug.tools.parsgn.ebnf.EBNFParser;
 import guru.bug.tools.parsgn.processing.debug.Debugger;
 import guru.bug.tools.parsgn.processing.debug.State;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.ReadOnlyIntegerWrapper;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.*;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -135,7 +121,7 @@ public class ProcessDebugger {
             tryMore();
             hasNext.set(idx < history.size() - 1);
         }
-        lastIndex.set(lastIdx);
+        lastIndex.set(lastIdx < 0 ? 0 : lastIdx);
         index.set(idx);
         isLastFrame.set(idx >= lastIdx);
     }
@@ -257,6 +243,14 @@ public class ProcessDebugger {
 
     public void setIndex(int index) {
         this.index.set(index);
+    }
+
+    public int getLastIndex() {
+        return lastIndex.get();
+    }
+
+    public ReadOnlyIntegerProperty lastIndexProperty() {
+        return lastIndex.getReadOnlyProperty();
     }
 
     private class DebuggerImpl implements Debugger {

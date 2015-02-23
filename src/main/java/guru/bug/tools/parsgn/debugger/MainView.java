@@ -34,10 +34,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -71,6 +68,9 @@ public class MainView extends VBox {
     private Button navigateLastButton;
     @FXML
     private Label resultLabel;
+    @FXML
+    private Slider indexSlider;
+
     private ProcessDebugger debugger;
     private Font textFont = Font.font("Monospaced");
     private Font specFont = Font.font("Monospaced", textFont.getSize() / 2.0);
@@ -135,6 +135,8 @@ public class MainView extends VBox {
                 return result == null ? null : result.toString();
             }
         });
+        indexSlider.valueProperty().bindBidirectional(debugger.indexProperty());
+        indexSlider.maxProperty().bind(debugger.lastIndexProperty());
         expressionStack.getSelectionModel().selectFirst();
     }
 

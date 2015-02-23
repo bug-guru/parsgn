@@ -92,6 +92,8 @@
                         </ImageView>
                     </graphic>
                 </Button>
+                <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="42.0"
+                           prefWidth="110.0"/>
             </items>
         </ToolBar>
         <SplitPane dividerPositions="0.75" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
@@ -100,20 +102,36 @@
                 <SplitPane dividerPositions="0.5" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
                            orientation="VERTICAL">
                     <items>
-                        <TitledPane collapsible="false" maxHeight="1.7976931348623157E308"
-                                    maxWidth="1.7976931348623157E308" text="Source Text">
-                            <content>
-                                <ScrollPane hmax="1000.0" maxHeight="1.7976931348623157E308"
-                                            maxWidth="1.7976931348623157E308" minHeight="1.0" minWidth="1.0"
-                                            pannable="true" prefViewportHeight="228.0" prefViewportWidth="713.0"
-                                            vmax="1000.0">
+                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0"
+                              minWidth="0.0" prefHeight="100.0" prefWidth="100.0">
+                            <children>
+                                <TitledPane collapsible="false" maxHeight="1.7976931348623157E308"
+                                            maxWidth="1.7976931348623157E308" text="Source Text" VBox.vgrow="ALWAYS">
                                     <content>
-                                        <TextFlow fx:id="sourceText" maxHeight="1.7976931348623157E308"
-                                                  maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0"/>
+                                        <ScrollPane hmax="1000.0" maxHeight="1.7976931348623157E308"
+                                                    maxWidth="1.7976931348623157E308" minHeight="1.0" minWidth="1.0"
+                                                    pannable="true" prefViewportHeight="228.0" prefViewportWidth="713.0"
+                                                    vmax="1000.0">
+                                            <content>
+                                                <TextFlow fx:id="sourceText" maxHeight="1.7976931348623157E308"
+                                                          maxWidth="1.7976931348623157E308" minHeight="0.0"
+                                                          minWidth="0.0"/>
+                                            </content>
+                                        </ScrollPane>
                                     </content>
-                                </ScrollPane>
-                            </content>
-                        </TitledPane>
+                                </TitledPane>
+                                <Slider fx:id="indexSlider" maxHeight="1.7976931348623157E308"
+                                        maxWidth="1.7976931348623157E308" minWidth="100.0" prefHeight="16.0"
+                                        prefWidth="100.0" VBox.vgrow="NEVER">
+                                    <VBox.margin>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                                    </VBox.margin>
+                                    <padding>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                                    </padding>
+                                </Slider>
+                            </children>
+                        </VBox>
                         <SplitPane dividerPositions="0.3">
                             <items>
                                 <TitledPane collapsible="false" maxHeight="1.7976931348623157E308"
