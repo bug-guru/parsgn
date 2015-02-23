@@ -90,10 +90,10 @@ public class MainView extends VBox {
 
     @FXML
     private void initialize() {
+        navigateFirstButton.disableProperty().bind(Bindings.not(debugger.hasPreviousProperty()));
         navigatePreviousButton.disableProperty().bind(Bindings.not(debugger.hasPreviousProperty()));
         navigateNextButton.disableProperty().bind(Bindings.not(debugger.hasNextProperty()));
-        navigateFirstButton.setDisable(true);
-        navigateLastButton.setDisable(true);
+        navigateLastButton.disableProperty().bind(debugger.isLastFrameProperty());
         expressionStack.setCellFactory(lv -> new ListCell<StackElement>() {
             @Override
             protected void updateItem(StackElement item, boolean empty) {
@@ -135,6 +135,7 @@ public class MainView extends VBox {
                 return result == null ? null : result.toString();
             }
         });
+        expressionStack.getSelectionModel().selectFirst();
     }
 
     private void highlight(StackElement element) {
@@ -236,6 +237,16 @@ public class MainView extends VBox {
     @FXML
     private void navigateNext(ActionEvent e) {
         debugger.next();
+    }
+
+    @FXML
+    private void navigateFirst(ActionEvent e) {
+        debugger.first();
+    }
+
+    @FXML
+    private void navigateLast(ActionEvent e) {
+        debugger.last();
     }
 
     private static class SourceChar extends Text {

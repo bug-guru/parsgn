@@ -52,7 +52,8 @@
         </MenuBar>
         <ToolBar focusTraversable="false" prefHeight="40.0" prefWidth="200.0" VBox.vgrow="NEVER">
             <items>
-                <Button fx:id="navigateFirstButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" text="First">
+                <Button fx:id="navigateFirstButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false"
+                        onAction="#navigateFirst" text="First">
                     <graphic>
                         <ImageView pickOnBounds="true" preserveRatio="true">
                             <image>
@@ -81,7 +82,8 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button fx:id="navigateLastButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" text="Last">
+                <Button fx:id="navigateLastButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false"
+                        onAction="#navigateLast" text="Last">
                     <graphic>
                         <ImageView pickOnBounds="true" preserveRatio="true">
                             <image>

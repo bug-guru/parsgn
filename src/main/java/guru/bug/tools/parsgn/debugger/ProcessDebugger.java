@@ -27,13 +27,24 @@ import guru.bug.tools.parsgn.ebnf.EBNFParser;
 import guru.bug.tools.parsgn.processing.debug.Debugger;
 import guru.bug.tools.parsgn.processing.debug.State;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
-import javafx.beans.property.*;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 /**
@@ -43,15 +54,16 @@ import java.util.NoSuchElementException;
  */
 public class ProcessDebugger {
     private final Parser parser;
-    private final List<State> history = new ArrayList<>();
-    private final ListIterator<State> historyIterator = history.listIterator();
+    private final List<State> history = new ArrayList<>(4096);
     private boolean updateRequired = false;
     private boolean started = false;
     private boolean eof = false;
     private ReadOnlyBooleanWrapper hasPrevious = new ReadOnlyBooleanWrapper(false);
     private ReadOnlyBooleanWrapper hasNext = new ReadOnlyBooleanWrapper(false);
+    private ReadOnlyBooleanWrapper isLastFrame = new ReadOnlyBooleanWrapper(false);
     private ReadOnlyObjectWrapper<State> currentState = new ReadOnlyObjectWrapper<>();
     private ReadOnlyStringWrapper content = new ReadOnlyStringWrapper();
+    private int index = 0;
 
 
     public ProcessDebugger(Parser parser) {
@@ -80,7 +92,8 @@ public class ProcessDebugger {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            updateState(null);
+            tryMore();
+            updateState();
         }
     }
 
@@ -104,27 +117,19 @@ public class ProcessDebugger {
         return text.toString();
     }
 
-    private void updateState(State current) {
-        currentState.set(current);
-        hasPrevious.set(hasPrevious());
-        hasNext.set(hasNext());
-    }
-
-    public boolean hasNext() {
-        synchronized (history) {
-            while (true) {
-                if (historyIterator.hasNext()) {
-                    return true;
-                } else if (eof) {
-                    return false;
-                } else {
-                    tryNext();
-                }
-            }
+    private void updateState() {
+        currentState.set(index >= history.size() ? null : history.get(index));
+        hasPrevious.set(index > 0);
+        if (index < history.size() - 1) {
+            hasNext.set(true);
+        } else {
+            tryMore();
+            hasNext.set(index < history.size() - 1);
         }
+        isLastFrame.set(index >= history.size() - (eof ? 1 : 2));
     }
 
-    private void tryNext() {
+    private void tryMore() {
         try {
             updateRequired = true;
             history.notify();
@@ -136,41 +141,50 @@ public class ProcessDebugger {
         }
     }
 
-    public State next() {
+    public void first() {
+        synchronized (history) {
+            index = 0;
+            updateState();
+        }
+    }
+
+    public void last() {
+        synchronized (history) {
+            index = history.size() - (eof ? 1 : 2);
+            updateState();
+        }
+    }
+
+    public void next() {
         synchronized (history) {
             while (true) {
-                if (historyIterator.hasNext()) {
-                    State state = historyIterator.next();
-                    updateState(state);
-                    return state;
+                if (index < history.size() - 1) {
+                    index++;
+                    updateState();
+                    return;
                 } else if (eof) {
                     throw new NoSuchElementException();
                 } else {
-                    tryNext();
+                    tryMore();
                 }
             }
         }
     }
 
-    public boolean hasPrevious() {
+    public void previous() {
         synchronized (history) {
-            return historyIterator.hasPrevious();
-        }
-    }
-
-    public State previous() {
-        synchronized (history) {
-            State state = historyIterator.previous();
-            updateState(state);
-            return state;
+            if (index == 0) {
+                throw new NoSuchElementException();
+            }
+            index--;
+            updateState();
         }
     }
 
     private void addState(State state) {
         synchronized (history) {
             try {
-                historyIterator.add(state);
-                historyIterator.previous();
+                history.add(state);
                 updateRequired = false;
                 history.notify();
                 while (!updateRequired) {
@@ -196,6 +210,14 @@ public class ProcessDebugger {
 
     public ReadOnlyBooleanProperty hasNextProperty() {
         return hasNext.getReadOnlyProperty();
+    }
+
+    public boolean getIsLastFrame() {
+        return hasNext.get();
+    }
+
+    public ReadOnlyBooleanProperty isLastFrameProperty() {
+        return isLastFrame.getReadOnlyProperty();
     }
 
     public State getCurrentState() {
