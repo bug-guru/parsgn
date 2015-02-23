@@ -29,10 +29,12 @@ import guru.bug.tools.parsgn.processing.debug.State;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -55,19 +57,25 @@ import java.util.NoSuchElementException;
 public class ProcessDebugger {
     private final Parser parser;
     private final List<State> history = new ArrayList<>(4096);
+    private final ReadOnlyBooleanWrapper hasPrevious = new ReadOnlyBooleanWrapper(false);
+    private final ReadOnlyBooleanWrapper hasNext = new ReadOnlyBooleanWrapper(false);
+    private final ReadOnlyBooleanWrapper isLastFrame = new ReadOnlyBooleanWrapper(false);
+    private final ReadOnlyObjectWrapper<State> currentState = new ReadOnlyObjectWrapper<>();
+    private final ReadOnlyStringWrapper content = new ReadOnlyStringWrapper();
+    private final SimpleIntegerProperty index = new SimpleIntegerProperty(0);
+    private final ReadOnlyIntegerWrapper lastIndex = new ReadOnlyIntegerWrapper(0);
     private boolean updateRequired = false;
     private boolean started = false;
     private boolean eof = false;
-    private ReadOnlyBooleanWrapper hasPrevious = new ReadOnlyBooleanWrapper(false);
-    private ReadOnlyBooleanWrapper hasNext = new ReadOnlyBooleanWrapper(false);
-    private ReadOnlyBooleanWrapper isLastFrame = new ReadOnlyBooleanWrapper(false);
-    private ReadOnlyObjectWrapper<State> currentState = new ReadOnlyObjectWrapper<>();
-    private ReadOnlyStringWrapper content = new ReadOnlyStringWrapper();
-    private int index = 0;
+    private int idx = 0;
 
 
     public ProcessDebugger(Parser parser) {
         this.parser = parser;
+        index.addListener((o, ov, nv) -> {
+            idx = nv == null ? 0 : nv.intValue();
+            updateState();
+        });
     }
 
     public void debug(String sourceFileName) throws IOException {
@@ -118,15 +126,18 @@ public class ProcessDebugger {
     }
 
     private void updateState() {
-        currentState.set(index >= history.size() ? null : history.get(index));
-        hasPrevious.set(index > 0);
-        if (index < history.size() - 1) {
+        int lastIdx = history.size() - (eof ? 1 : 2);
+        currentState.set(idx >= history.size() ? null : history.get(idx));
+        hasPrevious.set(idx > 0);
+        if (idx < history.size() - 1) {
             hasNext.set(true);
         } else {
             tryMore();
-            hasNext.set(index < history.size() - 1);
+            hasNext.set(idx < history.size() - 1);
         }
-        isLastFrame.set(index >= history.size() - (eof ? 1 : 2));
+        lastIndex.set(lastIdx);
+        index.set(idx);
+        isLastFrame.set(idx >= lastIdx);
     }
 
     private void tryMore() {
@@ -143,14 +154,14 @@ public class ProcessDebugger {
 
     public void first() {
         synchronized (history) {
-            index = 0;
+            idx = 0;
             updateState();
         }
     }
 
     public void last() {
         synchronized (history) {
-            index = history.size() - (eof ? 1 : 2);
+            idx = history.size() - (eof ? 1 : 2);
             updateState();
         }
     }
@@ -158,8 +169,8 @@ public class ProcessDebugger {
     public void next() {
         synchronized (history) {
             while (true) {
-                if (index < history.size() - 1) {
-                    index++;
+                if (idx < history.size() - 1) {
+                    idx++;
                     updateState();
                     return;
                 } else if (eof) {
@@ -173,10 +184,10 @@ public class ProcessDebugger {
 
     public void previous() {
         synchronized (history) {
-            if (index == 0) {
+            if (idx == 0) {
                 throw new NoSuchElementException();
             }
-            index--;
+            idx--;
             updateState();
         }
     }
@@ -234,6 +245,18 @@ public class ProcessDebugger {
 
     public ReadOnlyStringProperty contentProperty() {
         return content.getReadOnlyProperty();
+    }
+
+    public int getIndex() {
+        return index.get();
+    }
+
+    public SimpleIntegerProperty indexProperty() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index.set(index);
     }
 
     private class DebuggerImpl implements Debugger {
