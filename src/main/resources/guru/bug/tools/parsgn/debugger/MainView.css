@@ -20,20 +20,20 @@
  * THE SOFTWARE.
  */
 
-TextFlow#sourceText .char {
+.char {
     -fx-font-family: monospace;
 }
 
-TextFlow#sourceText .char.specChar {
+.char.specChar {
     -fx-font-size: 50%;
 }
 
-TextFlow#sourceText .char.highlight {
+.char.highlight {
     -fx-fill: red;
     -fx-underline: true;
 }
 
-TextFlow#sourceText .char:hover {
+.char:hover {
     -fx-font-weight: bold;
     -fx-fill: darkblue;
 }

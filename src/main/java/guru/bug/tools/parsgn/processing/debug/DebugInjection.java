@@ -20,37 +20,19 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
-
-import guru.bug.tools.parsgn.exceptions.ParsingException;
-import guru.bug.tools.parsgn.expr.ReferenceExpression;
-import guru.bug.tools.parsgn.processing.CodePointSource;
-import guru.bug.tools.parsgn.processing.ParsingContext;
-import guru.bug.tools.parsgn.processing.debug.DebugInjection;
-
-import java.io.IOException;
-import java.io.Reader;
+package guru.bug.tools.parsgn.processing.debug;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class Parser {
-    private final ReferenceExpression root;
+public interface DebugInjection {
 
-    public Parser(ReferenceExpression root) {
-        this.root = root;
-    }
+    void afterCheck(DebugFrame frame);
 
-    public <T> void parse(Reader input, ResultBuilder<T> builder) throws ParsingException, IOException {
-        this.parse(input, builder, null);
-    }
+    void onStart();
 
-    public <T> void parse(Reader input, ResultBuilder<T> builder, DebugInjection debugInjection) throws ParsingException, IOException {
-        CodePointSource src = new CodePointSource(input);
-        ParsingContext<T> ctx = new ParsingContext<>(root, builder, src);
-        ctx.parse(debugInjection);
-    }
+    void onFinish();
 
 }

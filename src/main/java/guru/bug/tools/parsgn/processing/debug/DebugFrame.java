@@ -34,12 +34,12 @@ import java.util.List;
  * @version 1.0
  * @since 1.0
  */
-public class State {
+public class DebugFrame {
     private final List<StackElement> stack;
     private final Position currentPosition;
     private final ResultType result;
 
-    public State(List<StackElement> stack, Position currentPosition, ResultType result) {
+    public DebugFrame(List<StackElement> stack, Position currentPosition, ResultType result) {
         this.stack = Collections.unmodifiableList(new ArrayList<>(stack));
         this.currentPosition = currentPosition;
         this.result = result;

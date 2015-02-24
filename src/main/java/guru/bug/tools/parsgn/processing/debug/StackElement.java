@@ -22,6 +22,7 @@
 
 package guru.bug.tools.parsgn.processing.debug;
 
+import guru.bug.tools.parsgn.expr.Expression;
 import guru.bug.tools.parsgn.processing.Position;
 
 /**
@@ -31,18 +32,22 @@ import guru.bug.tools.parsgn.processing.Position;
  */
 public class StackElement {
     private final Position startPosition;
-    private final String display;
+    private final Expression.ExpressionChecker checker;
 
-    public StackElement(Position startPosition, String display) {
+    public StackElement(Position startPosition, Expression.ExpressionChecker checker) {
         this.startPosition = startPosition;
-        this.display = display;
+        this.checker = checker;
     }
 
     public Position getStartPosition() {
         return startPosition;
     }
 
+    public Expression.ExpressionChecker getChecker() {
+        return checker;
+    }
+
     public String getDisplay() {
-        return display;
+        return checker == null ? "ROOT" : checker.toString();
     }
 }

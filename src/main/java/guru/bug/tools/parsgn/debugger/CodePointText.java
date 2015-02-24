@@ -20,37 +20,52 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn;
+package guru.bug.tools.parsgn.debugger;
 
-import guru.bug.tools.parsgn.exceptions.ParsingException;
-import guru.bug.tools.parsgn.expr.ReferenceExpression;
-import guru.bug.tools.parsgn.processing.CodePointSource;
-import guru.bug.tools.parsgn.processing.ParsingContext;
-import guru.bug.tools.parsgn.processing.debug.DebugInjection;
+import guru.bug.tools.parsgn.processing.CodePoint;
+import guru.bug.tools.parsgn.processing.Position;
+import javafx.scene.text.Text;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class Parser {
-    private final ReferenceExpression root;
+public class CodePointText extends Text {
+    private CodePoint codePoint;
+    private Set<String> styles = new HashSet<>();
 
-    public Parser(ReferenceExpression root) {
-        this.root = root;
+    public CodePointText(CodePoint codePoint) {
+        if (codePoint.isNewLine()) {
+            setText(codePoint.toString() + "\n");
+        } else {
+            setText(codePoint.toString());
+        }
+        this.codePoint = codePoint;
+        if (codePoint.toString().length() > 1) {
+            styles.add("specChar");
+        }
+        styles.add("char");
+        updateStyles();
     }
 
-    public <T> void parse(Reader input, ResultBuilder<T> builder) throws ParsingException, IOException {
-        this.parse(input, builder, null);
+    public void highlight(boolean highlight) {
+        if (highlight) {
+            styles.add(MainView.HIGHLIGHT);
+        } else {
+            styles.remove(MainView.HIGHLIGHT);
+        }
+        updateStyles();
     }
 
-    public <T> void parse(Reader input, ResultBuilder<T> builder, DebugInjection debugInjection) throws ParsingException, IOException {
-        CodePointSource src = new CodePointSource(input);
-        ParsingContext<T> ctx = new ParsingContext<>(root, builder, src);
-        ctx.parse(debugInjection);
+    private void updateStyles() {
+        getStyleClass().setAll(styles);
     }
 
+    public Position getPosition() {
+        return codePoint.getPosition();
+    }
 }

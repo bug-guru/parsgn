@@ -22,46 +22,133 @@
 
 package guru.bug.tools.parsgn.debugger;
 
-import guru.bug.tools.parsgn.processing.debug.State;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.ReadOnlyIntegerWrapper;
-import javafx.beans.property.ReadOnlyListProperty;
-import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleIntegerProperty;
+import guru.bug.tools.parsgn.processing.CodePoint;
+import guru.bug.tools.parsgn.processing.Position;
+import guru.bug.tools.parsgn.processing.debug.DebugFrame;
+import guru.bug.tools.parsgn.processing.debug.Debugger;
+import guru.bug.tools.parsgn.processing.debug.StackElement;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DebuggerFacade {
     private final ReadOnlyBooleanWrapper hasPrevious = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyBooleanWrapper hasNext = new ReadOnlyBooleanWrapper(false);
-    private final ReadOnlyBooleanWrapper isLastFrame = new ReadOnlyBooleanWrapper(false);
-    private final ReadOnlyObjectWrapper<State> currentState = new ReadOnlyObjectWrapper<>();
-    private final ReadOnlyListWrapper<CharEntity> source = new ReadOnlyListWrapper<>();
-    private final ReadOnlyListWrapper<CharEntity> rules = new ReadOnlyListWrapper<>();
-    private final SimpleIntegerProperty index = new SimpleIntegerProperty(0);
+    private final ReadOnlyBooleanWrapper isLastFrame = new ReadOnlyBooleanWrapper(true);
+    private final ReadOnlyObjectWrapper<DebugFrame> currentFrame = new ReadOnlyObjectWrapper<>();
+    private final ReadOnlyListWrapper<CodePointText> source = new ReadOnlyListWrapper<>();
+    private final ReadOnlyListWrapper<CodePointText> rules = new ReadOnlyListWrapper<>();
     private final ReadOnlyIntegerWrapper lastIndex = new ReadOnlyIntegerWrapper(0);
+    private final SimpleIntegerProperty index = new SimpleIntegerProperty(0);
+    private final SimpleObjectProperty<Debugger> debugger = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<StackElement> highlighted = new SimpleObjectProperty<>();
 
     public DebuggerFacade() {
         index.addListener((o, ov, nv) -> {
-            idx = nv == null ? 0 : nv.intValue();
-            updateState();
+            Debugger deb = debugger.get();
+            if (deb != null) {
+                deb.setIndex(nv == null ? 0 : nv.intValue());
+                updateState();
+            }
         });
+        debugger.addListener((o, ov, nv) -> resetDebugger(ov, nv));
+        highlighted.addListener((o, ov, nv) -> highlight(nv));
     }
-    private void updateState() {
-        currentState.set(curStt);
-        hasPrevious.set(idx > 0);
-        if (idx < history.size() - 1) {
-            hasNext.set(true);
-        } else {
-            tryMore();
-            hasNext.set(idx < history.size() - 1);
+
+    public void goToFirstFrame() {
+        debugger.get().goToFirstFrame();
+        updateState();
+    }
+
+    public void goToLastFrame() {
+        debugger.get().goToLastFrame();
+        updateState();
+    }
+
+    public void goToNextFrame() {
+        debugger.get().goToNextFrame();
+        updateState();
+    }
+
+    public void goToPreviousFrame() {
+        debugger.get().goToPreviousFrame();
+        updateState();
+    }
+
+    private void resetDebugger(Debugger ov, Debugger nv) {
+        if (ov != null) {
+            ov.close();
         }
-        lastIndex.set(lastIdx < 0 ? 0 : lastIdx);
-        index.set(idx);
-        isLastFrame.set(idx >= lastIdx);
+        if (nv == null) {
+            source.set(FXCollections.emptyObservableList());
+            rules.set(FXCollections.emptyObservableList());
+        } else {
+            source.set(convertText(nv.getSource(), this::handleGoToPosition));
+            rules.set(convertText(nv.getRules(), null));
+        }
+        updateState();
+    }
+
+    private void handleGoToPosition(MouseEvent e) {
+        CodePointText src = (CodePointText) e.getSource();
+        Position pos = src.getPosition();
+        debugger.get().goToPosition(pos);
+        updateState();
+    }
+
+    private ObservableList<CodePointText> convertText(List<CodePoint> points, EventHandler<? super MouseEvent> onClick) {
+        List<CodePointText> tmp = points.stream()
+                .map(CodePointText::new)
+                .peek(e -> e.setOnMouseClicked(onClick))
+                .collect(Collectors.toList());
+        return FXCollections.unmodifiableObservableList(FXCollections.observableList(tmp));
+    }
+
+    private void updateState() {
+        Debugger deb = debugger.get();
+        if (deb == null) {
+            index.set(0);
+            lastIndex.set(0);
+            currentFrame.set(null);
+            isLastFrame.set(true);
+            hasNext.set(false);
+            hasPrevious.set(false);
+        } else {
+            lastIndex.set(deb.getLastIndex());
+            index.set(deb.getIndex());
+            currentFrame.set(deb.getCurrentFrame());
+            isLastFrame.set(deb.isLastFrame());
+            hasNext.set(deb.hasNext());
+            hasPrevious.set(deb.hasPrevious());
+        }
+    }
+
+    private void highlight(StackElement element) {
+        if (element == null) {
+            getSource().stream().forEach(e -> e.highlight(false));
+            getRules().stream().forEach(e -> e.highlight(false));
+            return;
+        }
+        Position tmp = element.getStartPosition();
+        Position first = tmp == null ? new Position(1, 1) : tmp;
+        Position last = currentFrame.get().getCurrentPosition();
+        getSource().stream()
+                .forEach(sc -> {
+                    if (last.compareTo(sc.getPosition()) <= 0) {
+                        sc.highlight(false);
+                    } else if (first.compareTo(sc.getPosition()) <= 0) {
+                        sc.highlight(true);
+                    } else {
+                        sc.highlight(false);
+                    }
+                });
+        // TODO highlight rules too
+
     }
 
     public boolean getHasPrevious() {
@@ -88,27 +175,27 @@ public class DebuggerFacade {
         return isLastFrame.getReadOnlyProperty();
     }
 
-    public State getCurrentState() {
-        return currentState.get();
+    public DebugFrame getCurrentFrame() {
+        return currentFrame.get();
     }
 
-    public ReadOnlyObjectProperty<State> currentStateProperty() {
-        return currentState.getReadOnlyProperty();
+    public ReadOnlyObjectProperty<DebugFrame> currentFrameProperty() {
+        return currentFrame.getReadOnlyProperty();
     }
 
-    public ObservableList<CharEntity> getSource() {
+    public ObservableList<CodePointText> getSource() {
         return source.get();
     }
 
-    public ReadOnlyListProperty<CharEntity> sourceProperty() {
+    public ReadOnlyListProperty<CodePointText> sourceProperty() {
         return source.getReadOnlyProperty();
     }
 
-    public ObservableList<CharEntity> getRules() {
+    public ObservableList<CodePointText> getRules() {
         return rules.get();
     }
 
-    public ReadOnlyListProperty<CharEntity> rulesProperty() {
+    public ReadOnlyListProperty<CodePointText> rulesProperty() {
         return rules.getReadOnlyProperty();
     }
 
@@ -130,5 +217,29 @@ public class DebuggerFacade {
 
     public ReadOnlyIntegerProperty lastIndexProperty() {
         return lastIndex.getReadOnlyProperty();
+    }
+
+    public Debugger getDebugger() {
+        return debugger.get();
+    }
+
+    public SimpleObjectProperty<Debugger> debuggerProperty() {
+        return debugger;
+    }
+
+    public void setDebugger(Debugger debugger) {
+        this.debugger.set(debugger);
+    }
+
+    public StackElement getHighlighted() {
+        return highlighted.get();
+    }
+
+    public SimpleObjectProperty<StackElement> highlightedProperty() {
+        return highlighted;
+    }
+
+    public void setHighlighted(StackElement highlighted) {
+        this.highlighted.set(highlighted);
     }
 }

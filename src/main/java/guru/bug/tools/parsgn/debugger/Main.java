@@ -22,16 +22,10 @@
 
 package guru.bug.tools.parsgn.debugger;
 
-import guru.bug.tools.parsgn.Parser;
-import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
-import guru.bug.tools.parsgn.ebnf.EBNFParser;
+import guru.bug.tools.parsgn.processing.debug.Debugger;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -48,7 +42,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         String rulesFileName = getParameters().getNamed().get("rules");
         String sourceFileName = getParameters().getNamed().get("source");
-        ProcessDebugger debugger = setupEnvironment(rulesFileName, sourceFileName);
+        Debugger debugger = new Debugger(rulesFileName, sourceFileName);
         MainView root = new MainView(debugger);
         primaryStage.setTitle("ParsGN Debugger");
         Scene scene = new Scene(root, root.getPrefWidth(), root.getPrefHeight());
@@ -58,27 +52,6 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    //    private void setupRulesStructure(String rulesFileName) throws IOException {
-//        String rulesContent = readContent(rulesFileName);
-//        StringReader rulesReader = new StringReader(rulesContent);
-//        EBNFParser ebnfParser = new EBNFParser();
-//        ParseTreeResultBuilder resultBuilder = new ParseTreeResultBuilder();
-//        ebnfParser.parse(rulesReader, resultBuilder);
-//        RulesViewModel model = new RulesViewModel(resultBuilder.getRoot(), rulesContent);
-//    }
-//
-    private ProcessDebugger setupEnvironment(String rulesFileName, String sourceFileName) throws IOException {
-        Parser parser;
-        if (rulesFileName == null) {
-            parser = new EBNFParser();
-        } else {
-            DefaultParserBuilder builder = new DefaultParserBuilder();
-            parser = builder.createParser(new FileReader(new File(rulesFileName)));
-        }
-        ProcessDebugger result = new ProcessDebugger(parser);
-        result.debug(sourceFileName);
-        return result;
-    }
 
 
 }

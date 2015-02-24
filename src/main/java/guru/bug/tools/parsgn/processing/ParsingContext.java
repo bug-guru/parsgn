@@ -28,9 +28,9 @@ import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
 import guru.bug.tools.parsgn.expr.Expression;
 import guru.bug.tools.parsgn.expr.calc.CalculationContext;
-import guru.bug.tools.parsgn.processing.debug.Debugger;
+import guru.bug.tools.parsgn.processing.debug.DebugFrame;
+import guru.bug.tools.parsgn.processing.debug.DebugInjection;
 import guru.bug.tools.parsgn.processing.debug.StackElement;
-import guru.bug.tools.parsgn.processing.debug.State;
 import guru.bug.tools.parsgn.utils.StringUtils;
 
 import java.io.IOException;
@@ -50,7 +50,7 @@ public class ParsingContext<T> implements CalculationContext {
     private final ResultBuilder<T> builder;
     private final CodePointSource source;
     private final List<Expression.ExpressionChecker> failedExpressions = new ArrayList<>();
-    private Debugger debugger;
+    private DebugInjection debugInjection;
 
     public ParsingContext(Expression root, ResultBuilder<T> builder, CodePointSource source) {
         this.builder = builder;
@@ -60,16 +60,16 @@ public class ParsingContext<T> implements CalculationContext {
         pushExpression(root);
     }
 
-    public void parse(Debugger debugger) throws IOException, ParsingException {
-        this.debugger = debugger;
-        if (debugger != null) {
-            debugger.onStart();
+    public void parse(DebugInjection debugInjection) throws IOException, ParsingException {
+        this.debugInjection = debugInjection;
+        if (debugInjection != null) {
+            debugInjection.onStart();
         }
         while (!builder.isFinished()) {
             next();
         }
-        if (debugger != null) {
-            debugger.onFinish();
+        if (debugInjection != null) {
+            debugInjection.onFinish();
         }
     }
 
@@ -163,17 +163,17 @@ public class ParsingContext<T> implements CalculationContext {
     }
 
     private void afterCheck(ResultType prevResult) {
-        if (debugger != null) {
-            State state = buildPublicState(prevResult);
-            debugger.afterCheck(state);
+        if (debugInjection != null) {
+            DebugFrame frame = buildDebugFrame(prevResult);
+            debugInjection.afterCheck(frame);
         }
     }
 
-    private State buildPublicState(ResultType prevResult) {
+    private DebugFrame buildDebugFrame(ResultType prevResult) {
         List<StackElement> result = stack.stream()
-                .map(n -> new StackElement(n.start, n.toString()))
+                .map(n -> new StackElement(n.start, n.checker))
                 .collect(Collectors.toList());
-        return new State(result, source.getLastPos(), prevResult);
+        return new DebugFrame(result, source.getLastPos(), prevResult);
     }
 
     private boolean isIgnoreFlagSet(Expression.LeafExpressionChecker leaf, Expression.BranchExpressionChecker branchChecker) {

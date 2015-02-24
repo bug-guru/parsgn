@@ -20,38 +20,61 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.debugger;
+package guru.bug.tools.parsgn.processing;
 
-import guru.bug.tools.parsgn.processing.Position;
+import guru.bug.tools.parsgn.expr.CharType;
+import guru.bug.tools.parsgn.utils.StringUtils;
 
-public class CharEntity {
-    private final char aChar;
+/**
+ * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
+ * @version 1.0
+ * @since 1.0
+ */
+public class CodePoint {
+    private final int codePoint;
     private final Position position;
+    private boolean newLine;
 
-    public CharEntity(char aChar, Position position) {
-        this.aChar = aChar;
-        this.position = position;
+    public CodePoint(CodePoint prev, int codePoint) {
+        this.codePoint = codePoint;
+        if (prev != null && prev.codePoint == '\r' && codePoint == '\n') {
+            prev.newLine = false;
+        }
+        this.newLine = CharType.LINE_SEPARATOR.apply(codePoint);
+        if (prev == null) {
+            position = new Position(1, 1);
+        } else if (prev.newLine) {
+            position = Position.newRow(prev.position);
+        } else {
+            position = Position.newCol(prev.position);
+        }
     }
 
-    public char getChar() {
-        return aChar;
+    public int getCodePoint() {
+        return codePoint;
     }
 
     public Position getPosition() {
         return position;
     }
 
+    public boolean isNewLine() {
+        return newLine;
+    }
+
     @Override
     public String toString() {
-        switch (aChar) {
-            case '\n':
-                return "\\n";
-            case '\r':
-                return "\\r";
+        switch (codePoint) {
+            case '\\':
+                return "\\";
+            case '\'':
+                return "\'";
+            case '\"':
+                return "\"";
             case '\t':
                 return "\\t       ";
             default:
-                return String.valueOf(aChar);
+                return StringUtils.codePointToString(codePoint);
         }
     }
 }

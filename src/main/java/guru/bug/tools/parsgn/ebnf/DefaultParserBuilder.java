@@ -61,6 +61,26 @@ public class DefaultParserBuilder {
         }
     }
 
+    public Document readConfigDOM(Reader input) throws IOException, ParsingException {
+        XmlResultBuilder builder = new XmlResultBuilder();
+        EBNF_PARSER.parse(input, builder);
+        return builder.getResult();
+    }
+
+    public ConfigFileBuilder createConfigFileBuilder(Document doc) throws ParsingException {
+        try {
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            Source source = new DOMSource(doc);
+            return (ConfigFileBuilder) unmarshaller.unmarshal(source);
+        } catch (JAXBException e) {
+            throw new ParsingException(e);
+        }
+    }
+
+    public Parser createParser(ConfigFileBuilder builder) {
+        return new Parser(builder.buildRoot());
+    }
+
     /**
      * Creates the parser reading EBNF from a reader.
      *

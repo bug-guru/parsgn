@@ -22,8 +22,6 @@
 
 package guru.bug.tools.parsgn.processing;
 
-import guru.bug.tools.parsgn.expr.CharType;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Deque;
@@ -35,11 +33,11 @@ import java.util.LinkedList;
  * @since 1.0
  */
 public class CodePointSource {
-    private final Deque<CodePoint> bookmarks = new LinkedList<>();
+    private final Deque<CodePointNode> bookmarks = new LinkedList<>();
     private final Reader reader;
-    private CodePoint next;
+    private CodePointNode next;
     private Position max;
-    private CodePoint last;
+    private CodePointNode last;
 
     public CodePointSource(Reader reader) throws IOException {
         this.reader = reader;
@@ -50,17 +48,17 @@ public class CodePointSource {
         if (this.next == null) {
             readNext();
         } else {
-            if (this.next.next == null) {
+            if (this.next.rightNode == null) {
                 readNext();
             }
-            this.next = this.next.next;
+            this.next = this.next.rightNode;
         }
     }
 
     private void readNext() throws IOException {
         int ch1 = reader.read();
         while (true) {
-            if (ch1 != -1 && isHighSurrogate(ch1)) {
+            if (ch1 != -1 && Character.isHighSurrogate((char) ch1)) {
                 int ch2 = reader.read();
                 int cp = toCodePoint(ch1, ch2);
                 if (cp == -1) {
@@ -78,31 +76,24 @@ public class CodePointSource {
     }
 
     private void addNext(int codePoint) {
-        if (codePoint == '\r') {
-            codePoint = '\n';
-        }
-        CodePoint tmp = new CodePoint(last, codePoint);
+        CodePoint cp = new CodePoint(last == null ? null : last.cp, codePoint);
+        CodePointNode tmp = new CodePointNode();
+        tmp.cp = cp;
         if (next == null) {
             next = tmp;
             last = tmp;
         } else {
-            last.next = tmp;
+            last.rightNode = tmp;
             last = tmp;
         }
     }
 
     private int toCodePoint(int ch1, int ch2) {
-        if (ch1 == '\r' && ch2 == '\n') {
-            return '\n';
-        } else if (Character.isSurrogatePair((char) ch1, (char) ch2)) {
+        if (Character.isSurrogatePair((char) ch1, (char) ch2)) {
             return Character.toCodePoint((char) ch1, (char) ch2);
         } else {
             return -1;
         }
-    }
-
-    private boolean isHighSurrogate(int ch) {
-        return ch == '\r' || Character.isHighSurrogate((char) ch);
     }
 
     public void mark() {
@@ -118,14 +109,18 @@ public class CodePointSource {
     }
 
     public int getNext() throws IOException {
-        int result = next.codePoint;
+        return getNextCodePoint().getCodePoint();
+    }
+
+    public CodePoint getNextCodePoint() throws IOException {
+        CodePoint result = next.cp;
         updateMax();
         prepareNext();
         return result;
     }
 
     private void updateMax() {
-        max = Position.max(max, next.pos);
+        max = Position.max(max, next.cp.getPosition());
     }
 
     public Position getMaxPos() {
@@ -133,37 +128,15 @@ public class CodePointSource {
     }
 
     public Position getNextPos() {
-        return next.pos;
+        return next.cp.getPosition();
     }
 
     public Position getLastPos() {
-        return last == null ? null : last.pos;
+        return last == null ? null : last.cp.getPosition();
     }
 
-    private static class CodePoint {
-        private final int codePoint;
-        private final Position pos;
-        private final boolean newLine;
-        private CodePoint next;
-
-        public CodePoint(CodePoint prev, int codePoint) {
-            this.codePoint = codePoint;
-            this.newLine = CharType.LINE_SEPARATOR.apply(codePoint);
-            if (prev == null) {
-                pos = new Position(1, 1);
-            } else if (prev.newLine) {
-                pos = Position.newRow(prev.pos);
-            } else {
-                pos = Position.newCol(prev.pos);
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "CodePoint{" +
-                    "codePoint=" + codePoint +
-                    ", pos=" + pos +
-                    '}';
-        }
+    private class CodePointNode {
+        CodePoint cp;
+        CodePointNode rightNode;
     }
 }

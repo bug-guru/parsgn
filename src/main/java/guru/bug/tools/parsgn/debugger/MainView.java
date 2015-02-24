@@ -22,10 +22,10 @@
 
 package guru.bug.tools.parsgn.debugger;
 
-import guru.bug.tools.parsgn.processing.Position;
 import guru.bug.tools.parsgn.processing.ResultType;
+import guru.bug.tools.parsgn.processing.debug.DebugFrame;
+import guru.bug.tools.parsgn.processing.debug.Debugger;
 import guru.bug.tools.parsgn.processing.debug.StackElement;
-import guru.bug.tools.parsgn.processing.debug.State;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ListBinding;
 import javafx.beans.binding.StringBinding;
@@ -34,20 +34,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -80,10 +71,10 @@ public class MainView extends VBox {
     @FXML
     private Label sourceColLabel;
 
-    private ProcessDebugger debugger;
+    private DebuggerFacade debugger = new DebuggerFacade();
 
-    public MainView(ProcessDebugger debugger) {
-        this.debugger = debugger;
+    public MainView(Debugger debugger) {
+        this.debugger.setDebugger(debugger);
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(getClass().getSimpleName() + ".fxml"));
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
@@ -114,128 +105,68 @@ public class MainView extends VBox {
         });
         expressionStack.itemsProperty().bind(new ListBinding<StackElement>() {
             {
-                bind(debugger.currentStateProperty());
+                bind(debugger.currentFrameProperty());
             }
 
             @Override
             protected ObservableList<StackElement> computeValue() {
-                State current = debugger.currentStateProperty().get();
+                DebugFrame current = debugger.getCurrentFrame();
                 if (current == null) {
                     return null;
                 }
-                return FXCollections.observableList(debugger.getCurrentState().getStack());
+                return FXCollections.observableList(current.getStack());
             }
         });
-        List<Text> flow = createFlow();
-        sourceText.getChildren().setAll(flow);
-        expressionStack.getSelectionModel().selectedItemProperty().addListener((o, ov, nv) -> highlight(nv));
+        debugger.debuggerProperty().addListener((o, ov, nv) -> updateTexts(nv));
+        debugger.highlightedProperty().bind(expressionStack.getSelectionModel().selectedItemProperty());
         expressionStack.itemsProperty().addListener((o, ov, nv) -> expressionStack.getSelectionModel().selectFirst());
         resultLabel.textProperty().bind(new StringBinding() {
             {
-                bind(debugger.currentStateProperty());
+                bind(debugger.currentFrameProperty());
             }
 
             @Override
             protected String computeValue() {
-                State state = debugger.getCurrentState();
-                ResultType result = state == null ? null : state.getResult();
+                DebugFrame frame = debugger.getCurrentFrame();
+                ResultType result = frame == null ? null : frame.getResult();
                 return result == null ? null : result.toString();
             }
         });
         indexSlider.valueProperty().bindBidirectional(debugger.indexProperty());
         indexSlider.maxProperty().bind(debugger.lastIndexProperty());
         expressionStack.getSelectionModel().selectFirst();
+        updateTexts(debugger.getDebugger());
     }
 
-    private void highlight(StackElement element) {
-        if (element == null) {
-            return;
+    private void updateTexts(Debugger nv) {
+        if (nv == null) {
+            sourceText.getChildren().clear();
+            rulesText.getChildren().clear();
+        } else {
+            sourceText.getChildren().setAll(debugger.getSource());
+            rulesText.getChildren().setAll(debugger.getRules());
         }
-        Position tmp = element.getStartPosition();
-        Position first = tmp == null ? new Position(1, 1) : tmp;
-        Position last = debugger.getCurrentState().getCurrentPosition();
-        sourceText.getChildren().stream()
-                .filter(n -> n instanceof SourceChar)
-                .map(n -> (SourceChar) n)
-                .forEach(sc -> {
-                    if (last.compareTo(sc.charEntity.getPosition()) <= 0) {
-                        sc.highlight(false);
-                    } else if (first.compareTo(sc.charEntity.getPosition()) <= 0) {
-                        sc.highlight(true);
-                    } else {
-                        sc.highlight(false);
-                    }
-                });
-    }
-
-    private List<Text> createFlow() {
-        Position nextPos = new Position(1, 1);
-        List<CharEntity> source = debugger.getSource();
-        List<Text> flow = new ArrayList<>(source.size());
-        int prevRow = 1;
-        for (CharEntity ce : source) {
-            if (ce.getPosition().getRow() > prevRow) {
-                flow.add(new Text("\n"));
-                prevRow = ce.getPosition().getRow();
-            }
-            flow.add(new SourceChar(ce));
-        }
-        return flow;
     }
 
     @FXML
     private void navigatePrevious(ActionEvent e) {
-        debugger.previous();
+        debugger.goToPreviousFrame();
     }
 
     @FXML
     private void navigateNext(ActionEvent e) {
-        debugger.next();
+        debugger.goToNextFrame();
     }
 
     @FXML
     private void navigateFirst(ActionEvent e) {
-        debugger.first();
+        debugger.goToFirstFrame();
     }
 
     @FXML
     private void navigateLast(ActionEvent e) {
-        debugger.last();
+        debugger.goToLastFrame();
     }
 
 
-    private class SourceChar extends Text {
-        private CharEntity charEntity;
-        private Set<String> styles = new HashSet<>();
-
-        public SourceChar(CharEntity charEntity) {
-            super(charEntity.toString());
-            this.charEntity = charEntity;
-            if (charEntity.toString().length() > 1) {
-                styles.add("specChar");
-            }
-            styles.add("char");
-            this.setOnMouseEntered(e -> {
-                sourceRowLabel.setText(String.valueOf(charEntity.getPosition().getRow()));
-                sourceColLabel.setText(String.valueOf(charEntity.getPosition().getCol()));
-            });
-            this.setOnMouseClicked(e -> {
-                debugger.moveTo(charEntity.getPosition());
-            });
-            updateStyles();
-        }
-
-        public void highlight(boolean highlight) {
-            if (highlight) {
-                styles.add(HIGHLIGHT);
-            } else {
-                styles.remove(HIGHLIGHT);
-            }
-            updateStyles();
-        }
-
-        private void updateStyles() {
-            getStyleClass().setAll(styles);
-        }
-    }
 }
