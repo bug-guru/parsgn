@@ -212,6 +212,7 @@ public class ProcessDebugger {
     }
 
     public void next() {
+    // TODO: something wrong when it comes to EOF (endless loop)
         synchronized (history) {
             while (true) {
                 if (idx < history.size() - 1) {
