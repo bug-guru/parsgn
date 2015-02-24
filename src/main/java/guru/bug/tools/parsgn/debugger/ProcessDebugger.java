@@ -24,12 +24,30 @@ package guru.bug.tools.parsgn.debugger;
 
 import guru.bug.tools.parsgn.Parser;
 import guru.bug.tools.parsgn.ebnf.EBNFParser;
+import guru.bug.tools.parsgn.processing.Position;
 import guru.bug.tools.parsgn.processing.debug.Debugger;
 import guru.bug.tools.parsgn.processing.debug.State;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
-import javafx.beans.property.*;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerWrapper;
+import javafx.beans.property.ReadOnlyListProperty;
+import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,13 +65,16 @@ public class ProcessDebugger {
     private final ReadOnlyBooleanWrapper hasNext = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyBooleanWrapper isLastFrame = new ReadOnlyBooleanWrapper(false);
     private final ReadOnlyObjectWrapper<State> currentState = new ReadOnlyObjectWrapper<>();
-    private final ReadOnlyStringWrapper content = new ReadOnlyStringWrapper();
+    private final ReadOnlyListWrapper<CharEntity> content = new ReadOnlyListWrapper<>();
     private final SimpleIntegerProperty index = new SimpleIntegerProperty(0);
     private final ReadOnlyIntegerWrapper lastIndex = new ReadOnlyIntegerWrapper(0);
     private boolean updateRequired = false;
     private boolean started = false;
     private boolean eof = false;
     private int idx = 0;
+    private int lastIdx = 0;
+    private State curStt = null;
+    private boolean bulkUpdate = false;
 
 
     public ProcessDebugger(Parser parser) {
@@ -67,8 +88,8 @@ public class ProcessDebugger {
     public void debug(String sourceFileName) throws IOException {
         synchronized (history) {
             String txt = readContent(sourceFileName);
+            createContent(txt);
             Reader reader = new StringReader(txt);
-            content.set(txt);
             ParseTreeResultBuilder resultBuilder = new ParseTreeResultBuilder();
             Thread t = new Thread(() -> {
                 try {
@@ -89,6 +110,40 @@ public class ProcessDebugger {
             tryMore();
             updateState();
         }
+    }
+
+    private void createContent(String source) {
+        Position nextPos = new Position(1, 1);
+        ArrayList<CharEntity> flow = new ArrayList<>(2048);
+        boolean crlfSuspect = false;
+        for (int i = 0; i < source.length(); i++) {
+            char ch = source.charAt(i);
+            if (crlfSuspect) {
+                crlfSuspect = false;
+                if (ch == '\n') {
+                    flow.add(new CharEntity('\r', nextPos));
+                    nextPos = Position.newCol(nextPos);
+                    flow.add(new CharEntity('\n', nextPos));
+                    nextPos = Position.newRow(nextPos);
+                    continue;
+                } else {
+                    flow.add(new CharEntity('\r', nextPos));
+                    nextPos = Position.newRow(nextPos);
+                }
+            }
+            if (ch == '\r') {
+                crlfSuspect = true;
+                continue;
+            }
+            flow.add(new CharEntity(ch, nextPos));
+            if (ch == '\n') {
+                nextPos = Position.newRow(nextPos);
+            } else {
+                nextPos = Position.newCol(nextPos);
+            }
+        }
+        flow.trimToSize();
+        content.set(FXCollections.unmodifiableObservableList(FXCollections.observableList(flow)));
     }
 
     private String readContent(String fileName) throws IOException {
@@ -112,8 +167,12 @@ public class ProcessDebugger {
     }
 
     private void updateState() {
-        int lastIdx = history.size() - (eof ? 1 : 2);
-        currentState.set(idx >= history.size() ? null : history.get(idx));
+        lastIdx = history.size() - (eof ? 1 : 2);
+        curStt = idx >= history.size() ? null : history.get(idx);
+        if (bulkUpdate) {
+            return;
+        }
+        currentState.set(curStt);
         hasPrevious.set(idx > 0);
         if (idx < history.size() - 1) {
             hasNext.set(true);
@@ -178,6 +237,34 @@ public class ProcessDebugger {
         }
     }
 
+    public void moveTo(Position target) {
+        synchronized (history) {
+            bulkUpdate = true;
+            Position current = currentState.get().getCurrentPosition();
+            int rel = target.compareTo(current);
+            if (rel > 0) {
+                forward(target);
+            } else if (rel < 0) {
+                rewind(target);
+            }
+            bulkUpdate = false;
+            updateState();
+        }
+    }
+
+    private void rewind(Position target) {
+        while (idx > 0 && curStt.getCurrentPosition().compareTo(target) > 0) {
+            previous();
+        }
+    }
+
+    private void forward(Position target) {
+        while (idx < history.size() && curStt.getCurrentPosition().compareTo(target) < 0) {
+            next();
+        }
+        updateState();
+    }
+
     private void addState(State state) {
         synchronized (history) {
             try {
@@ -225,11 +312,11 @@ public class ProcessDebugger {
         return currentState.getReadOnlyProperty();
     }
 
-    public String getContent() {
+    public ObservableList<CharEntity> getContent() {
         return content.get();
     }
 
-    public ReadOnlyStringProperty contentProperty() {
+    public ReadOnlyListProperty<CharEntity> contentProperty() {
         return content.getReadOnlyProperty();
     }
 

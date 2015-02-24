@@ -34,14 +34,20 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -152,9 +158,9 @@ public class MainView extends VBox {
                 .filter(n -> n instanceof SourceChar)
                 .map(n -> (SourceChar) n)
                 .forEach(sc -> {
-                    if (last.compareTo(sc.position) <= 0) {
+                    if (last.compareTo(sc.charEntity.getPosition()) <= 0) {
                         sc.highlight(false);
-                    } else if (first.compareTo(sc.position) <= 0) {
+                    } else if (first.compareTo(sc.charEntity.getPosition()) <= 0) {
                         sc.highlight(true);
                     } else {
                         sc.highlight(false);
@@ -164,71 +170,17 @@ public class MainView extends VBox {
 
     private List<Text> createFlow() {
         Position nextPos = new Position(1, 1);
-        String source = debugger.getContent();
-        List<Text> flow = new ArrayList<>(2048);
-        Character prev = null;
-        for (int i = 0; i < source.length(); i++) {
-            char ch = source.charAt(i);
-            Text text;
-            if (prev != null && prev == '\r') {
-                prev = null;
-                if (ch == '\n') {
-                    nextPos = createCRLFText(nextPos, flow);
-                    continue;
-                } else {
-                    nextPos = createCRText(nextPos, flow);
-                }
+        List<CharEntity> source = debugger.getContent();
+        List<Text> flow = new ArrayList<>(source.size());
+        int prevRow = 1;
+        for (CharEntity ce : source) {
+            if (ce.getPosition().getRow() > prevRow) {
+                flow.add(new Text("\n"));
+                prevRow = ce.getPosition().getRow();
             }
-            if (ch == '\r') {
-                prev = '\r';
-                continue;
-            }
-            if (ch == '\n') {
-                nextPos = createLFText(nextPos, flow);
-            } else if (ch == '\t') {
-                nextPos = createTabText(nextPos, flow);
-            } else {
-                nextPos = createCharText(nextPos, ch, flow);
-            }
+            flow.add(new SourceChar(ce));
         }
         return flow;
-    }
-
-    private Position createCharText(Position pos, char ch, List<Text> flow) {
-        Text text = new SourceChar(String.valueOf(ch), pos);
-        flow.add(text);
-        return Position.newCol(pos);
-    }
-
-    private Position createTabText(Position pos, List<Text> flow) {
-        Text text = new SourceChar("\\t       ", pos);
-        text.getStyleClass().add("specChar");
-        flow.add(text);
-        return Position.newCol(pos);
-    }
-
-    private Position createLFText(Position pos, List<Text> flow) {
-        Text text = new SourceChar("\\n\n", pos);
-        text.getStyleClass().add("specChar");
-        flow.add(text);
-        return Position.newRow(pos);
-    }
-
-    private Position createCRText(Position pos, List<Text> flow) {
-        Text text = new SourceChar("\\r\n", pos);
-        text.getStyleClass().add("specChar");
-        flow.add(text);
-        return Position.newRow(pos);
-    }
-
-    private Position createCRLFText(Position pos, List<Text> flow) {
-        Text text1 = new SourceChar("\\r", pos);
-        text1.getStyleClass().add("specChar");
-        flow.add(text1);
-        Text text2 = new SourceChar("\\n\n", Position.newCol(pos));
-        text2.getStyleClass().add("specChar");
-        flow.add(text2);
-        return Position.newRow(pos);
     }
 
     @FXML
@@ -253,27 +205,37 @@ public class MainView extends VBox {
 
 
     private class SourceChar extends Text {
-        private Position position;
+        private CharEntity charEntity;
+        private Set<String> styles = new HashSet<>();
 
-        public SourceChar(String text, Position position) {
-            super(text);
-            this.position = position;
-            getStyleClass().add("char");
+        public SourceChar(CharEntity charEntity) {
+            super(charEntity.toString());
+            this.charEntity = charEntity;
+            if (charEntity.toString().length() > 1) {
+                styles.add("specChar");
+            }
+            styles.add("char");
             this.setOnMouseEntered(e -> {
-                sourceRowLabel.setText(String.valueOf(position.getRow()));
-                sourceColLabel.setText(String.valueOf(position.getCol()));
+                sourceRowLabel.setText(String.valueOf(charEntity.getPosition().getRow()));
+                sourceColLabel.setText(String.valueOf(charEntity.getPosition().getCol()));
             });
             this.setOnMouseClicked(e -> {
-                System.out.println("Clicked on " + position);
+                debugger.moveTo(charEntity.getPosition());
             });
+            updateStyles();
         }
 
         public void highlight(boolean highlight) {
             if (highlight) {
-                getStyleClass().add(HIGHLIGHT);
+                styles.add(HIGHLIGHT);
             } else {
-                getStyleClass().remove(HIGHLIGHT);
+                styles.remove(HIGHLIGHT);
             }
+            updateStyles();
+        }
+
+        private void updateStyles() {
+            getStyleClass().setAll(styles);
         }
     }
 }
