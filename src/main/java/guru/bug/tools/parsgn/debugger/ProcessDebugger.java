@@ -23,32 +23,21 @@
 package guru.bug.tools.parsgn.debugger;
 
 import guru.bug.tools.parsgn.Parser;
+import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
 import guru.bug.tools.parsgn.ebnf.EBNFParser;
 import guru.bug.tools.parsgn.processing.Position;
 import guru.bug.tools.parsgn.processing.debug.Debugger;
 import guru.bug.tools.parsgn.processing.debug.State;
+import guru.bug.tools.parsgn.utils.FileUtils;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanWrapper;
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.ReadOnlyIntegerWrapper;
-import javafx.beans.property.ReadOnlyListProperty;
-import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -59,35 +48,24 @@ import java.util.NoSuchElementException;
  * @since 1.0
  */
 public class ProcessDebugger {
-    private final Parser parser;
     private final List<State> history = new ArrayList<>(4096);
-    private final ReadOnlyBooleanWrapper hasPrevious = new ReadOnlyBooleanWrapper(false);
-    private final ReadOnlyBooleanWrapper hasNext = new ReadOnlyBooleanWrapper(false);
-    private final ReadOnlyBooleanWrapper isLastFrame = new ReadOnlyBooleanWrapper(false);
-    private final ReadOnlyObjectWrapper<State> currentState = new ReadOnlyObjectWrapper<>();
-    private final ReadOnlyListWrapper<CharEntity> content = new ReadOnlyListWrapper<>();
-    private final SimpleIntegerProperty index = new SimpleIntegerProperty(0);
-    private final ReadOnlyIntegerWrapper lastIndex = new ReadOnlyIntegerWrapper(0);
+    private Parser parser;
     private boolean updateRequired = false;
     private boolean started = false;
     private boolean eof = false;
     private int idx = 0;
     private int lastIdx = 0;
     private State curStt = null;
-    private boolean bulkUpdate = false;
 
 
-    public ProcessDebugger(Parser parser) {
-        this.parser = parser;
-        index.addListener((o, ov, nv) -> {
-            idx = nv == null ? 0 : nv.intValue();
-            updateState();
-        });
+    public ProcessDebugger(String rulesFileName, String sourceFileName) throws IOException {
+        setupParser(rulesFileName);
+        init(sourceFileName);
     }
 
-    public void debug(String sourceFileName) throws IOException {
+    private void init(String sourceFileName) throws IOException {
         synchronized (history) {
-            String txt = readContent(sourceFileName);
+            String txt = FileUtils.readFileContent(sourceFileName);
             createContent(txt);
             Reader reader = new StringReader(txt);
             ParseTreeResultBuilder resultBuilder = new ParseTreeResultBuilder();
@@ -143,46 +121,12 @@ public class ProcessDebugger {
             }
         }
         flow.trimToSize();
-        content.set(FXCollections.unmodifiableObservableList(FXCollections.observableList(flow)));
-    }
-
-    private String readContent(String fileName) throws IOException {
-        StringBuilder text = new StringBuilder(2048);
-        try (
-                InputStream rulesInputStream = fileName == null
-                        ? EBNFParser.class.getResourceAsStream("config.rules")
-                        : new FileInputStream(new File(fileName));
-                Reader rulesReader = new BufferedReader(new InputStreamReader(rulesInputStream))
-        ) {
-            CharBuffer buf = CharBuffer.allocate(512);
-            while (rulesReader.read(buf) != -1) {
-                buf.flip();
-                text.append(buf.array(), 0, buf.limit());
-                buf.clear();
-            }
-            buf.flip();
-            text.append(buf.array(), 0, buf.limit());
-        }
-        return text.toString();
+        this.source.set(FXCollections.unmodifiableObservableList(FXCollections.observableList(flow)));
     }
 
     private void updateState() {
         lastIdx = history.size() - (eof ? 1 : 2);
         curStt = idx >= history.size() ? null : history.get(idx);
-        if (bulkUpdate) {
-            return;
-        }
-        currentState.set(curStt);
-        hasPrevious.set(idx > 0);
-        if (idx < history.size() - 1) {
-            hasNext.set(true);
-        } else {
-            tryMore();
-            hasNext.set(idx < history.size() - 1);
-        }
-        lastIndex.set(lastIdx < 0 ? 0 : lastIdx);
-        index.set(idx);
-        isLastFrame.set(idx >= lastIdx);
     }
 
     private void tryMore() {
@@ -281,65 +225,25 @@ public class ProcessDebugger {
         }
     }
 
-    public boolean getHasPrevious() {
-        return hasPrevious.get();
+    public void setupParser(String rulesFileName) throws IOException {
+        Parser parser;
+        String rules;
+        if (rulesFileName == null) {
+            rules = readEBNFRulesContent();
+        } else {
+            rules = readContent(rulesFileName);
+            DefaultParserBuilder builder = new DefaultParserBuilder();
+            parser = builder.createParser(new FileReader(new File(rulesFileName)));
+        }
+        this.parser = parser;
     }
 
-    public ReadOnlyBooleanProperty hasPreviousProperty() {
-        return hasPrevious.getReadOnlyProperty();
+    private String readEBNFRulesContent() throws IOException {
+        try (InputStream is = EBNFParser.class.getResourceAsStream("config.rules")) {
+
+        }
     }
 
-    public boolean getHasNext() {
-        return hasNext.get();
-    }
-
-    public ReadOnlyBooleanProperty hasNextProperty() {
-        return hasNext.getReadOnlyProperty();
-    }
-
-    public boolean getIsLastFrame() {
-        return hasNext.get();
-    }
-
-    public ReadOnlyBooleanProperty isLastFrameProperty() {
-        return isLastFrame.getReadOnlyProperty();
-    }
-
-    public State getCurrentState() {
-        return currentState.get();
-    }
-
-    public ReadOnlyObjectProperty<State> currentStateProperty() {
-        return currentState.getReadOnlyProperty();
-    }
-
-    public ObservableList<CharEntity> getContent() {
-        return content.get();
-    }
-
-    public ReadOnlyListProperty<CharEntity> contentProperty() {
-        return content.getReadOnlyProperty();
-    }
-
-    public int getIndex() {
-        return index.get();
-    }
-
-    public SimpleIntegerProperty indexProperty() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index.set(index);
-    }
-
-    public int getLastIndex() {
-        return lastIndex.get();
-    }
-
-    public ReadOnlyIntegerProperty lastIndexProperty() {
-        return lastIndex.getReadOnlyProperty();
-    }
 
     private class DebuggerImpl implements Debugger {
 

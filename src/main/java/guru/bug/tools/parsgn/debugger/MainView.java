@@ -170,7 +170,7 @@ public class MainView extends VBox {
 
     private List<Text> createFlow() {
         Position nextPos = new Position(1, 1);
-        List<CharEntity> source = debugger.getContent();
+        List<CharEntity> source = debugger.getSource();
         List<Text> flow = new ArrayList<>(source.size());
         int prevRow = 1;
         for (CharEntity ce : source) {
