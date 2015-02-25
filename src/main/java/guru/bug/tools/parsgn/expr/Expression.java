@@ -32,7 +32,7 @@ import guru.bug.tools.parsgn.processing.ResultType;
  * @version 1.0
  * @since 1.0
  */
-public abstract class Expression {
+public abstract class Expression extends BaseExpression {
     private boolean hidden;
 
     public abstract ExpressionChecker checker(CalculationContext cCtx);
@@ -58,6 +58,10 @@ public abstract class Expression {
 
         public boolean isHidden() {
             return Expression.this.isHidden();
+        }
+
+        public Expression getExpression() {
+            return Expression.this;
         }
 
         @Override

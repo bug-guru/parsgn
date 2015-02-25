@@ -33,7 +33,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -50,16 +49,17 @@ public class RuleBuilder extends BaseBuilder {
     @XmlElement(name = RuleNames.NAME)
     @XmlElementWrapper(name = RuleNames.RULE_PARAMS)
     private List<String> ruleParams;
-    @XmlElement(name = RuleNames.EXPRESSION)
-    @XmlElementWrapper(name = RuleNames.EXPRESSION_LIST)
-    private List<ExpressionParentBuilder> expressionList;
+    @XmlElement(name = RuleNames.EXPRESSION_LIST)
+    private ExpressionListBuilder expressionListBuilder;
 
     public String getName() {
         return name;
     }
 
-    public void build(RuleFactory builder) throws ParsingException {
-        List<Expression> exprList = expressionList.stream().map(m -> m.build(builder)).collect(Collectors.toList());
-        builder.rule(name, exprList).hidden(hidden == null ? false : hidden).params(ruleParams);
+    public void build(RuleFactory factory) throws ParsingException {
+        Expression exprList = expressionListBuilder.build(factory);
+        update(factory.rule(name, exprList)
+                .hidden(hidden == null ? false : hidden)
+                .params(ruleParams));
     }
 }

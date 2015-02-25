@@ -54,6 +54,6 @@ public class ReferenceExpressionBuilder extends ExpressionBuilder {
         if (ruleParamsBuilders != null) {
             ruleParams = ruleParamsBuilders.stream().map(CalcExpressionBuilder::build).collect(Collectors.toList());
         }
-        return rf.ref(name).params(ruleParams);
+        return update(rf.ref(name).params(ruleParams));
     }
 }

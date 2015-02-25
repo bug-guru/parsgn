@@ -22,7 +22,7 @@
 
 package guru.bug.tools.parsgn.expr.calc;
 
-import guru.bug.tools.parsgn.processing.Position;
+import guru.bug.tools.parsgn.expr.BaseExpression;
 
 import java.util.List;
 
@@ -31,9 +31,7 @@ import java.util.List;
  * @version 1.0
  * @since 1.0
  */
-public abstract class Term {
-    private Position start;
-    private Position end;
+public abstract class Term extends BaseExpression {
 
     public static Term variable(String name) {
         return new VariableTerm(name);

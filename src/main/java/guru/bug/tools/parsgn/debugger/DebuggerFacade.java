@@ -22,6 +22,7 @@
 
 package guru.bug.tools.parsgn.debugger;
 
+import guru.bug.tools.parsgn.expr.Expression;
 import guru.bug.tools.parsgn.processing.CodePoint;
 import guru.bug.tools.parsgn.processing.Position;
 import guru.bug.tools.parsgn.processing.debug.DebugFrame;
@@ -108,7 +109,7 @@ public class DebuggerFacade {
         updateState();
     }
 
-    private ObservableList<CodePointText> convertText(List<CodePoint> points, EventHandler<? super MouseEvent> onMouseClick,  EventHandler<? super MouseEvent> onMouseEnter) {
+    private ObservableList<CodePointText> convertText(List<CodePoint> points, EventHandler<? super MouseEvent> onMouseClick, EventHandler<? super MouseEvent> onMouseEnter) {
         List<CodePointText> tmp = points.stream()
                 .map(CodePointText::new)
                 .peek(e -> e.setOnMouseClicked(onMouseClick))
@@ -145,17 +146,26 @@ public class DebuggerFacade {
         Position tmp = element.getStartPosition();
         Position first = tmp == null ? new Position(1, 1) : tmp;
         Position last = currentFrame.get().getCurrentPosition();
-        getSource().stream()
+        highlight(getSource(), first, last);
+
+        Expression.ExpressionChecker checker = element.getChecker();
+        Expression expression = checker == null ? null : element.getChecker().getExpression();
+        Position ruleStart = expression == null ? null : expression.getStartPosition();
+        Position ruleEnd = expression == null ? null : expression.getEndPosition();
+        highlight(getRules(), ruleStart, ruleEnd);
+    }
+
+    private void highlight(ObservableList<CodePointText> src, Position startPosition, Position endPosition) {
+        src.stream()
                 .forEach(sc -> {
-                    if (last.compareTo(sc.getPosition()) <= 0) {
+                    if (startPosition == null || endPosition == null || endPosition.compareTo(sc.getPosition()) <= 0) {
                         sc.highlight(false);
-                    } else if (first.compareTo(sc.getPosition()) <= 0) {
+                    } else if (startPosition.compareTo(sc.getPosition()) <= 0) {
                         sc.highlight(true);
                     } else {
                         sc.highlight(false);
                     }
                 });
-        // TODO highlight rules too
     }
 
     public boolean getHasPrevious() {

@@ -41,6 +41,8 @@ public class VariableBuilder extends TermBuilder {
 
     @Override
     public Term build() {
-        return Term.variable(variableName);
+        return update(Term.variable(variableName));
     }
+
+
 }

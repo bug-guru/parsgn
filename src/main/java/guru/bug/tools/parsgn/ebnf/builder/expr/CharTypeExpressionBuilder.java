@@ -42,6 +42,8 @@ public class CharTypeExpressionBuilder extends ExpressionBuilder {
 
     @Override
     public Expression build(RuleFactory rf) {
-        return rf.charType(CharType.valueOf(charTypeName));
+        return update(rf.charType(CharType.valueOf(charTypeName)));
     }
+
+
 }

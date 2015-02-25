@@ -47,6 +47,6 @@ public class OneOfExpressionBuilder extends ExpressionBuilder {
         List<Expression> expressions = expressionParentBuilders.stream()
                 .map(b -> b.build(rf))
                 .collect(Collectors.toList());
-        return rf.oneOf(expressions);
+        return update(rf.oneOf(expressions));
     }
 }

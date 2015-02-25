@@ -47,6 +47,6 @@ public class ConfigFileBuilder extends BaseBuilder {
         RuleFactory builder = new RuleFactory();
         ruleList.forEach(m -> m.build(builder));
         String rootName = ruleList.get(0).getName();
-        return builder.build(rootName);
+        return update(builder.build(rootName));
     }
 }

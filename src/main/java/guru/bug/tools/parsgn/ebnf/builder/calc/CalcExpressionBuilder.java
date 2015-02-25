@@ -46,12 +46,16 @@ public class CalcExpressionBuilder extends TermBuilder {
     private List<OperatorParentBuilder> operatorParentBuilders;
 
     public Term build() {
-        List<Term> terms = termParentBuilders.stream().map(TermParentBuilder::build).collect(Collectors.toList());
+        List<Term> terms = termParentBuilders.stream()
+                .map(TermParentBuilder::build)
+                .collect(Collectors.toList());
         if (operatorParentBuilders == null) {
             return terms.get(0);
         } else {
-            List<Operator> operators = operatorParentBuilders.stream().map(OperatorParentBuilder::build).collect(Collectors.toList());
-            return Term.expression(terms, operators);
+            List<Operator> operators = operatorParentBuilders.stream()
+                    .map(OperatorParentBuilder::build)
+                    .collect(Collectors.toList());
+            return update(Term.expression(terms, operators));
         }
     }
 }

@@ -42,6 +42,6 @@ public class ExactlyNTimesSuffixBuilder extends SuffixBuilder {
 
     @Override
     public Expression build(RuleFactory rf, Expression expr) {
-        return rf.exactlyNTimes(calcExpressionBuilder.build(), expr);
+        return update(rf.exactlyNTimes(calcExpressionBuilder.build(), expr));
     }
 }

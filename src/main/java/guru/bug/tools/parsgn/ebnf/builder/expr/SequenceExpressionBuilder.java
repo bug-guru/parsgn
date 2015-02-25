@@ -47,6 +47,6 @@ public class SequenceExpressionBuilder extends ExpressionBuilder {
     @Override
     public Expression build(RuleFactory rf) {
         List<Expression> exprList = expressionList.stream().map(m -> m.build(rf)).collect(Collectors.toList());
-        return rf.sequence(exprList);
+        return update(rf.sequence(exprList));
     }
 }

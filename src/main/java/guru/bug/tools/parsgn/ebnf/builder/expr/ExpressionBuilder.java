@@ -36,4 +36,5 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType
 public abstract class ExpressionBuilder extends BaseBuilder {
     public abstract Expression build(RuleFactory rf);
+
 }

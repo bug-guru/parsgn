@@ -36,6 +36,6 @@ import javax.xml.bind.annotation.XmlType;
 public class OneOrMoreSuffixBuilder extends SuffixBuilder {
     @Override
     public Expression build(RuleFactory rf, Expression expr) {
-        return rf.oneOrMore(expr);
+        return update(rf.oneOrMore(expr));
     }
 }

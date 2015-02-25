@@ -42,6 +42,6 @@ public class UntilSuffixBuilder extends SuffixBuilder {
 
     @Override
     public Expression build(RuleFactory rf, Expression expr) {
-        return rf.repeatUntil(expressionParentBuilder.build(rf), expr);
+        return update(rf.repeatUntil(expressionParentBuilder.build(rf), expr));
     }
 }

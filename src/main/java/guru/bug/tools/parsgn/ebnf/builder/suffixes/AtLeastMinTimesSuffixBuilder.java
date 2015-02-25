@@ -42,6 +42,6 @@ public class AtLeastMinTimesSuffixBuilder extends SuffixBuilder {
 
     @Override
     public Expression build(RuleFactory rf, Expression expr) {
-        return rf.atLeastMinTimes(calcExpressionBuilder.build(), expr);
+        return update(rf.atLeastMinTimes(calcExpressionBuilder.build(), expr));
     }
 }

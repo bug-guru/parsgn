@@ -23,7 +23,6 @@
 package guru.bug.tools.parsgn.ebnf.builder.calc;
 
 import guru.bug.tools.parsgn.ebnf.RuleNames;
-import guru.bug.tools.parsgn.ebnf.builder.BaseBuilder;
 import guru.bug.tools.parsgn.expr.calc.Operator;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -36,7 +35,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since 1.0
  */
 @XmlType
-public class OperatorParentBuilder extends BaseBuilder {
+public class OperatorParentBuilder {
 
     @XmlElements({
             @XmlElement(name = RuleNames.ADDITION, type = OperatorBuilder.AddOperatorBuilder.class),

@@ -20,41 +20,32 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.ebnf.builder;
+package guru.bug.tools.parsgn.expr;
 
-import guru.bug.tools.parsgn.RuleFactory;
-import guru.bug.tools.parsgn.ebnf.RuleNames;
-import guru.bug.tools.parsgn.ebnf.builder.expr.*;
-import guru.bug.tools.parsgn.expr.Expression;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlType;
+import guru.bug.tools.parsgn.processing.Position;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-@XmlType
-public class ExpressionParentBuilder {
-    @XmlElements({
-            @XmlElement(name = RuleNames.ONE_OF, type = OneOfExpressionBuilder.class),
-            @XmlElement(name = RuleNames.REFERENCE, type = ReferenceExpressionBuilder.class),
-            @XmlElement(name = RuleNames.CHAR_TYPE, type = CharTypeExpressionBuilder.class),
-            @XmlElement(name = RuleNames.STRING, type = StringExpressionBuilder.class),
-            @XmlElement(name = RuleNames.SEQUENCE, type = SequenceExpressionBuilder.class)
-    })
-    private ExpressionBuilder expression;
-    @XmlElement(name = RuleNames.EXPRESSION_SUFFIX)
-    private SuffixParentBuilder suffix;
+public abstract class BaseExpression {
+    private Position startPosition;
+    private Position endPosition;
 
+    public Position getStartPosition() {
+        return startPosition;
+    }
 
-    public Expression build(RuleFactory builder) {
-        Expression expr = expression.build(builder);
-        if (suffix == null) {
-            return expr;
-        }
-        return suffix.generate(builder, expr);
+    public void setStartPosition(Position startPosition) {
+        this.startPosition = startPosition;
+    }
+
+    public Position getEndPosition() {
+        return endPosition;
+    }
+
+    public void setEndPosition(Position endPosition) {
+        this.endPosition = endPosition;
     }
 }

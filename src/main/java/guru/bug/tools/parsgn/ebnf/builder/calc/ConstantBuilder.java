@@ -40,6 +40,6 @@ public class ConstantBuilder extends TermBuilder {
 
     @Override
     public Term build() {
-        return Term.constant(value);
+        return update(Term.constant(value));
     }
 }

@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since 1.0
  */
 @XmlType
-public class SuffixParentBuilder extends BaseBuilder {
+public class SuffixParentBuilder {
     @XmlElements({
             @XmlElement(name = RuleNames.ZERO_OR_ONE, type = ZeroOrOneSuffixBuilder.class),
             @XmlElement(name = RuleNames.ONE_OR_MORE, type = OneOrMoreSuffixBuilder.class),

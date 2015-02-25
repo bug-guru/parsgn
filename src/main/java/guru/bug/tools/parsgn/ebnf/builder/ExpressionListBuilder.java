@@ -24,12 +24,12 @@ package guru.bug.tools.parsgn.ebnf.builder;
 
 import guru.bug.tools.parsgn.RuleFactory;
 import guru.bug.tools.parsgn.ebnf.RuleNames;
-import guru.bug.tools.parsgn.ebnf.builder.expr.*;
 import guru.bug.tools.parsgn.expr.Expression;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -37,24 +37,22 @@ import javax.xml.bind.annotation.XmlType;
  * @since 1.0
  */
 @XmlType
-public class ExpressionParentBuilder {
-    @XmlElements({
-            @XmlElement(name = RuleNames.ONE_OF, type = OneOfExpressionBuilder.class),
-            @XmlElement(name = RuleNames.REFERENCE, type = ReferenceExpressionBuilder.class),
-            @XmlElement(name = RuleNames.CHAR_TYPE, type = CharTypeExpressionBuilder.class),
-            @XmlElement(name = RuleNames.STRING, type = StringExpressionBuilder.class),
-            @XmlElement(name = RuleNames.SEQUENCE, type = SequenceExpressionBuilder.class)
-    })
-    private ExpressionBuilder expression;
-    @XmlElement(name = RuleNames.EXPRESSION_SUFFIX)
-    private SuffixParentBuilder suffix;
+public class ExpressionListBuilder extends BaseBuilder {
+    @XmlElement(name = RuleNames.EXPRESSION)
+    private List<ExpressionParentBuilder> expressionList;
 
-
-    public Expression build(RuleFactory builder) {
-        Expression expr = expression.build(builder);
-        if (suffix == null) {
-            return expr;
+    public Expression build(RuleFactory factory) {
+        List<Expression> exprList = expressionList.stream()
+                .map(m -> m.build(factory))
+                .collect(Collectors.toList());
+        Expression result;
+        if (exprList.size() == 1) {
+            result = exprList.get(0);
+        } else {
+            result = update(factory.sequence(exprList));
         }
-        return suffix.generate(builder, expr);
+        return result;
     }
+
+
 }

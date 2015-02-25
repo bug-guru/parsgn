@@ -46,6 +46,6 @@ public class AtLeastNButNotMoreThanMTimesSuffixBuilder extends SuffixBuilder {
     public Expression build(RuleFactory rf, Expression expr) {
         Term min = calcExpressionBuilders.get(0).build();
         Term max = calcExpressionBuilders.get(1).build();
-        return rf.atLeastMinButNotMoreThanMaxTimes(min, max, expr);
+        return update(rf.atLeastMinButNotMoreThanMaxTimes(min, max, expr));
     }
 }

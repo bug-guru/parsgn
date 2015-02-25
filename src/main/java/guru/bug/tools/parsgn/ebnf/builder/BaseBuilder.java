@@ -23,6 +23,7 @@
 package guru.bug.tools.parsgn.ebnf.builder;
 
 import guru.bug.tools.parsgn.ebnf.builder.utils.PositionAdapter;
+import guru.bug.tools.parsgn.expr.BaseExpression;
 import guru.bug.tools.parsgn.processing.Position;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -56,4 +57,11 @@ public abstract class BaseBuilder {
     public void setEndPosition(Position endPosition) {
         this.endPosition = endPosition;
     }
+
+    public <T extends BaseExpression> T update(T expr) {
+        expr.setStartPosition(getStartPosition());
+        expr.setEndPosition(getEndPosition());
+        return expr;
+    }
+
 }

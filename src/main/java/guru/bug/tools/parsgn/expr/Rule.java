@@ -32,7 +32,7 @@ import java.util.List;
  * @version 1.0
  * @since 1.0
  */
-public class Rule {
+public class Rule extends BaseExpression {
     private final String name;
     private Expression expression;
     private List<String> params = new ArrayList<>(2);

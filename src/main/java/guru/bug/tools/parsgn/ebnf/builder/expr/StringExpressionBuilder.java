@@ -45,6 +45,8 @@ public class StringExpressionBuilder extends ExpressionBuilder {
     public Expression build(RuleFactory rf) {
         String str = constants.get(0);
         String transform = constants.size() > 1 ? constants.get(1) : null;
-        return rf.str(str).transform(transform);
+        return update(rf.str(str).transform(transform));
     }
+
+
 }
