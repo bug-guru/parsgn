@@ -27,7 +27,7 @@ package guru.bug.tools.parsgn.expr.calc;
  * @version 1.0
  * @since 1.0
  */
-class VariableTerm extends Term {
+public class VariableTerm extends Term {
     private String name;
 
     public VariableTerm(String name) {

@@ -56,9 +56,9 @@ public class RuleBuilder extends BaseBuilder {
         return name;
     }
 
-    public void build(RuleFactory factory) throws ParsingException {
-        Expression exprList = expressionListBuilder.build(factory);
-        update(factory.rule(name, exprList)
+    public void build(RuleFactory rf) throws ParsingException {
+        Expression exprList = expressionListBuilder.build(rf);
+        update(rf.rule(name, exprList)
                 .hidden(hidden == null ? false : hidden)
                 .params(ruleParams));
     }

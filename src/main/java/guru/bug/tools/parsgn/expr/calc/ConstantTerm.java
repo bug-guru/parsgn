@@ -27,7 +27,7 @@ package guru.bug.tools.parsgn.expr.calc;
  * @version 1.0
  * @since 1.0
  */
-class ConstantTerm extends Term {
+public class ConstantTerm extends Term {
 
     private final Object value;
 

@@ -32,7 +32,7 @@ import java.util.ListIterator;
  * @version 1.0
  * @since 1.0
  */
-class CalculationTerm extends Term {
+public class CalculationTerm extends Term {
     private final List<Term> terms;
     private final List<Operator> operators;
 

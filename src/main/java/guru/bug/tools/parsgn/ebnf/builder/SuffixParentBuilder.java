@@ -49,7 +49,7 @@ public class SuffixParentBuilder {
     })
     private SuffixBuilder suffix;
 
-    public Expression generate(RuleFactory rb, Expression expr) {
-        return suffix.build(rb, expr);
+    public Expression generate(RuleFactory rf, Expression expr) {
+        return suffix.build(rf, expr);
     }
 }

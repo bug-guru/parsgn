@@ -50,11 +50,11 @@ public class ExpressionParentBuilder {
     private SuffixParentBuilder suffix;
 
 
-    public Expression build(RuleFactory builder) {
-        Expression expr = expression.build(builder);
+    public Expression build(RuleFactory rf) {
+        Expression expr = expression.build(rf);
         if (suffix == null) {
             return expr;
         }
-        return suffix.generate(builder, expr);
+        return suffix.generate(rf, expr);
     }
 }

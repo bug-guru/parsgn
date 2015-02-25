@@ -41,15 +41,15 @@ public class ExpressionListBuilder extends BaseBuilder {
     @XmlElement(name = RuleNames.EXPRESSION)
     private List<ExpressionParentBuilder> expressionList;
 
-    public Expression build(RuleFactory factory) {
+    public Expression build(RuleFactory rf) {
         List<Expression> exprList = expressionList.stream()
-                .map(m -> m.build(factory))
+                .map(m -> m.build(rf))
                 .collect(Collectors.toList());
         Expression result;
         if (exprList.size() == 1) {
             result = exprList.get(0);
         } else {
-            result = update(factory.sequence(exprList));
+            result = update(rf.sequence(exprList));
         }
         return result;
     }
