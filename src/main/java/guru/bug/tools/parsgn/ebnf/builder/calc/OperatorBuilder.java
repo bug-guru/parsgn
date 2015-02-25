@@ -22,6 +22,7 @@
 
 package guru.bug.tools.parsgn.ebnf.builder.calc;
 
+import guru.bug.tools.parsgn.ebnf.builder.BaseBuilder;
 import guru.bug.tools.parsgn.expr.calc.Operator;
 
 import javax.xml.bind.annotation.XmlEnum;
@@ -34,7 +35,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType
 @XmlEnum(String.class)
-public abstract class OperatorBuilder {
+public abstract class OperatorBuilder extends BaseBuilder {
 
     public abstract Operator build();
 

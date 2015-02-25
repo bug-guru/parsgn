@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.XmlType;
  * @since 1.0
  */
 @XmlType
-public class ExpressionParentBuilder {
+public class ExpressionParentBuilder extends BaseBuilder {
     @XmlElements({
             @XmlElement(name = RuleNames.ONE_OF, type = OneOfExpressionBuilder.class),
             @XmlElement(name = RuleNames.REFERENCE, type = ReferenceExpressionBuilder.class),

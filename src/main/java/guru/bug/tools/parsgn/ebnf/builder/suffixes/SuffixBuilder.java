@@ -23,6 +23,7 @@
 package guru.bug.tools.parsgn.ebnf.builder.suffixes;
 
 import guru.bug.tools.parsgn.RuleFactory;
+import guru.bug.tools.parsgn.ebnf.builder.BaseBuilder;
 import guru.bug.tools.parsgn.expr.Expression;
 
 import javax.xml.bind.annotation.XmlType;
@@ -33,6 +34,6 @@ import javax.xml.bind.annotation.XmlType;
  * @since 1.0
  */
 @XmlType
-public abstract class SuffixBuilder {
+public abstract class SuffixBuilder extends BaseBuilder {
     public abstract Expression build(RuleFactory rf, Expression expr);
 }

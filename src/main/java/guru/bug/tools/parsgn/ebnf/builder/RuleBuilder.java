@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * @since 1.0
  */
 @XmlType
-public class RuleBuilder {
+public class RuleBuilder extends BaseBuilder {
     @XmlElement(name = RuleNames.NAME)
     private String name;
     @XmlElement(name = RuleNames.HIDE_FLAG)

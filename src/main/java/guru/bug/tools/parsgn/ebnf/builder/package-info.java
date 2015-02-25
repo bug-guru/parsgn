@@ -20,33 +20,12 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.ebnf.builder;
-
-import guru.bug.tools.parsgn.RuleFactory;
-import guru.bug.tools.parsgn.ebnf.RuleNames;
-import guru.bug.tools.parsgn.exceptions.NumberOfParametersException;
-import guru.bug.tools.parsgn.exceptions.ParsingException;
-import guru.bug.tools.parsgn.expr.ReferenceExpression;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
-
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
+@XmlAccessorType(XmlAccessType.NONE) package guru.bug.tools.parsgn.ebnf.builder;
 
-@XmlRootElement(name = RuleNames.CONFIG_FILE)
-public class ConfigFileBuilder extends BaseBuilder {
-    @XmlElement(name = RuleNames.RULE)
-    private List<RuleBuilder> ruleList;
-
-    public ReferenceExpression buildRoot() throws ParsingException, NumberOfParametersException {
-        RuleFactory builder = new RuleFactory();
-        ruleList.forEach(m -> m.build(builder));
-        String rootName = ruleList.get(0).getName();
-        return builder.build(rootName);
-    }
-}
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;

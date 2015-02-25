@@ -22,34 +22,38 @@
 
 package guru.bug.tools.parsgn.ebnf.builder;
 
-import guru.bug.tools.parsgn.RuleFactory;
-import guru.bug.tools.parsgn.ebnf.RuleNames;
-import guru.bug.tools.parsgn.ebnf.builder.suffixes.*;
-import guru.bug.tools.parsgn.expr.Expression;
+import guru.bug.tools.parsgn.ebnf.builder.utils.PositionAdapter;
+import guru.bug.tools.parsgn.processing.Position;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-@XmlType
-public class SuffixParentBuilder extends BaseBuilder {
-    @XmlElements({
-            @XmlElement(name = RuleNames.ZERO_OR_ONE, type = ZeroOrOneSuffixBuilder.class),
-            @XmlElement(name = RuleNames.ONE_OR_MORE, type = OneOrMoreSuffixBuilder.class),
-            @XmlElement(name = RuleNames.ZERO_OR_MORE, type = ZeroOrMoreSuffixBuilder.class),
-            @XmlElement(name = RuleNames.EXACTLY_N_TIMES, type = ExactlyNTimesSuffixBuilder.class),
-            @XmlElement(name = RuleNames.AT_LEAST_MIN_TIMES, type = AtLeastMinTimesSuffixBuilder.class),
-            @XmlElement(name = RuleNames.AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES, type = AtLeastNButNotMoreThanMTimesSuffixBuilder.class),
-            @XmlElement(name = RuleNames.UNTIL, type = UntilSuffixBuilder.class)
-    })
-    private SuffixBuilder suffix;
+public abstract class BaseBuilder {
+    @XmlAttribute(name = "startPos")
+    @XmlJavaTypeAdapter(PositionAdapter.class)
+    private Position startPosition;
+    @XmlAttribute(name = "endPos")
+    @XmlJavaTypeAdapter(PositionAdapter.class)
+    private Position endPosition;
 
-    public Expression generate(RuleFactory rb, Expression expr) {
-        return suffix.build(rb, expr);
+    public Position getStartPosition() {
+        return startPosition;
+    }
+
+    public void setStartPosition(Position startPosition) {
+        this.startPosition = startPosition;
+    }
+
+    public Position getEndPosition() {
+        return endPosition;
+    }
+
+    public void setEndPosition(Position endPosition) {
+        this.endPosition = endPosition;
     }
 }

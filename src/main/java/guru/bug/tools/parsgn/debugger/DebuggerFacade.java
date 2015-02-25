@@ -148,7 +148,6 @@ public class DebuggerFacade {
                     }
                 });
         // TODO highlight rules too
-
     }
 
     public boolean getHasPrevious() {

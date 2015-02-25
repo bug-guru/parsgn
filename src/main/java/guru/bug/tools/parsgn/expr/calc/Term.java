@@ -22,6 +22,8 @@
 
 package guru.bug.tools.parsgn.expr.calc;
 
+import guru.bug.tools.parsgn.processing.Position;
+
 import java.util.List;
 
 /**
@@ -30,6 +32,9 @@ import java.util.List;
  * @since 1.0
  */
 public abstract class Term {
+    private Position start;
+    private Position end;
+
     public static Term variable(String name) {
         return new VariableTerm(name);
     }

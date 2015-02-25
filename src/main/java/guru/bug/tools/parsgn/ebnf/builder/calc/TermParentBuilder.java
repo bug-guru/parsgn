@@ -22,6 +22,7 @@
 
 package guru.bug.tools.parsgn.ebnf.builder.calc;
 
+import guru.bug.tools.parsgn.ebnf.builder.BaseBuilder;
 import guru.bug.tools.parsgn.expr.calc.Term;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -36,7 +37,7 @@ import static guru.bug.tools.parsgn.ebnf.RuleNames.*;
  * @since 1.0
  */
 @XmlType
-public class TermParentBuilder {
+public class TermParentBuilder extends BaseBuilder {
     @XmlElements({
             @XmlElement(name = CALCULATION, type = CalcExpressionBuilder.class),
             @XmlElement(name = VARIABLE, type = VariableBuilder.class),

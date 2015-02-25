@@ -20,33 +20,40 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.ebnf.builder;
+package guru.bug.tools.parsgn.ebnf.builder.utils;
 
-import guru.bug.tools.parsgn.RuleFactory;
-import guru.bug.tools.parsgn.ebnf.RuleNames;
-import guru.bug.tools.parsgn.exceptions.NumberOfParametersException;
-import guru.bug.tools.parsgn.exceptions.ParsingException;
-import guru.bug.tools.parsgn.expr.ReferenceExpression;
+import guru.bug.tools.parsgn.processing.Position;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.List;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
+public class PositionAdapter extends XmlAdapter<String, Position> {
+    @Override
+    public Position unmarshal(String v) throws Exception {
+        return PositionAdapter.fromString(v);
+    }
 
-@XmlRootElement(name = RuleNames.CONFIG_FILE)
-public class ConfigFileBuilder extends BaseBuilder {
-    @XmlElement(name = RuleNames.RULE)
-    private List<RuleBuilder> ruleList;
+    @Override
+    public String marshal(Position p) throws Exception {
+        return PositionAdapter.toString(p);
+    }
 
-    public ReferenceExpression buildRoot() throws ParsingException, NumberOfParametersException {
-        RuleFactory builder = new RuleFactory();
-        ruleList.forEach(m -> m.build(builder));
-        String rootName = ruleList.get(0).getName();
-        return builder.build(rootName);
+    public static Position fromString(String v) {
+        if (v == null || v.isEmpty()) {
+            return null;
+        }
+        String[] parts = v.split(":");
+        return new Position(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+    }
+
+    public static String toString(Position p) {
+        if (p == null) {
+            return null;
+        }
+        return p.getRow() + ":" + p.getCol();
     }
 }

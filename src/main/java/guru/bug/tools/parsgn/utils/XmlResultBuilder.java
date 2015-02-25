@@ -23,6 +23,7 @@
 package guru.bug.tools.parsgn.utils;
 
 import guru.bug.tools.parsgn.ResultBuilder;
+import guru.bug.tools.parsgn.ebnf.builder.utils.PositionAdapter;
 import guru.bug.tools.parsgn.exceptions.InternalParsingException;
 import guru.bug.tools.parsgn.processing.Position;
 import org.w3c.dom.Document;
@@ -67,6 +68,8 @@ public class XmlResultBuilder extends ResultBuilder<Node> {
         if (children != null) {
             children.forEach(node::appendChild);
         }
+        node.setAttribute("startPos", PositionAdapter.toString(start));
+        node.setAttribute("endPos", PositionAdapter.toString(end));
         return node;
     }
 
