@@ -34,7 +34,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 
@@ -136,6 +140,32 @@ public class MainView extends VBox {
         indexSlider.maxProperty().bind(debugger.lastIndexProperty());
         expressionStack.getSelectionModel().selectFirst();
         updateTexts(debugger.getDebugger());
+        sourceRowLabel.textProperty().bind(new StringBinding() {
+            {
+                bind(debugger.hoveredSourcePositionProperty());
+            }
+
+            @Override
+            protected String computeValue() {
+                if (debugger == null || debugger.getHoveredSourcePosition() == null) {
+                    return null;
+                }
+                return String.valueOf(debugger.getHoveredSourcePosition().getRow());
+            }
+        });
+        sourceColLabel.textProperty().bind(new StringBinding() {
+            {
+                bind(debugger.hoveredSourcePositionProperty());
+            }
+
+            @Override
+            protected String computeValue() {
+                if (debugger == null || debugger.getHoveredSourcePosition() == null) {
+                    return null;
+                }
+                return String.valueOf(debugger.getHoveredSourcePosition().getCol());
+            }
+        });
     }
 
     private void updateTexts(Debugger nv) {

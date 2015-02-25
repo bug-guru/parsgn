@@ -47,6 +47,7 @@ public class DebuggerFacade {
     private final SimpleIntegerProperty index = new SimpleIntegerProperty(0);
     private final SimpleObjectProperty<Debugger> debugger = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<StackElement> highlighted = new SimpleObjectProperty<>();
+    private final ReadOnlyObjectWrapper<Position> hoveredSourcePosition = new ReadOnlyObjectWrapper<>();
 
     public DebuggerFacade() {
         index.addListener((o, ov, nv) -> {
@@ -88,10 +89,16 @@ public class DebuggerFacade {
             source.set(FXCollections.emptyObservableList());
             rules.set(FXCollections.emptyObservableList());
         } else {
-            source.set(convertText(nv.getSource(), this::handleGoToPosition));
-            rules.set(convertText(nv.getRules(), null));
+            source.set(convertText(nv.getSource(), this::handleGoToPosition, this::handleShowPosition));
+            rules.set(convertText(nv.getRules(), null, null));
         }
         updateState();
+    }
+
+    private void handleShowPosition(MouseEvent mouseEvent) {
+        CodePointText src = (CodePointText) mouseEvent.getSource();
+        Position pos = src.getPosition();
+        hoveredSourcePosition.set(pos);
     }
 
     private void handleGoToPosition(MouseEvent e) {
@@ -101,10 +108,11 @@ public class DebuggerFacade {
         updateState();
     }
 
-    private ObservableList<CodePointText> convertText(List<CodePoint> points, EventHandler<? super MouseEvent> onClick) {
+    private ObservableList<CodePointText> convertText(List<CodePoint> points, EventHandler<? super MouseEvent> onMouseClick,  EventHandler<? super MouseEvent> onMouseEnter) {
         List<CodePointText> tmp = points.stream()
                 .map(CodePointText::new)
-                .peek(e -> e.setOnMouseClicked(onClick))
+                .peek(e -> e.setOnMouseClicked(onMouseClick))
+                .peek(e -> e.setOnMouseEntered(onMouseEnter))
                 .collect(Collectors.toList());
         return FXCollections.unmodifiableObservableList(FXCollections.observableList(tmp));
     }
@@ -240,5 +248,13 @@ public class DebuggerFacade {
 
     public void setHighlighted(StackElement highlighted) {
         this.highlighted.set(highlighted);
+    }
+
+    public Position getHoveredSourcePosition() {
+        return hoveredSourcePosition.get();
+    }
+
+    public ReadOnlyObjectProperty<Position> hoveredSourcePositionProperty() {
+        return hoveredSourcePosition;
     }
 }
