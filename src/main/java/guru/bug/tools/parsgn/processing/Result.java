@@ -20,16 +20,31 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.debugger;
+package guru.bug.tools.parsgn.processing;
 
-import guru.bug.tools.parsgn.utils.ParseNode;
-import javafx.scene.control.TreeItem;
+import java.util.Deque;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-public class TreeItemParseNode extends TreeItem<ParseNode> {
-    // TODO: finish this
+public class Result {
+    private final ResultType basicResult;
+    private final ResultAction action;
+
+    public Result(ResultType basicResult, ResultAction action) {
+        this.basicResult = basicResult;
+        this.action = action;
+    }
+
+    public ResultType getBasicResult() {
+        return basicResult;
+    }
+
+    public <T> void apply(Deque<Holder<T>> stack, CodePointSource codePointSource) {
+        if (action != null) {
+            action.apply(stack, codePointSource);
+        }
+    }
 }

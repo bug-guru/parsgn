@@ -25,6 +25,7 @@ package guru.bug.tools.parsgn.expr;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.calc.CalculationContext;
 import guru.bug.tools.parsgn.expr.calc.Term;
+import guru.bug.tools.parsgn.processing.Result;
 import guru.bug.tools.parsgn.processing.ResultType;
 
 /**
@@ -140,42 +141,40 @@ public class QuantityExpression extends Expression {
 
         @Override
         public Expression next() {
-            return expression;
+            return minOccurrences == 0 && maxOccurrences == 0
+                    ? AlwaysMatchExpression.INSTANCE
+                    : expression;
         }
 
         @Override
-        public ResultType check(ResultType childResult) throws ParsingException {
+        public Result check(ResultType childResult) throws ParsingException {
             switch (childResult) {
-                case COMMIT:
+                case MATCH:
                     return doCommitOrContinue();
-                case ROLLBACK_OPTIONAL:
-                case ROLLBACK:
+                case MISMATCH:
+                case MISMATCH_BUT_OPTIONAL:
                     return doCommitOrRollback();
                 default:
                     throw new ParsingException("unknown result: " + childResult);
             }
         }
 
-        private ResultType doCommitOrRollback() throws ParsingException {
-            if (minOccurrences == 0 && maxOccurrences == 0 && turnsPassed == 0) {
-                return ResultType.COMMIT;
-            } else if (minOccurrences == 0 && turnsPassed == 0) {
-                return ResultType.ROLLBACK_OPTIONAL;
-            } else if (turnsPassed >= minOccurrences) {
-                return ResultType.COMMIT;
+        private Result doCommitOrRollback() throws ParsingException {
+            if (turnsPassed >= minOccurrences && turnsPassed > 0) {
+                return ResultType.MATCH.andMerge();
+            } else if (turnsPassed == 0 && minOccurrences == 0) {
+                return ResultType.MISMATCH_BUT_OPTIONAL.andRollback();
             } else {
-                return ResultType.ROLLBACK;
+                return ResultType.MISMATCH.andRollback();
             }
         }
 
-        private ResultType doCommitOrContinue() throws ParsingException {
+        private Result doCommitOrContinue() throws ParsingException {
             turnsPassed++;
-            if (maxOccurrences < turnsPassed) {
-                return ResultType.ROLLBACK;
-            } else if (maxOccurrences == turnsPassed) {
-                return ResultType.COMMIT;
+            if (maxOccurrences == turnsPassed) {
+                return ResultType.MATCH.andMerge();
             } else {
-                return ResultType.CONTINUE;
+                return ResultType.CONTINUE.noAction();
             }
         }
 

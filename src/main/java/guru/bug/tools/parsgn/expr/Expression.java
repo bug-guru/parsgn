@@ -25,6 +25,7 @@ package guru.bug.tools.parsgn.expr;
 
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.calc.CalculationContext;
+import guru.bug.tools.parsgn.processing.Result;
 import guru.bug.tools.parsgn.processing.ResultType;
 
 /**
@@ -33,33 +34,15 @@ import guru.bug.tools.parsgn.processing.ResultType;
  * @since 1.0
  */
 public abstract class Expression extends BaseExpression {
-    private boolean hidden;
 
     public abstract ExpressionChecker checker(CalculationContext cCtx);
 
-    public boolean isHidden() {
-        return hidden;
-    }
-
-    public void setHidden(boolean hidden) {
-        this.hidden = hidden;
-    }
-
-    public Expression hide() {
-        setHidden(true);
-        return this;
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
     }
 
     public abstract class ExpressionChecker {
-
-        public boolean isIgnored() {
-            return false;
-        }
-
-        public boolean isHidden() {
-            return Expression.this.isHidden();
-        }
-
         public Expression getExpression() {
             return Expression.this;
         }
@@ -71,27 +54,12 @@ public abstract class Expression extends BaseExpression {
     }
 
     public abstract class LeafExpressionChecker extends ExpressionChecker {
-        public abstract void commitResult(StringBuilder result);
-
-        public abstract ResultType check(int codePoint) throws ParsingException;
-
-
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName();
+        public abstract Result check(int codePoint) throws ParsingException;
     }
 
     public abstract class BranchExpressionChecker extends ExpressionChecker {
         public abstract Expression next();
 
-        public String getGroupName() {
-            return null;
-        }
-
-        public ResultType check(ResultType childResult) throws ParsingException {
-            return childResult;
-        }
+        public abstract Result check(ResultType childResult) throws ParsingException;
     }
 }

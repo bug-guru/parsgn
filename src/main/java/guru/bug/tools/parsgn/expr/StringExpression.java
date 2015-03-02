@@ -24,6 +24,7 @@ package guru.bug.tools.parsgn.expr;
 
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.calc.CalculationContext;
+import guru.bug.tools.parsgn.processing.Result;
 import guru.bug.tools.parsgn.processing.ResultType;
 import guru.bug.tools.parsgn.utils.StringUtils;
 
@@ -85,22 +86,17 @@ public class StringExpression extends Expression {
         private int offset;
 
         @Override
-        public void commitResult(StringBuilder result) {
-            if (transform != null) {
-                result.append(transform);
-            }
-        }
-
-        @Override
-        public ResultType check(int codePoint) throws ParsingException {
+        public Result check(int codePoint) throws ParsingException {
             if (codePoints[offset] != codePoint) {
-                return ResultType.ROLLBACK;
+                return ResultType.MISMATCH.andRollback();
             } else {
                 offset++;
                 if (offset == len) {
-                    return ResultType.COMMIT;
+                    return transform == null
+                            ? ResultType.MATCH.andSkip()
+                            : ResultType.MATCH.andCommitString(transform);
                 } else {
-                    return ResultType.CONTINUE;
+                    return ResultType.CONTINUE.noAction();
                 }
             }
         }

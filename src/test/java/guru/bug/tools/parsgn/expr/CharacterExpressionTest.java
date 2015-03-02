@@ -37,14 +37,14 @@ public class CharacterExpressionTest {
         CharacterExpression expr = new CharacterExpression();
         expr.setCharType(CharType.DIGIT);
         CharacterExpression.Checker checker = (CharacterExpression.Checker) expr.checker(null);
-        assertSame(ResultType.ROLLBACK, checker.check('a'));
-        assertSame(ResultType.ROLLBACK, checker.check(-1));
-        assertSame(ResultType.ROLLBACK, checker.check('\n'));
-        assertSame(ResultType.ROLLBACK, checker.check('S'));
-        assertSame(ResultType.COMMIT, checker.check('1'));
-        assertSame(ResultType.COMMIT, checker.check('2'));
-        assertSame(ResultType.COMMIT, checker.check('3'));
-        assertSame(ResultType.COMMIT, checker.check('0'));
+        assertSame(ResultType.MISMATCH, checker.check('a').getBasicResult());
+        assertSame(ResultType.MISMATCH, checker.check(-1).getBasicResult());
+        assertSame(ResultType.MISMATCH, checker.check('\n').getBasicResult());
+        assertSame(ResultType.MISMATCH, checker.check('S').getBasicResult());
+        assertSame(ResultType.MATCH, checker.check('1').getBasicResult());
+        assertSame(ResultType.MATCH, checker.check('2').getBasicResult());
+        assertSame(ResultType.MATCH, checker.check('3').getBasicResult());
+        assertSame(ResultType.MATCH, checker.check('0').getBasicResult());
     }
 
     @Test
@@ -52,8 +52,8 @@ public class CharacterExpressionTest {
         CharacterExpression expr = new CharacterExpression();
         expr.setCharType(CharType.EOF);
         CharacterExpression.Checker checker = (CharacterExpression.Checker) expr.checker(null);
-        assertSame(ResultType.ROLLBACK, checker.check('a'));
-        assertSame(ResultType.COMMIT, checker.check(-1));
+        assertSame(ResultType.MISMATCH, checker.check('a').getBasicResult());
+        assertSame(ResultType.MATCH, checker.check(-1).getBasicResult());
     }
 
     @Test
@@ -61,8 +61,8 @@ public class CharacterExpressionTest {
         CharacterExpression expr = new CharacterExpression();
         expr.setCharType(CharType.LINE_SEPARATOR);
         CharacterExpression.Checker checker = (CharacterExpression.Checker) expr.checker(null);
-        assertSame(ResultType.ROLLBACK, checker.check(' '));
-        assertSame(ResultType.COMMIT, checker.check('\n'));
-        assertSame(ResultType.COMMIT, checker.check('\r'));
+        assertSame(ResultType.MISMATCH, checker.check(' ').getBasicResult());
+        assertSame(ResultType.MATCH, checker.check('\n').getBasicResult());
+        assertSame(ResultType.MATCH, checker.check('\r').getBasicResult());
     }
 }

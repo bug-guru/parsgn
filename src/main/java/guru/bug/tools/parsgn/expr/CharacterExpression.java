@@ -24,6 +24,7 @@ package guru.bug.tools.parsgn.expr;
 
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.calc.CalculationContext;
+import guru.bug.tools.parsgn.processing.Result;
 import guru.bug.tools.parsgn.processing.ResultType;
 
 /**
@@ -53,22 +54,17 @@ public class CharacterExpression extends Expression {
     }
 
     class Checker extends LeafExpressionChecker {
-        private int result;
 
         @Override
-        public void commitResult(StringBuilder sb) {
-            if (Character.isValidCodePoint(result)) {
-                sb.appendCodePoint(result);
-            }
-        }
-
-        @Override
-        public ResultType check(int codePoint) throws ParsingException {
+        public Result check(int codePoint) throws ParsingException {
             if (charType.apply(codePoint)) {
-                result = codePoint;
-                return ResultType.COMMIT;
+                if (codePoint == -1) {
+                    return ResultType.MATCH.andRollback();
+                } else {
+                    return ResultType.MATCH.andCommitCodePoint(codePoint);
+                }
             } else {
-                return ResultType.ROLLBACK;
+                return ResultType.MISMATCH.andRollback();
             }
         }
     }

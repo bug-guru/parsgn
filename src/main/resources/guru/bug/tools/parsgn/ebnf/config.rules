@@ -24,41 +24,48 @@ ConfigFile:
     [I Rule]+ I #EOF;
 
 Rule:
-    HideFlag? I Name I RuleParams? I ":" ExpressionList ";";
+    HideFlag? I Name I RuleParams? I ":" ExpressionList I ";" ;
 
-HideFlag: ".";
+HideFlag: "." I;
 
 RuleParams: "(" I Name [I "," I Name]* I ")";
 
-I: [#WHITESPACE | SingleLineComment | MultiLineComment]*;
+I: [!#EOF [WS | LT | SingleLineComment | MultiLineComment]]*;
 
-SingleLineComment: "//" #VALID>#LINE_SEPARATOR;
+SingleLineComment: "//" [!EOL #VALID]* EOL;
 
-MultiLineComment: "/*" #VALID>"*/" "*/";
+.EOL: WS LT;
+
+.LT: ["\r\n" | "\r" | "\n" | #EOF];
+
+.WS: [" " | "\t"]*;
+
+MultiLineComment: "/*" [!"*/" #VALID]* "*/";
 
 Name: #UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART*;
 
 ExpressionList: [I Expression]+;
 
 Expression:
+    NegativeFlag?
     OneOf | Reference | CharType | String | Sequence
     ExpressionSuffix?;
+
+NegativeFlag: "!" I ;
 
 ExpressionSuffix: I [ZeroOrOne
                    | OneOrMore
                    | ZeroOrMore
                    | ExactlyNTimes
                    | AtLeastMinTimes
-                   | AtLeastMinButNotMoreThanMaxTimes
-                   | Until] I;
+                   | AtLeastMinButNotMoreThanMaxTimes]
+                  I;
 
 ZeroOrOne: "?";
 
 OneOrMore: "+";
 
 ZeroOrMore: "*";
-
-Until: ">" I Expression I;
 
 ExactlyNTimes: "{" I Calculation I "}";
 
@@ -80,17 +87,17 @@ CharType: "#" Name; //TODO: list all possible char types
 
 String: StringConstant [I "->" I StringConstant]?;
 
-StringConstant: "\""
-                    [   "\\\"" -> "\""
-                      | "\\\\" -> "\\"
-                      | "\\n" -> "\n"
-                      | "\\r" -> "\r"
-                      | "\\t" -> "\t"
-                      | "\\f" -> "\f"
-                      | "\\b" -> "\b"
-                      | #VALID
-                    ] > "\""
-                "\"";
+StringConstant: "\"" [!"\""
+                            [   "\\\"" -> "\""
+                              | "\\\\" -> "\\"
+                              | "\\n" -> "\n"
+                              | "\\r" -> "\r"
+                              | "\\t" -> "\t"
+                              | "\\f" -> "\f"
+                              | "\\b" -> "\b"
+                              | #VALID
+                            ]
+                ]* "\"";
 
 Sequence: "[" ExpressionList I "]";
 

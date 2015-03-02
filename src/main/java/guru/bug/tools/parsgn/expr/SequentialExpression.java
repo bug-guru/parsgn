@@ -24,6 +24,7 @@ package guru.bug.tools.parsgn.expr;
 
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.calc.CalculationContext;
+import guru.bug.tools.parsgn.processing.Result;
 import guru.bug.tools.parsgn.processing.ResultType;
 
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class SequentialExpression extends Expression {
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append("[");
-        for(Expression e : expressions) {
+        for (Expression e : expressions) {
             result.append(e).append(" ");
         }
         result.setLength(result.length() - 1);
@@ -85,27 +86,26 @@ public class SequentialExpression extends Expression {
         }
 
         @Override
-        public ResultType check(ResultType childResult) throws ParsingException {
+        public Result check(ResultType childResult) throws ParsingException {
             switch (childResult) {
-                case COMMIT:
+                case MATCH:
                     hasCommitted = true;
+                case MISMATCH_BUT_OPTIONAL:
                     return doCommitOrContinue();
-                case ROLLBACK_OPTIONAL:
-                    return doCommitOrContinue();
-                case ROLLBACK:
-                    return ResultType.ROLLBACK;
+                case MISMATCH:
+                    return ResultType.MISMATCH.andRollback();
                 default:
                     throw new ParsingException("unknown result: " + childResult);
             }
         }
 
-        private ResultType doCommitOrContinue() throws ParsingException {
+        private Result doCommitOrContinue() throws ParsingException {
             if (expressions.hasNext()) {
-                return ResultType.CONTINUE;
+                return ResultType.CONTINUE.noAction();
             } else if (!hasCommitted) {
-                return ResultType.ROLLBACK_OPTIONAL;
+                return ResultType.MISMATCH_BUT_OPTIONAL.andRollback();
             } else {
-                return ResultType.COMMIT;
+                return ResultType.MATCH.andMerge();
             }
         }
     }

@@ -20,37 +20,16 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.expr;
+package guru.bug.tools.parsgn.processing;
 
-import guru.bug.tools.parsgn.processing.ResultType;
-import org.junit.Test;
-
-import static org.junit.Assert.assertSame;
+import java.util.Deque;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
+ * @version 1.0
+ * @since 1.0
  */
-public class QuantityExpressionExactly1TimeTest extends QuantityExpressionTestBase {
-
-    public QuantityExpressionExactly1TimeTest() {
-        expression.minOccurrences(1).maxOccurrences(1);
-    }
-
-    @Test
-    public void testChecker_C() throws Exception {
-        checker.next();
-        assertSame(ResultType.MATCH, checker.check(ResultType.MATCH).getBasicResult());
-    }
-
-    @Test
-    public void testChecker_R() throws Exception {
-        checker.next();
-        assertSame(ResultType.MISMATCH, checker.check(ResultType.MISMATCH).getBasicResult());
-    }
-
-    @Test
-    public void testChecker_O() throws Exception {
-        checker.next();
-        assertSame(ResultType.MISMATCH, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
-    }
+@FunctionalInterface
+public interface ResultAction {
+    public <T> void apply(Deque<Holder<T>> stack, CodePointSource codePointSource);
 }

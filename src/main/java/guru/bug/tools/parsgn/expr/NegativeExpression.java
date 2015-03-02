@@ -24,21 +24,30 @@ package guru.bug.tools.parsgn.expr;
 
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.calc.CalculationContext;
+import guru.bug.tools.parsgn.processing.Result;
 import guru.bug.tools.parsgn.processing.ResultType;
 
-public class UntilExpressionConditionProxy extends Expression {
-    private Expression conditionExpression;
+/**
+ * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
+ * @version 1.0
+ * @since 1.0
+ */
+public class NegativeExpression extends Expression {
+    private Expression expression;
 
-    public Expression getConditionExpression() {
-        return conditionExpression;
+    public Expression getExpression() {
+        return expression;
     }
 
-    public void setConditionExpression(Expression conditionExpression) {
-        this.conditionExpression = conditionExpression;
+    public void setExpression(Expression expression) {
+        if (expression == null) {
+            throw new NullPointerException("expression");
+        }
+        this.expression = expression;
     }
 
-    public UntilExpressionConditionProxy condition(Expression conditionExpression) {
-        setConditionExpression(conditionExpression);
+    public NegativeExpression expression(Expression expression) {
+        setExpression(expression);
         return this;
     }
 
@@ -49,29 +58,27 @@ public class UntilExpressionConditionProxy extends Expression {
 
     @Override
     public String toString() {
-        return "proxy:" + conditionExpression.toString();
+        return "!" + expression;
     }
 
-    class Checker extends BranchExpressionChecker {
+    private class Checker extends BranchExpressionChecker {
 
         @Override
         public Expression next() {
-            return conditionExpression;
+            return expression;
         }
 
         @Override
-        public ResultType check(ResultType childResult) throws ParsingException {
-            if (childResult == ResultType.COMMIT) {
-                return ResultType.COMMIT;
-            } else {
-                return childResult;
+        public Result check(ResultType childResult) throws ParsingException {
+            switch (childResult) {
+                case MATCH:
+                    return ResultType.MISMATCH.andRollback();
+                case MISMATCH:
+                case MISMATCH_BUT_OPTIONAL:
+                    return ResultType.MATCH.andRollback();
+                default:
+                    throw new ParsingException("unknown result: " + childResult);
             }
-        }
-
-        @Override
-        public boolean isIgnored() {
-            return true;
         }
     }
 }
-

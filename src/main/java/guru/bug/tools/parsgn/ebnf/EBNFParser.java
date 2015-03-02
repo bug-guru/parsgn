@@ -61,7 +61,7 @@ public class EBNFParser extends Parser implements RuleNames {
                 rb.charType(CharType.EOF)
         );
         // Rule:
-        //     HideFlag? I Name I RuleParams? I ":" ExpressionList ";";
+        //     HideFlag? I Name I RuleParams? I ":" ExpressionList I ";";
         rb.rule(RULE,
                 rb.zeroOrOne(rb.ref(HIDE_FLAG)),
                 rb.ref(I),
@@ -71,11 +71,13 @@ public class EBNFParser extends Parser implements RuleNames {
                 rb.ref(I),
                 rb.str(":"),
                 rb.ref(EXPRESSION_LIST),
+                rb.ref(I),
                 rb.str(";")
         );
-        // HideFlag: ".";
+        // HideFlag: "." I;
         rb.rule(HIDE_FLAG,
-                rb.str(".")
+                rb.str("."),
+                rb.ref(I)
         );
         // RuleParams: "(" I Name [I "," I Name]* I ")";
         rb.rule(RULE_PARAMS,
@@ -91,27 +93,53 @@ public class EBNFParser extends Parser implements RuleNames {
                 rb.ref(I),
                 rb.str(")")
         );
-        // I: [#WHITESPACE | SingleLineComment | MultiLineComment]*;
+        // I: [!#EOF [WS | LT | SingleLineComment | MultiLineComment]]*;
         rb.rule(I,
-                rb.zeroOrMore(rb.oneOf(
-                        rb.charType(CharType.WHITESPACE),
-                        rb.ref(SINGLE_LINE_COMMENT),
-                        rb.ref(MULTI_LINE_COMMENT)
-                ))
-        );
-        // SingleLineComment: "//" #VALID>#LINE_SEPARATOR;
-        rb.rule(SINGLE_LINE_COMMENT,
-                rb.str("//"),
-                rb.repeatUntil(
-                        rb.charType(CharType.LINE_SEPARATOR),
-                        rb.charType(CharType.VALID)
+                rb.zeroOrMore(
+                        rb.not(rb.charType(CharType.EOF)),
+                        rb.oneOf(
+                                rb.ref(WS),
+                                rb.ref(LT),
+                                rb.ref(SINGLE_LINE_COMMENT),
+                                rb.ref(MULTI_LINE_COMMENT)
+                        )
                 )
         );
-        // MultiLineComment: "/*" #VALID>"*/" "*/";
+        // SingleLineComment: "//" [!EOL #VALID]* EOL;
+        rb.rule(SINGLE_LINE_COMMENT,
+                rb.str("//"),
+                rb.zeroOrMore(
+                        rb.not(rb.ref(EOL)),
+                        rb.charType(CharType.VALID)
+                ),
+                rb.ref(EOL)
+        );
+        // .EOL: WS LT;
+        rb.rule(EOL,
+                rb.ref(WS),
+                rb.ref(LT)
+        ).hide();
+        // .LT: ["\r\n" | "\r" | "\n" | #EOF];
+        rb.rule(LT,
+                rb.oneOf(
+                        rb.str("\r\n"),
+                        rb.str("\r"),
+                        rb.str("\n"),
+                        rb.charType(CharType.EOF)
+                )
+        ).hide();
+        // .WS: [" " | "\t"]*;
+        rb.rule(WS,
+                rb.zeroOrMore(rb.oneOf(
+                        rb.str(" "),
+                        rb.str("\t")
+                ))
+        ).hide();
+        // MultiLineComment: "/*" [!"*/" #VALID] "*/";
         rb.rule(MULTI_LINE_COMMENT,
                 rb.str("/*"),
-                rb.repeatUntil(
-                        rb.str("*/"),
+                rb.zeroOrMore(
+                        rb.not(rb.str("*/")),
                         rb.charType(CharType.VALID)
                 ),
                 rb.str("*/")
@@ -131,9 +159,11 @@ public class EBNFParser extends Parser implements RuleNames {
                 )
         );
         // Expression:
+        //     NegativeFlag?
         //     OneOf | Reference | CharType | String | Sequence
         //     ExpressionSuffix?;
         rb.rule(EXPRESSION,
+                rb.zeroOrOne(rb.ref(NEGATIVE_FLAG)),
                 rb.oneOf(
                         rb.ref(ONE_OF),
                         rb.ref(REFERENCE),
@@ -145,13 +175,18 @@ public class EBNFParser extends Parser implements RuleNames {
                         rb.ref(EXPRESSION_SUFFIX)
                 )
         );
+        // NegativeFlag: "!" I ;
+        rb.rule(NEGATIVE_FLAG,
+                rb.str("!"),
+                rb.ref(I)
+        );
         // ExpressionSuffix: I [ZeroOrOne
         //                    | OneOrMore
         //                    | ZeroOrMore
         //                    | ExactlyNTimes
         //                    | AtLeastMinTimes
         //                    | AtLeastMinButNotMoreThanMaxTimes
-        //                    | Until] I;
+        //                    | LookAhead] I;
         rb.rule(EXPRESSION_SUFFIX,
                 rb.ref(I),
                 rb.oneOf(
@@ -160,8 +195,7 @@ public class EBNFParser extends Parser implements RuleNames {
                         rb.ref(ZERO_OR_MORE),
                         rb.ref(EXACTLY_N_TIMES),
                         rb.ref(AT_LEAST_MIN_TIMES),
-                        rb.ref(AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES),
-                        rb.ref(UNTIL)
+                        rb.ref(AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES)
                 ),
                 rb.ref(I)
         );
@@ -176,13 +210,6 @@ public class EBNFParser extends Parser implements RuleNames {
         // ZeroOrMore: "*";
         rb.rule(ZERO_OR_MORE,
                 rb.str("*")
-        );
-        // Until: ">" I Expression I;
-        rb.rule(UNTIL,
-                rb.str(">"),
-                rb.ref(I),
-                rb.ref(EXPRESSION),
-                rb.ref(I)
         );
         // ExactlyNTimes: "{" I CalcExpression I "}";
         rb.rule(EXACTLY_N_TIMES,
@@ -290,21 +317,21 @@ public class EBNFParser extends Parser implements RuleNames {
                         rb.ref(STRING_CONSTANT)
                 )
         );
-        // StringConstant: "\""
-        //                 [   "\\\"" -> "\""
-        //                   | "\\\\" -> "\\"
-        //                   | "\\n" -> "\n"
-        //                   | "\\r" -> "\r"
-        //                   | "\\t" -> "\t"
-        //                   | "\\f" -> "\f"
-        //                   | "\\b" -> "\b"
-        //                   | #VALID
-        //                 ] > "\""
-        //                 "\"";
+        // StringConstant: "\"" [!"\""
+        //                             [   "\\\"" -> "\""
+        //                               | "\\\\" -> "\\"
+        //                               | "\\n" -> "\n"
+        //                               | "\\r" -> "\r"
+        //                               | "\\t" -> "\t"
+        //                               | "\\f" -> "\f"
+        //                               | "\\b" -> "\b"
+        //                               | #VALID
+        //                             ]
+        //                 ]* "\"";
         rb.rule(STRING_CONSTANT,
                 rb.str("\""),
-                rb.repeatUntil(
-                        rb.str("\""),
+                rb.zeroOrMore(
+                        rb.not(rb.str("\"")),
                         rb.oneOf(
                                 rb.str("\\\"").transform("\""),
                                 rb.str("\\\\").transform("\\"),

@@ -89,6 +89,11 @@ public class RuleFactory {
                 .expressions(expressions);
     }
 
+    public final NegativeExpression not(Expression... expressions) {
+        Expression expr = wrap(expressions);
+        return new NegativeExpression().expression(expr);
+    }
+
     public final CharacterExpression charType(CharType charType) {
         CharacterExpression result = new CharacterExpression();
         result.setCharType(charType);
@@ -154,12 +159,6 @@ public class RuleFactory {
                 .loop(wrap(expressions))
                 .minOccurrences(min)
                 .maxOccurrences(max);
-    }
-
-    public final UntilExpression repeatUntil(Expression until, Expression... expressions) throws ParsingException {
-        return new UntilExpression()
-                .loop(wrap(expressions))
-                .condition(until);
     }
 
     public final SequentialExpression sequence(Expression... expressions) {

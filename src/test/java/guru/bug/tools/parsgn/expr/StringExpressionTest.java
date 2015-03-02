@@ -22,11 +22,12 @@
 
 package guru.bug.tools.parsgn.expr;
 
+import guru.bug.tools.parsgn.processing.Result;
 import guru.bug.tools.parsgn.processing.ResultType;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 /**
@@ -49,32 +50,32 @@ public class StringExpressionTest {
     public void testChecker_OK() throws Exception {
         expression.setValue("Hello, World!");
         expression.setTransform(null);
-        test(ResultType.COMMIT, "Hello, World!");
-        StringBuilder builder = new StringBuilder();
-        checker.commitResult(builder);
-        assertEquals(0, builder.length());
+        test(ResultType.MATCH, "Hello, World!");
     }
 
     @Test
     public void testChecker_FAIL() throws Exception {
         expression.setValue("Hello, World!");
-        test(ResultType.ROLLBACK, "Hello, World?");
+        test(ResultType.MISMATCH, "Hello, World?");
     }
 
     @Test
     public void testChecker_Transform() throws Exception {
         expression.setValue("Hello, World!");
         expression.setTransform("Bye-bye!");
-        test(ResultType.COMMIT, "Hello, World!");
-        StringBuilder builder = new StringBuilder();
-        checker.commitResult(builder);
-        assertEquals("Bye-bye!", builder.toString());
+        test(ResultType.MATCH, "Hello, World!");
     }
 
     private void test(ResultType expectedResult, String input) throws Exception {
         for (int i = 0; i < input.length() - 1; i++) {
-            assertSame(ResultType.CONTINUE, checker.check(input.codePointAt(i)));
+            Result result = checker.check(input.codePointAt(i));
+            assertNotNull(result);
+            assertNotNull(result.getBasicResult());
+            assertSame(ResultType.CONTINUE, result.getBasicResult());
         }
-        assertSame(expectedResult, checker.check(input.codePointAt(input.length() - 1)));
+        Result result = checker.check(input.codePointAt(input.length() - 1));
+        assertNotNull(result);
+        assertNotNull(result.getBasicResult());
+        assertSame(expectedResult, result.getBasicResult());
     }
 }

@@ -23,8 +23,11 @@
 package guru.bug.tools.parsgn.expr;
 
 import guru.bug.tools.parsgn.exceptions.NumberOfParametersException;
+import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.calc.CalculationContext;
 import guru.bug.tools.parsgn.expr.calc.Term;
+import guru.bug.tools.parsgn.processing.Result;
+import guru.bug.tools.parsgn.processing.ResultType;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -119,13 +122,21 @@ public class ReferenceExpression extends Expression {
         }
 
         @Override
-        public String getGroupName() {
-            return reference.getName();
-        }
-
-        @Override
-        public boolean isHidden() {
-            return ReferenceExpression.this.isHidden() || reference.isHidden();
+        public Result check(ResultType childResult) throws ParsingException {
+            switch (childResult) {
+                case MATCH:
+                    if (reference.isHidden()) {
+                        return ResultType.MATCH.andSkip();
+                    } else {
+                        return ResultType.MATCH.andCommitGroup(reference.getName());
+                    }
+                case MISMATCH:
+                    return ResultType.MISMATCH.andRollback();
+                case MISMATCH_BUT_OPTIONAL:
+                    return ResultType.MISMATCH_BUT_OPTIONAL.andRollback();
+                default:
+                    throw new IllegalArgumentException(childResult.toString());
+            }
         }
 
         @Override

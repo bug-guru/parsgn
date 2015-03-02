@@ -20,28 +20,33 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.ebnf.builder.suffixes;
+package guru.bug.tools.parsgn.expr;
 
-import guru.bug.tools.parsgn.RuleFactory;
-import guru.bug.tools.parsgn.ebnf.RuleNames;
-import guru.bug.tools.parsgn.ebnf.builder.ExpressionParentBuilder;
-import guru.bug.tools.parsgn.expr.Expression;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import guru.bug.tools.parsgn.exceptions.ParsingException;
+import guru.bug.tools.parsgn.expr.calc.CalculationContext;
+import guru.bug.tools.parsgn.processing.Result;
+import guru.bug.tools.parsgn.processing.ResultType;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
-@XmlType
-public class UntilSuffixBuilder extends SuffixBuilder {
-    @XmlElement(name = RuleNames.EXPRESSION)
-    private ExpressionParentBuilder expressionParentBuilder;
+public class AlwaysMatchExpression extends Expression {
+    public static final Expression INSTANCE = new AlwaysMatchExpression();
+
+    private final Checker defaultChecker = new Checker();
 
     @Override
-    public Expression build(RuleFactory rf, Expression expr) {
-        return update(rf.repeatUntil(expressionParentBuilder.build(rf), expr));
+    public ExpressionChecker checker(CalculationContext cCtx) {
+        return defaultChecker;
+    }
+
+    private class Checker extends LeafExpressionChecker {
+
+        @Override
+        public Result check(int codePoint) throws ParsingException {
+            return ResultType.MATCH.andRollback();
+        }
     }
 }

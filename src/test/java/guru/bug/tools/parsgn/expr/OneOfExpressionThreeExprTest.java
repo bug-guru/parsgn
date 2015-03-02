@@ -47,166 +47,166 @@ public class OneOfExpressionThreeExprTest extends OneOfExpressionTestBase {
     }
 
     /*
-        COMMIT
-        ROLLBACK, COMMIT
-        ROLLBACK_OPT, COMMIT
-        ROLLBACK, ROLLBACK, COMMIT
-        ROLLBACK, ROLLBACK_OPT, COMMIT
-        ROLLBACK_OPT, ROLLBACK, COMMIT
-        ROLLBACK_OPT, ROLLBACK_OPT, COMMIT
+        MATCH
+        MISMATCH, MATCH
+        ROLLBACK_OPT, MATCH
+        MISMATCH, MISMATCH, MATCH
+        MISMATCH, ROLLBACK_OPT, MATCH
+        ROLLBACK_OPT, MISMATCH, MATCH
+        ROLLBACK_OPT, ROLLBACK_OPT, MATCH
 
-        ROLLBACK, ROLLBACK, ROLLBACK
-        ROLLBACK, ROLLBACK, ROLLBACK_OPT
+        MISMATCH, MISMATCH, MISMATCH
+        MISMATCH, MISMATCH, ROLLBACK_OPT
 
-        ROLLBACK, ROLLBACK_OPT, ROLLBACK
-        ROLLBACK, ROLLBACK_OPT, ROLLBACK_OPT
+        MISMATCH, ROLLBACK_OPT, MISMATCH
+        MISMATCH, ROLLBACK_OPT, ROLLBACK_OPT
 
-        ROLLBACK_OPT, ROLLBACK, ROLLBACK
-        ROLLBACK_OPT, ROLLBACK, ROLLBACK_OPT
+        ROLLBACK_OPT, MISMATCH, MISMATCH
+        ROLLBACK_OPT, MISMATCH, ROLLBACK_OPT
 
-        ROLLBACK_OPT, ROLLBACK_OPT, ROLLBACK
+        ROLLBACK_OPT, ROLLBACK_OPT, MISMATCH
         ROLLBACK_OPT, ROLLBACK_OPT, ROLLBACK_OPT
      */
 
     @Test
     public void testChecker_C() throws Exception {
         checker.next();
-        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
+        assertSame(ResultType.MATCH, checker.check(ResultType.MATCH).getBasicResult());
     }
 
     @Test
     public void testChecker_RC() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH).getBasicResult());
         checker.next();
-        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
+        assertSame(ResultType.MATCH, checker.check(ResultType.MATCH).getBasicResult());
     }
 
     @Test
     public void testChecker_OC() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
         checker.next();
-        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
+        assertSame(ResultType.MATCH, checker.check(ResultType.MATCH).getBasicResult());
     }
 
     @Test
     public void testChecker_RRC() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH).getBasicResult());
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH).getBasicResult());
         checker.next();
-        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
+        assertSame(ResultType.MATCH, checker.check(ResultType.MATCH).getBasicResult());
     }
 
     @Test
     public void testChecker_ROC() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH).getBasicResult());
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
         checker.next();
-        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
+        assertSame(ResultType.MATCH, checker.check(ResultType.MATCH).getBasicResult());
     }
 
     @Test
     public void testChecker_ORC() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH).getBasicResult());
         checker.next();
-        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
+        assertSame(ResultType.MATCH, checker.check(ResultType.MATCH).getBasicResult());
     }
 
     @Test
     public void testChecker_OOC() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
         checker.next();
-        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
+        assertSame(ResultType.MATCH, checker.check(ResultType.MATCH).getBasicResult());
     }
 
     @Test
     public void testChecker_RRR() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH).getBasicResult());
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH).getBasicResult());
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.MISMATCH, checker.check(ResultType.MISMATCH).getBasicResult());
     }
 
     @Test
     public void testChecker_RRO() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH).getBasicResult());
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH).getBasicResult());
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.MISMATCH, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
     }
 
     @Test
     public void testChecker_ROR() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH).getBasicResult());
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.MISMATCH, checker.check(ResultType.MISMATCH).getBasicResult());
     }
 
     @Test
     public void testChecker_ROO() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH).getBasicResult());
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.MISMATCH, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
     }
 
     @Test
     public void testChecker_ORR() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH).getBasicResult());
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.MISMATCH, checker.check(ResultType.MISMATCH).getBasicResult());
     }
 
     @Test
     public void testChecker_ORO() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH).getBasicResult());
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.MISMATCH, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
     }
 
     @Test
     public void testChecker_OOR() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.MISMATCH, checker.check(ResultType.MISMATCH).getBasicResult());
     }
 
     @Test
     public void testChecker_OOO() throws Exception {
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
         checker.next();
-        assertSame(ResultType.CONTINUE, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.CONTINUE, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
         checker.next();
-        assertSame(ResultType.ROLLBACK, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.MISMATCH, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
     }
 }

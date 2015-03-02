@@ -37,26 +37,26 @@ public class QuantityExpressionZeroOrOneTest extends QuantityExpressionTestBase 
     }
 
     /*
-        COMMIT
-        ROLLBACK
+        MATCH
+        MISMATCH
         ROLLBACK_OPT
      */
 
     @Test
     public void testChecker_COMMIT() throws Exception {
         checker.next();
-        assertSame(ResultType.COMMIT, checker.check(ResultType.COMMIT));
+        assertSame(ResultType.MATCH, checker.check(ResultType.MATCH).getBasicResult());
     }
 
     @Test
     public void testChecker_ROLLBACK() throws Exception {
         checker.next();
-        assertSame(ResultType.ROLLBACK_OPTIONAL, checker.check(ResultType.ROLLBACK));
+        assertSame(ResultType.MISMATCH_BUT_OPTIONAL, checker.check(ResultType.MISMATCH).getBasicResult());
     }
 
     @Test
     public void testChecker_ROLLBACK_OPTIONAL() throws Exception {
         checker.next();
-        assertSame(ResultType.ROLLBACK_OPTIONAL, checker.check(ResultType.ROLLBACK_OPTIONAL));
+        assertSame(ResultType.MISMATCH_BUT_OPTIONAL, checker.check(ResultType.MISMATCH_BUT_OPTIONAL).getBasicResult());
     }
 }

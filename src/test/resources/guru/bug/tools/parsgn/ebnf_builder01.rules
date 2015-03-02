@@ -2,7 +2,7 @@ text: header+;
 
 header: line underscore | semiunderscore;
 
-line: #VALID > eol eol;
+line: [!eol #VALID] eol;
 
 underscore: "_"{4,} eol;
 

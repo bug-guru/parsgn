@@ -24,6 +24,7 @@ package guru.bug.tools.parsgn.expr;
 
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.calc.CalculationContext;
+import guru.bug.tools.parsgn.processing.Result;
 import guru.bug.tools.parsgn.processing.ResultType;
 
 import java.util.ArrayList;
@@ -90,23 +91,23 @@ public class OneOfExpression extends Expression {
         }
 
         @Override
-        public ResultType check(ResultType childResult) throws ParsingException {
+        public Result check(ResultType childResult) throws ParsingException {
             switch (childResult) {
-                case COMMIT:
-                    return ResultType.COMMIT;
-                case ROLLBACK_OPTIONAL:
-                case ROLLBACK:
+                case MATCH:
+                    return ResultType.MATCH.andMerge();
+                case MISMATCH:
+                case MISMATCH_BUT_OPTIONAL:
                     return doRollbackOrContinue();
                 default:
                     throw new ParsingException("unknown result: " + childResult);
             }
         }
 
-        private ResultType doRollbackOrContinue() throws ParsingException {
+        private Result doRollbackOrContinue() throws ParsingException {
             if (exprIterator.hasNext()) {
-                return ResultType.CONTINUE;
+                return ResultType.CONTINUE.noAction();
             } else {
-                return ResultType.ROLLBACK;
+                return ResultType.MISMATCH.andRollback();
             }
         }
     }

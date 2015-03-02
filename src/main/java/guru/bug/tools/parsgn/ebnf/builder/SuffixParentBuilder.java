@@ -44,8 +44,7 @@ public class SuffixParentBuilder {
             @XmlElement(name = RuleNames.ZERO_OR_MORE, type = ZeroOrMoreSuffixBuilder.class),
             @XmlElement(name = RuleNames.EXACTLY_N_TIMES, type = ExactlyNTimesSuffixBuilder.class),
             @XmlElement(name = RuleNames.AT_LEAST_MIN_TIMES, type = AtLeastMinTimesSuffixBuilder.class),
-            @XmlElement(name = RuleNames.AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES, type = AtLeastNButNotMoreThanMTimesSuffixBuilder.class),
-            @XmlElement(name = RuleNames.UNTIL, type = UntilSuffixBuilder.class)
+            @XmlElement(name = RuleNames.AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES, type = AtLeastNButNotMoreThanMTimesSuffixBuilder.class)
     })
     private SuffixBuilder suffix;
 

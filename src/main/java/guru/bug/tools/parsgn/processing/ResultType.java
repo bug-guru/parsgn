@@ -22,14 +22,104 @@
 
 package guru.bug.tools.parsgn.processing;
 
+import java.util.Deque;
+
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0
  * @since 1.0
  */
+// TODO consider rename to Results
 public enum ResultType {
     CONTINUE,
-    COMMIT,
-    ROLLBACK,
-    ROLLBACK_OPTIONAL
+    MATCH,
+    MISMATCH,
+    MISMATCH_BUT_OPTIONAL;
+
+    public Result and(ResultAction action) {
+        return new Result(this, action);
+    }
+
+    public Result andRollback() {
+        return and(ResultType::rollback);
+    }
+
+    public Result andSkip() {
+        return and(ResultType::skip);
+    }
+
+    public Result andCommitGroup(String name) {
+        return and(new ResultAction() {
+            @Override
+            public <T> void apply(Deque<Holder<T>> stack, CodePointSource src) {
+                ResultType.commitGroup(stack, src, name);
+            }
+        });
+    }
+
+    public Result andCommitString(String value) {
+        return and(new ResultAction() {
+            @Override
+            public <T> void apply(Deque<Holder<T>> stack, CodePointSource src) {
+                ResultType.commitValue(stack, src, value);
+            }
+        });
+    }
+
+    public Result andCommitCodePoint(int codePoint) {
+        return and(new ResultAction() {
+            @Override
+            public <T> void apply(Deque<Holder<T>> stack, CodePointSource src) {
+                ResultType.commitCodePoint(stack, src, codePoint);
+            }
+        });
+    }
+
+    public Result andMerge() {
+        return and(ResultType::merge);
+    }
+
+    public Result noAction() {
+        return and(ResultType::empty);
+    }
+
+    public static <T> void rollback(Deque<Holder<T>> stack, CodePointSource source) {
+        stack.pop();
+        source.rewind();
+    }
+
+    public static <T> void skip(Deque<Holder<T>> stack, CodePointSource source) {
+        stack.pop();
+        source.removeMark();
+    }
+
+    public static <T> void commitGroup(Deque<Holder<T>> stack, CodePointSource source, String name) {
+        Holder<T> top = stack.pop();
+        source.removeMark();
+        top.setEnd(source.getNextPos());
+        stack.peek().commitNode(name, top);
+    }
+
+    public static <T> void commitValue(Deque<Holder<T>> stack, CodePointSource source, String value) {
+        stack.pop();
+        source.removeMark();
+        stack.peek().getCommittedValue().append(value);
+    }
+
+    public static <T> void commitCodePoint(Deque<Holder<T>> stack, CodePointSource source, int codePoint) {
+        stack.pop();
+        source.removeMark();
+        stack.peek().getCommittedValue().appendCodePoint(codePoint);
+    }
+
+
+    public static <T> void merge(Deque<Holder<T>> stack, CodePointSource source) {
+        Holder<T> top = stack.pop();
+        source.removeMark();
+        stack.peek().merge(top);
+    }
+
+    public static <T> void empty(Deque<Holder<T>> stack, CodePointSource source) {
+
+    }
 }
