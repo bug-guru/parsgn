@@ -170,6 +170,9 @@ public class QuantityExpression extends Expression {
         }
 
         private Result doCommitOrContinue() throws ParsingException {
+            if (maxOccurrences == 0 && minOccurrences == 0) {
+                return ResultType.MATCH.andSkip();
+            }
             turnsPassed++;
             if (maxOccurrences == turnsPassed) {
                 return ResultType.MATCH.andMerge();

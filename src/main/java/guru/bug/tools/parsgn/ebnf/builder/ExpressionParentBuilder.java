@@ -38,6 +38,8 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType
 public class ExpressionParentBuilder {
+    @XmlElement(name = RuleNames.NEGATIVE_FLAG)
+    private NegativeFlagBuilder negativeFlagBuilder;
     @XmlElements({
             @XmlElement(name = RuleNames.ONE_OF, type = OneOfExpressionBuilder.class),
             @XmlElement(name = RuleNames.REFERENCE, type = ReferenceExpressionBuilder.class),
@@ -51,10 +53,13 @@ public class ExpressionParentBuilder {
 
 
     public Expression build(RuleFactory rf) {
-        Expression expr = expression.build(rf);
-        if (suffix == null) {
-            return expr;
+        Expression result = expression.build(rf);
+        if (suffix != null) {
+            result = suffix.generate(rf, result);
         }
-        return suffix.generate(rf, expr);
+        if (negativeFlagBuilder != null) {
+            result = negativeFlagBuilder.generate(rf, result);
+        }
+        return result;
     }
 }

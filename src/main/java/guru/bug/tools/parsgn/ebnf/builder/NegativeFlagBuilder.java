@@ -20,17 +20,17 @@
  * THE SOFTWARE.
  */
 
-Root:
-    [EOL* !EOF Line(0)]* EOL* EOF;
+package guru.bug.tools.parsgn.ebnf.builder;
 
-Line(level):
-    Indent(level) [!EOL #VALID]* [!EOF [EOL* Line(level+1)]*]?;
+import guru.bug.tools.parsgn.RuleFactory;
+import guru.bug.tools.parsgn.expr.Expression;
 
-.Indent(level):
-    " "{level * 4};
+import javax.xml.bind.annotation.XmlType;
 
-.EOL:
-    " "* ["\r\n" | "\r" | "\n"];
+@XmlType
+public class NegativeFlagBuilder extends BaseBuilder {
 
-.EOF:
-    " "* #EOF;
+    public Expression generate(RuleFactory rf, Expression expr) {
+        return update((rf.not(expr)));
+    }
+}
