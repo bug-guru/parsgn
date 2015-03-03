@@ -21,7 +21,7 @@
  */
 
 ConfigFile:
-    [I Rule]+ I #EOF;
+    [I Rule]+ I;
 
 Rule:
     HideFlag? I Name I RuleParams? I ":" ExpressionList I ";" ;
@@ -30,13 +30,13 @@ HideFlag: "." I;
 
 RuleParams: "(" I Name [I "," I Name]* I ")";
 
-I: [!#EOF [WS | LT | SingleLineComment | MultiLineComment]]*;
+I: [WS | LT | SingleLineComment | MultiLineComment]*;
 
 SingleLineComment: "//" [!EOL #VALID]* EOL;
 
 .EOL: WS LT;
 
-.LT: ["\r\n" | "\r" | "\n" | #EOF];
+.LT: ["\r\n" | "\r" | "\n"];
 
 .WS: [" " | "\t"]*;
 

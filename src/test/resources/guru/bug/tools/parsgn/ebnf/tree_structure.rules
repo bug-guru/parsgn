@@ -21,16 +21,13 @@
  */
 
 Root:
-    [EOL* !EOF Line(0)]* EOL* EOF;
+    [EOL* Line(0)]* EOL*;
 
 Line(level):
-    Indent(level) [!EOL #VALID]* [!EOF [EOL* Line(level+1)]*]?;
+    Indent(level) [!EOL #VALID]* [EOL* Line(level+1)]*;
 
 .Indent(level):
     " "{level * 4};
 
 .EOL:
     " "* ["\r\n" | "\r" | "\n"];
-
-.EOF:
-    " "* #EOF;

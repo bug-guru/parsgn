@@ -93,6 +93,7 @@ public class SequentialExpression extends Expression {
                 case MISMATCH_BUT_OPTIONAL:
                     return doCommitOrContinue();
                 case MISMATCH:
+                case END_OF_FILE:
                     return ResultType.MISMATCH.andRollback();
                 default:
                     throw new ParsingException("unknown result: " + childResult);
@@ -103,6 +104,7 @@ public class SequentialExpression extends Expression {
             if (expressions.hasNext()) {
                 return ResultType.CONTINUE.noAction();
             } else if (!hasCommitted) {
+                // TODO review this. It seems weird to treat sequence as optinal if no one value were submitted.
                 return ResultType.MISMATCH_BUT_OPTIONAL.andRollback();
             } else {
                 return ResultType.MATCH.andMerge();

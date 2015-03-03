@@ -159,12 +159,6 @@ public enum CharType {
         public boolean apply(int codePoint) {
             return codePoint == '\n' || codePoint == '\r';
         }
-    },
-    EOF {
-        @Override
-        public boolean apply(int codePoint) {
-            return codePoint == -1;
-        }
     };
 
     public abstract boolean apply(int codePoint);

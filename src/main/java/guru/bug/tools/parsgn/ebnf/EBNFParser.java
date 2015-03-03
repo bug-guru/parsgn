@@ -57,8 +57,7 @@ public class EBNFParser extends Parser implements RuleNames {
                         rb.ref(I),
                         rb.ref(RULE)
                 ),
-                rb.ref(I),
-                rb.charType(CharType.EOF)
+                rb.ref(I)
         );
         // Rule:
         //     HideFlag? I Name I RuleParams? I ":" ExpressionList I ";";
@@ -93,10 +92,9 @@ public class EBNFParser extends Parser implements RuleNames {
                 rb.ref(I),
                 rb.str(")")
         );
-        // I: [!#EOF [WS | LT | SingleLineComment | MultiLineComment]]*;
+        // I: [WS | LT | SingleLineComment | MultiLineComment]*;
         rb.rule(I,
                 rb.zeroOrMore(
-                        rb.not(rb.charType(CharType.EOF)),
                         rb.oneOf(
                                 rb.ref(WS),
                                 rb.ref(LT),
@@ -119,13 +117,12 @@ public class EBNFParser extends Parser implements RuleNames {
                 rb.ref(WS),
                 rb.ref(LT)
         ).hide();
-        // .LT: ["\r\n" | "\r" | "\n" | #EOF];
+        // .LT: ["\r\n" | "\r" | "\n"];
         rb.rule(LT,
                 rb.oneOf(
                         rb.str("\r\n"),
                         rb.str("\r"),
-                        rb.str("\n"),
-                        rb.charType(CharType.EOF)
+                        rb.str("\n")
                 )
         ).hide();
         // .WS: [" " | "\t"]*;

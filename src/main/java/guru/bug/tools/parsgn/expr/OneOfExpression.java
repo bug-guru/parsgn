@@ -98,6 +98,8 @@ public class OneOfExpression extends Expression {
                 case MISMATCH:
                 case MISMATCH_BUT_OPTIONAL:
                     return doRollbackOrContinue();
+                case END_OF_FILE:
+                    return ResultType.MISMATCH.andRollback();
                 default:
                     throw new ParsingException("unknown result: " + childResult);
             }

@@ -48,15 +48,6 @@ public class CharacterExpressionTest {
     }
 
     @Test
-    public void testChecker_eof() throws Exception {
-        CharacterExpression expr = new CharacterExpression();
-        expr.setCharType(CharType.EOF);
-        CharacterExpression.Checker checker = (CharacterExpression.Checker) expr.checker(null);
-        assertSame(ResultType.MISMATCH, checker.check('a').getBasicResult());
-        assertSame(ResultType.MATCH, checker.check(-1).getBasicResult());
-    }
-
-    @Test
     public void testChecker_eol() throws Exception {
         CharacterExpression expr = new CharacterExpression();
         expr.setCharType(CharType.LINE_SEPARATOR);

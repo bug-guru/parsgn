@@ -99,14 +99,21 @@ public class ParsingContext<T> implements CalculationContext {
         Holder<T> leafHolder = stack.peek();
         Expression.LeafExpressionChecker leafChecker = leafHolder.getLeafExpressionChecker();
         if (logger.isLoggable(Level.FINER)) {
-            logger.log(Level.FINER, "checking: {0}; codePoint {1} at: {2}", new Object[]{StringUtils.codePointToString(codePoint), codePoint, lastPos});
+            logger.log(Level.FINER, "checking: {0}; codePoint {1} at: {2}",
+                    new Object[]{StringUtils.codePointToString(codePoint), codePoint, lastPos});
             logger.log(Level.FINER, "Expr stack: {0}", stackToString(stack));
         }
 
-        Result result = leafChecker.check(codePoint);
-        ResultType prevResult = result.getBasicResult();
-        result.apply(stack, source);
-        afterCheck(prevResult);
+        ResultType prevResult;
+        if (codePoint == -1) {
+            prevResult = ResultType.END_OF_FILE;
+            ResultType.rollback(stack, source);
+        } else {
+            Result result = leafChecker.check(codePoint);
+            prevResult = result.getBasicResult();
+            result.apply(stack, source);
+            afterCheck(prevResult);
+        }
         logger.log(Level.FINER, "result: {0}\n", prevResult);
 
         while (prevResult != ResultType.CONTINUE) {
@@ -123,9 +130,14 @@ public class ParsingContext<T> implements CalculationContext {
             if (logger.isLoggable(Level.FINER)) {
                 logger.log(Level.FINER, "Expr stack: {0}", stackToString(stack));
             }
-            result = branchChecker.check(prevResult);
+            Result result = branchChecker.check(prevResult);
             prevResult = result.getBasicResult();
             result.apply(stack, source);
+
+            if (prevResult == ResultType.CONTINUE && codePoint == -1 && source.getNextPos().compareTo(lastPos) >= 0) {
+                prevResult = ResultType.END_OF_FILE;
+            }
+
             afterCheck(prevResult);
 
             logger.log(Level.FINER, "result: {0}\n", prevResult);
