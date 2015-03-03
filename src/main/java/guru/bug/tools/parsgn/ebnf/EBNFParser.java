@@ -51,13 +51,14 @@ public class EBNFParser extends Parser implements RuleNames {
     private static ReferenceExpression generateRules() throws ParsingException {
         RuleFactory rb = new RuleFactory();
         // ConfigFile:
-        //    [I Rule]+ I #EOF;
+        //    [I Rule]+ I !#VALID;
         rb.rule(CONFIG_FILE,
                 rb.oneOrMore(
                         rb.ref(I),
                         rb.ref(RULE)
                 ),
-                rb.ref(I)
+                rb.ref(I),
+                rb.not(rb.charType(CharType.VALID))
         );
         // Rule:
         //     HideFlag? I Name I RuleParams? I ":" ExpressionList I ";";

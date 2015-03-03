@@ -21,7 +21,7 @@
  */
 
 ConfigFile:
-    [I Rule]+ I;
+    [I Rule]+ I !#VALID;
 
 Rule:
     HideFlag? I Name I RuleParams? I ":" ExpressionList I ";" ;

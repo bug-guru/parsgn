@@ -34,8 +34,7 @@ public enum ResultType {
     CONTINUE,
     MATCH,
     MISMATCH,
-    MISMATCH_BUT_OPTIONAL,
-    END_OF_FILE;
+    MISMATCH_BUT_OPTIONAL;
 
     public Result and(ResultAction action) {
         return new Result(this, action);

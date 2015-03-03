@@ -23,13 +23,18 @@
 package guru.bug.tools.parsgn;
 
 import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
+import guru.bug.tools.parsgn.ebnf.EBNFParser;
 import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
+import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
+import guru.bug.tools.parsgn.utils.ParseTreeUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -50,9 +55,28 @@ public class ErrorProcessingTest {
     public void testEBNFError() throws Exception {
         try {
             createParser("ebnf_error01.rules");
+            Assert.fail();
         } catch (SyntaxErrorException ex) {
             Assert.assertEquals(27, ex.getPosition().getRow());
             Assert.assertEquals(5, ex.getPosition().getCol());
         }
     }
+
+    @Ignore
+    @Test
+    public void printParseTree() throws Exception {
+        Parser parser = new EBNFParser();
+        try (
+                InputStream input = getClass().getResourceAsStream("ebnf_error01.rules");
+                BufferedInputStream buf = new BufferedInputStream(input);
+                InputStreamReader reader = new InputStreamReader(buf)
+        ) {
+            ParseTreeResultBuilder resultBuilder = new ParseTreeResultBuilder();
+            parser.parse(reader, resultBuilder);
+            StringWriter writer = new StringWriter(2048);
+            ParseTreeUtils.serialize(resultBuilder.getRoot(), writer);
+            System.out.println(writer.toString());
+        }
+    }
+
 }

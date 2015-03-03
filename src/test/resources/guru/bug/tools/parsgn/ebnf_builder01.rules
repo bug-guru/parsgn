@@ -8,5 +8,5 @@ underscore: "_"{4,} eol;
 
 semiunderscore: "_"{2,} eol;
 
-eol: "\r\n" | "\r" | "\n" | #EOF;
+eol: "\r\n" | "\r" | "\n";
 

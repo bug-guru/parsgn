@@ -153,7 +153,6 @@ public class QuantityExpression extends Expression {
                     return doCommitOrContinue();
                 case MISMATCH:
                 case MISMATCH_BUT_OPTIONAL:
-                case END_OF_FILE:
                     return doCommitOrRollback();
                 default:
                     throw new ParsingException("unknown result: " + childResult);

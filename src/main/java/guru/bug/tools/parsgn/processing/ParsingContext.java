@@ -104,16 +104,15 @@ public class ParsingContext<T> implements CalculationContext {
             logger.log(Level.FINER, "Expr stack: {0}", stackToString(stack));
         }
 
-        ResultType prevResult;
+        Result result;
         if (codePoint == -1) {
-            prevResult = ResultType.END_OF_FILE;
-            ResultType.rollback(stack, source);
+            result = ResultType.MISMATCH.andRollback();
         } else {
-            Result result = leafChecker.check(codePoint);
-            prevResult = result.getBasicResult();
-            result.apply(stack, source);
-            afterCheck(prevResult);
+            result = leafChecker.check(codePoint);
         }
+        ResultType prevResult = result.getBasicResult();
+        afterCheck(prevResult);
+        result.apply(stack, source);
         logger.log(Level.FINER, "result: {0}\n", prevResult);
 
         while (prevResult != ResultType.CONTINUE) {
@@ -130,15 +129,10 @@ public class ParsingContext<T> implements CalculationContext {
             if (logger.isLoggable(Level.FINER)) {
                 logger.log(Level.FINER, "Expr stack: {0}", stackToString(stack));
             }
-            Result result = branchChecker.check(prevResult);
+            result = branchChecker.check(prevResult);
             prevResult = result.getBasicResult();
-            result.apply(stack, source);
-
-            if (prevResult == ResultType.CONTINUE && codePoint == -1 && source.getNextPos().compareTo(lastPos) >= 0) {
-                prevResult = ResultType.END_OF_FILE;
-            }
-
             afterCheck(prevResult);
+            result.apply(stack, source);
 
             logger.log(Level.FINER, "result: {0}\n", prevResult);
         }
@@ -163,7 +157,7 @@ public class ParsingContext<T> implements CalculationContext {
         List<StackElement> result = stack.stream()
                 .map(n -> new StackElement(n.getStart(), n.getChecker()))
                 .collect(Collectors.toList());
-        return new DebugFrame(result, source.getLastPos(), prevResult);
+        return new DebugFrame(result, source.getNextPos(), prevResult);
     }
 
     @Override

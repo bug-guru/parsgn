@@ -93,7 +93,6 @@ public class SequentialExpression extends Expression {
                 case MISMATCH_BUT_OPTIONAL:
                     return doCommitOrContinue();
                 case MISMATCH:
-                case END_OF_FILE:
                     return ResultType.MISMATCH.andRollback();
                 default:
                     throw new ParsingException("unknown result: " + childResult);
