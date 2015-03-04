@@ -24,9 +24,14 @@ ConfigFile:
     [I Rule]+ I !#VALID;
 
 Rule:
-    HideFlag? I Name I RuleParams? I ":" ExpressionList I ";" ;
+    Flag? I Name I RuleParams? I ":" ExpressionList I ";" ;
 
-HideFlag: "." I;
+^Flag:
+    HideFlag | CompressFlag I;
+
+HideFlag: ".";
+
+CompressFlag: "^";
 
 RuleParams: "(" I Name [I "," I Name]* I ")";
 

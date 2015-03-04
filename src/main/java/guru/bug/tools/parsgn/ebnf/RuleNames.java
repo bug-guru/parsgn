@@ -30,7 +30,9 @@ package guru.bug.tools.parsgn.ebnf;
 public interface RuleNames {
     public static final String CONFIG_FILE = "ConfigFile";
     public static final String RULE = "Rule";
+    public static final String FLAG = "Flag";
     public static final String HIDE_FLAG = "HideFlag";
+    public static final String COMPRESS_FLAG = "CompressFlag";
     public static final String RULE_PARAMS = "RuleParams";
     public static final String I = "I";
     public static final String SINGLE_LINE_COMMENT = "SingleLineComment";

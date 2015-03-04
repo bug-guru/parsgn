@@ -61,9 +61,9 @@ public class EBNFParser extends Parser implements RuleNames {
                 rb.not(rb.charType(CharType.VALID))
         );
         // Rule:
-        //     HideFlag? I Name I RuleParams? I ":" ExpressionList I ";";
+        //     Flag? I Name I RuleParams? I ":" ExpressionList I ";" ;
         rb.rule(RULE,
-                rb.zeroOrOne(rb.ref(HIDE_FLAG)),
+                rb.zeroOrOne(rb.ref(FLAG)),
                 rb.ref(I),
                 rb.ref(NAME),
                 rb.ref(I),
@@ -74,11 +74,19 @@ public class EBNFParser extends Parser implements RuleNames {
                 rb.ref(I),
                 rb.str(";")
         );
-        // HideFlag: "." I;
-        rb.rule(HIDE_FLAG,
-                rb.str("."),
+        // ^Flag:
+        //     HideFlag | CompressFlag I;
+        rb.rule(FLAG,
+                rb.oneOf(
+                        rb.ref(HIDE_FLAG),
+                        rb.ref(COMPRESS_FLAG)
+                ),
                 rb.ref(I)
-        );
+        ).compress();
+        // HideFlag: ".";
+        rb.rule(HIDE_FLAG, rb.str("."));
+        // CompressFlag: "^";
+        rb.rule(COMPRESS_FLAG, rb.str("^"));
         // RuleParams: "(" I Name [I "," I Name]* I ")";
         rb.rule(RULE_PARAMS,
                 rb.str("("),

@@ -37,6 +37,7 @@ public class Rule extends BaseExpression {
     private Expression expression;
     private List<String> params = new ArrayList<>(2);
     private boolean hidden;
+    private boolean compressed;
 
     public Rule(String name) {
         this.name = name;
@@ -62,6 +63,14 @@ public class Rule extends BaseExpression {
         this.hidden = hidden;
     }
 
+    public boolean isCompressed() {
+        return compressed;
+    }
+
+    public void setCompressed(boolean compressed) {
+        this.compressed = compressed;
+    }
+
     public Rule hidden(boolean hidden) {
         setHidden(hidden);
         return this;
@@ -72,8 +81,13 @@ public class Rule extends BaseExpression {
         return this;
     }
 
-    public Rule hide(boolean hide) {
-        setHidden(hide);
+    public Rule compressed(boolean compress) {
+        setCompressed(compress);
+        return this;
+    }
+
+    public Rule compress() {
+        setCompressed(true);
         return this;
     }
 

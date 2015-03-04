@@ -127,6 +127,8 @@ public class ReferenceExpression extends Expression {
                 case MATCH:
                     if (reference.isHidden()) {
                         return ResultType.MATCH.andSkip();
+                    } else if (reference.isCompressed()) {
+                        return ResultType.MATCH.andMerge();
                     } else {
                         return ResultType.MATCH.andCommitGroup(reference.getName());
                     }

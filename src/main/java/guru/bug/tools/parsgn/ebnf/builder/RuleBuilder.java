@@ -46,6 +46,9 @@ public class RuleBuilder extends BaseBuilder {
     @XmlElement(name = RuleNames.HIDE_FLAG)
     @XmlJavaTypeAdapter(BooleanSubstituteAdapter.class)
     private Boolean hidden;
+    @XmlElement(name = RuleNames.COMPRESS_FLAG)
+    @XmlJavaTypeAdapter(BooleanSubstituteAdapter.class)
+    private Boolean compressed;
     @XmlElement(name = RuleNames.NAME)
     @XmlElementWrapper(name = RuleNames.RULE_PARAMS)
     private List<String> ruleParams;
@@ -60,6 +63,7 @@ public class RuleBuilder extends BaseBuilder {
         Expression exprList = expressionListBuilder.build(rf);
         update(rf.rule(name, exprList)
                 .hidden(hidden == null ? false : hidden)
+                .compressed(compressed == null ? false : compressed)
                 .params(ruleParams));
     }
 }
