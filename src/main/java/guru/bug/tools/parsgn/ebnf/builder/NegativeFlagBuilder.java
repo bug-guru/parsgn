@@ -24,8 +24,8 @@ package guru.bug.tools.parsgn.ebnf.builder;
 
 import guru.bug.tools.parsgn.RuleFactory;
 import guru.bug.tools.parsgn.expr.Expression;
+import jakarta.xml.bind.annotation.XmlType;
 
-import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 public class NegativeFlagBuilder extends BaseBuilder {

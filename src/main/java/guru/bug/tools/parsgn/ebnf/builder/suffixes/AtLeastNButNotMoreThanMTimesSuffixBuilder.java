@@ -28,8 +28,8 @@ import guru.bug.tools.parsgn.ebnf.builder.calc.CalcExpressionBuilder;
 import guru.bug.tools.parsgn.expr.Expression;
 import guru.bug.tools.parsgn.expr.calc.Term;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 import java.util.List;
 
 /**

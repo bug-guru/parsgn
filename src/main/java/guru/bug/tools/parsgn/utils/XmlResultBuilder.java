@@ -60,11 +60,13 @@ public class XmlResultBuilder extends ResultBuilder<Node> {
 
     @Override
     public Node createNode(String name, String value, List<Node> children, Position start, Position end) {
+        System.out.println("createNode: " + name + " " + value + " " + children + " " + start + " " + end);
         Element node = result.createElement(name);
         if (value != null) {
             Text txt = result.createTextNode(value);
             node.appendChild(txt);
         }
+
         if (children != null) {
             children.forEach(node::appendChild);
         }
@@ -75,6 +77,7 @@ public class XmlResultBuilder extends ResultBuilder<Node> {
 
     @Override
     public void committedRoot(Node root) {
+        System.out.println("committedRoot");
         result.appendChild(root);
     }
 

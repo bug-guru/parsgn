@@ -27,9 +27,10 @@ import guru.bug.tools.parsgn.ebnf.RuleNames;
 import guru.bug.tools.parsgn.exceptions.NumberOfParametersException;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.expr.ReferenceExpression;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,5 +49,15 @@ public class ConfigFileBuilder extends BaseBuilder {
         ruleList.forEach(m -> m.build(builder));
         String rootName = ruleList.get(0).getName();
         return update(builder.build(rootName));
+    }
+
+    public void addRule(RuleBuilder rule) {
+        if (ruleList == null) {
+            ruleList = new ArrayList<>();
+        }
+        if (!(ruleList instanceof ArrayList<RuleBuilder>)) {
+            ruleList = new ArrayList<>(ruleList);
+            ruleList.add(rule);
+        }
     }
 }

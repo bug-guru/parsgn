@@ -27,8 +27,8 @@ import guru.bug.tools.parsgn.ebnf.RuleNames;
 import guru.bug.tools.parsgn.ebnf.builder.calc.CalcExpressionBuilder;
 import guru.bug.tools.parsgn.expr.Expression;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>

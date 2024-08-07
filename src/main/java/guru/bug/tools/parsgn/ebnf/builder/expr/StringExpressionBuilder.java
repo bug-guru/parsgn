@@ -25,8 +25,8 @@ package guru.bug.tools.parsgn.ebnf.builder.expr;
 import guru.bug.tools.parsgn.RuleFactory;
 import guru.bug.tools.parsgn.expr.Expression;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 import java.util.List;
 
 import static guru.bug.tools.parsgn.ebnf.RuleNames.STRING_CONSTANT;

@@ -25,7 +25,7 @@ package guru.bug.tools.parsgn.ebnf.builder.suffixes;
 import guru.bug.tools.parsgn.RuleFactory;
 import guru.bug.tools.parsgn.expr.Expression;
 
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>

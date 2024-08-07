@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2024 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,20 +20,11 @@
  * THE SOFTWARE.
  */
 
-.char {
-    -fx-font-family: monospace;
-}
+package guru.bug.tools.parsgn.ebnf.builder;
 
-.char.specChar {
-    -fx-font-size: 50%;
-}
+public class IgnorableBuilder extends BaseBuilder {
+    public static final IgnorableBuilder INSTANCE = new IgnorableBuilder();
 
-.char.highlight {
-    -fx-fill: red;
-    -fx-underline: true;
-}
-
-.char:hover {
-    -fx-font-weight: bold;
-    -fx-fill: darkblue;
+    private IgnorableBuilder() {
+    }
 }

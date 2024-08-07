@@ -25,9 +25,9 @@ package guru.bug.tools.parsgn.ebnf.builder;
 import guru.bug.tools.parsgn.ebnf.builder.utils.PositionAdapter;
 import guru.bug.tools.parsgn.expr.BaseExpression;
 import guru.bug.tools.parsgn.processing.Position;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>

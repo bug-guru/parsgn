@@ -25,7 +25,7 @@ package guru.bug.tools.parsgn.ebnf.builder.calc;
 import guru.bug.tools.parsgn.ebnf.builder.BaseBuilder;
 import guru.bug.tools.parsgn.expr.calc.Term;
 
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlType;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>

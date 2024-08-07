@@ -96,7 +96,7 @@ public class Holder<T> {
             throw new IllegalArgumentException("child cannot be null");
         }
         boolean emptyNodes = child.committedNodes == null || child.committedNodes.isEmpty();
-        boolean emptyValue = child.committedValue == null || child.committedValue.length() == 0;
+        boolean emptyValue = child.committedValue == null || child.committedValue.isEmpty();
         String value = emptyValue ? null : child.committedValue.toString();
         List<T> nodes = emptyNodes ? null : child.committedNodes;
         return builder.createNode(nodeName, value, nodes, child.start, child.end);

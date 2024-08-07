@@ -29,9 +29,9 @@ import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.utils.XmlResultBuilder;
 import org.w3c.dom.Document;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
@@ -91,7 +91,7 @@ public class DefaultParserBuilder {
      */
     public Parser createParser(Reader input) throws IOException, ParsingException {
         try {
-            XmlResultBuilder builder = new XmlResultBuilder();
+            var builder = new XmlResultBuilder();
             EBNF_PARSER.parse(input, builder);
             Document doc = builder.getResult();
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();

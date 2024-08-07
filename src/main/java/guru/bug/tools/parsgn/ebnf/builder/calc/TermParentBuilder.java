@@ -24,9 +24,9 @@ package guru.bug.tools.parsgn.ebnf.builder.calc;
 
 import guru.bug.tools.parsgn.expr.calc.Term;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElements;
+import jakarta.xml.bind.annotation.XmlType;
 
 import static guru.bug.tools.parsgn.ebnf.RuleNames.*;
 
