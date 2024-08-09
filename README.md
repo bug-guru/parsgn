@@ -286,6 +286,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgments
 
-    JavaCC - Java Compiler Compiler, an inspiration for parsing-related projects.
-    ANTLR - Another parser generator framework that influenced the development of this library.
+- **JavaCC** - Java Compiler Compiler, an inspiration for parsing-related projects.
+- **ANTLR** - Another parser generator framework that influenced the development of this library.
 
