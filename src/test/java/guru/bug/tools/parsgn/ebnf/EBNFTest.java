@@ -28,13 +28,13 @@ import guru.bug.tools.parsgn.utils.EBNFResultBuilder;
 import guru.bug.tools.parsgn.utils.ParseNode;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.utils.ParseTreeUtils;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 
 import static java.util.Objects.requireNonNull;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -100,7 +100,7 @@ public class EBNFTest {
         }
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void printParseTree() throws Exception {
         Parser parser = new EBNFParser();

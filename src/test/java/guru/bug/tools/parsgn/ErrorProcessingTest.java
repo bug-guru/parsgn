@@ -27,9 +27,8 @@ import guru.bug.tools.parsgn.ebnf.EBNFParser;
 import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.utils.ParseTreeUtils;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -37,6 +36,8 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 import static java.util.Objects.requireNonNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -52,14 +53,14 @@ public class ErrorProcessingTest {
         ) {
             DefaultParserBuilder builder = new DefaultParserBuilder();
             builder.createParser(reader);
-            Assert.fail();
+            fail();
         } catch (SyntaxErrorException ex) {
-            Assert.assertEquals(27, ex.getPosition().getRow());
-            Assert.assertEquals(5, ex.getPosition().getCol());
+            assertEquals(27, ex.getPosition().getRow());
+            assertEquals(5, ex.getPosition().getCol());
         }
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void printParseTree() throws Exception {
         Parser parser = new EBNFParser();

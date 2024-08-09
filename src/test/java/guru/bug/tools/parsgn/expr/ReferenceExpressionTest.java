@@ -23,10 +23,10 @@
 package guru.bug.tools.parsgn.expr;
 
 import guru.bug.tools.parsgn.processing.ResultType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 
 /**
@@ -36,7 +36,7 @@ public class ReferenceExpressionTest {
     private FakeExpression expr;
     private ReferenceExpression.Checker checker;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         Rule rule = new Rule("fake");
         ReferenceExpression expression = new ReferenceExpression("fake");

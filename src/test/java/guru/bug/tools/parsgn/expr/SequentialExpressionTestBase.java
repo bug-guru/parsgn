@@ -22,21 +22,22 @@
 
 package guru.bug.tools.parsgn.expr;
 
-import org.junit.Before;
+
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  */
 public class SequentialExpressionTestBase {
-    protected final SequentialExpression expression;
-    protected SequentialExpression.Checker checker;
+    final SequentialExpression expression;
+    SequentialExpression.Checker checker;
 
-    public SequentialExpressionTestBase() {
+    SequentialExpressionTestBase() {
         expression = new SequentialExpression();
     }
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         checker = (SequentialExpression.Checker) expression.checker(null);
     }
 

@@ -22,7 +22,8 @@
 
 package guru.bug.tools.parsgn.expr;
 
-import org.junit.Before;
+
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -36,7 +37,7 @@ public class QuantityExpressionTestBase {
         expression.setExpression(new FakeExpression());
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         checker = (QuantityExpression.Checker) expression.checker(null);
     }

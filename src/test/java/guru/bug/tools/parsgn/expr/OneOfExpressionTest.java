@@ -23,10 +23,10 @@
 package guru.bug.tools.parsgn.expr;
 
 import guru.bug.tools.parsgn.processing.ResultType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -38,7 +38,7 @@ public class OneOfExpressionTest {
     private final OneOfExpression expression = new OneOfExpression();
     private OneOfExpression.Checker checker;
 
-    @Before
+    @BeforeEach
     public void createChecker() {
         checker = (OneOfExpression.Checker) expression.checker(null);
     }

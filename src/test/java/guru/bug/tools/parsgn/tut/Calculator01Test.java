@@ -26,8 +26,8 @@ import guru.bug.tools.parsgn.Parser;
 import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.utils.ParseTreeUtils;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -53,7 +53,7 @@ public class Calculator01Test {
         }
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() throws Exception {
         parser = createParser("calculator01.rules");
     }
