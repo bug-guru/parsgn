@@ -8,6 +8,8 @@ builds a parser, and then uses that parser to process input files, resulting in 
 
 - Dynamic Parser Creation: Create parsers on the fly using EBNF-like configuration files.
 - Flexible Grammar: Define complex parsing rules with support for sequences, choices, repetitions, and more.
+- Use of Variables and Arithmetic Expressions: Incorporate variables and arithmetic expressions directly in your grammar
+  definitions, allowing for context-sensitive parsing rules.
 - Parse Tree Generation: After parsing, a parse tree is generated, which can be traversed for further processing.
 
 ## Installation
@@ -15,7 +17,6 @@ builds a parser, and then uses that parser to process input files, resulting in 
 To use this library in your project, include the following dependency in your pom.xml if using Maven:
 
 ```xml
-
 <dependency>
     <groupId>guru.bug.tools</groupId>
     <artifactId>parsgn</artifactId>
@@ -164,6 +165,121 @@ END  : number
 END  : operand
 END  : expression
 ```
+
+## Advanced Grammar Example
+
+ParsGN also supports the use of variables and arithmetic expressions within grammar definitions. This allows for the
+creation of context-sensitive rules, such as those that depend on indentation levels or other dynamically calculated
+values.
+
+Here is an example demonstrating the use of variables in the grammar:
+
+```
+Root:
+    [EOL* Line(0)]* EOL*;
+
+Line(level):
+    Indent(level) [!EOL #VALID]* [EOL* Line(level+1)]*;
+
+.Indent(level):
+    " "{level * 4};
+
+.EOL:
+    " "* ["\r\n" | "\r" | "\n"];
+```
+
+In this example:
+
+- The variable level is used as a parameter to control the indentation size dynamically.
+- The Indent rule multiplies the level by 4 to determine the number of spaces required for indentation.
+
+This feature adds significant flexibility to your grammars, allowing you to handle complex input formats that depend on
+context. The use of variables makes the Line rule recursive, allowing lines with greater indentation to be treated as
+children of previous lines with lesser indentation.
+
+### Example Input and Parse Tree
+
+Given the following input content:
+
+```
+line 1 level 0
+line 2 level 0
+line 3 level 0
+    line 3.1 level 1
+    line 3.2 level 1
+        line 3.2.1 level 2
+        line 3.2.2 level 2
+        line 3.2.3 level 2
+    line 3.3 level 1
+        line 3.3.1 level 2
+line 4 level 0
+line 5 level 0
+    line 5.1
+```
+
+The resulting parse tree would be:
+
+```
+Root
+   Line=line 1 level 0
+   Line=line 2 level 0
+   Line=line 3 level 0
+      Line=line 3.1 level 1
+      Line=line 3.2 level 1
+         Line=line 3.2.1 level 2
+         Line=line 3.2.2 level 2
+         Line=line 3.2.3 level 2
+      Line=line 3.3 level 1
+         Line=line 3.3.1 level 2
+   Line=line 4 level 0
+   Line=line 5 level 0
+      Line=line 5.1
+```
+
+As you can see, thanks to the use of variables, the rule has become recursive. Lines with greater indentation are
+treated as children of previous lines with lesser indentation. This capability demonstrates how ParsGN can be used to
+create sophisticated parsers for structured text formats, making it an excellent choice for scenarios requiring
+context-sensitive parsing.
+
+## Comparison with ANTLR
+
+While ANTLR is a powerful tool for generating parsers and compilers for complex languages, ParsGN offers several
+advantages that make it preferable in certain scenarios:
+
+1. **Dynamic Parser Creation**:
+
+- **ParsGN** allows for the creation of parsers on-the-fly based on EBNF-like descriptions without the need for code
+  generation. This makes it ideal for scenarios where you need to quickly develop and test parsers without the overhead
+  of integrating generated code into your project.
+- **ANTLR** requires code generation and compilation, which can be more complex and time-consuming, especially for rapid
+  prototyping or when the grammar is frequently changing.
+
+2. **Simplicity and Ease of Use**:
+
+- **ParsGN** uses a straightforward, EBNF-like syntax that is easy to learn and use, making it accessible even for those
+  who may not have deep experience with parser generators.
+- **ANTLR**, while more powerful, has a steeper learning curve and requires a good understanding of its syntax and
+  concepts like predicates, actions, and the distinction between lexer and parser rules.
+
+3. **Context-Sensitive Parsing**:
+
+- **ParsGN** excels in scenarios where context-sensitive rules are needed, thanks to its support for variables and
+  arithmetic expressions within grammars. This allows for flexible and powerful grammar definitions, such as handling
+  indentation or other context-dependent features.
+- **ANTLR** can handle context-sensitive parsing but typically requires more complex configurations, such as semantic
+  predicates or actions embedded in the grammar.
+
+4. **Rapid Development and Prototyping**:
+
+- **ParsGN** is particularly well-suited for rapid development and prototyping of custom data formats or domain-specific
+  languages. Its ability to quickly define and deploy parsers directly from grammar descriptions without intermediate
+  steps streamlines the development process.
+- **ANTLR**, while powerful, might introduce additional steps in the development process due to its code generation
+  phase.
+
+In summary, while ANTLR remains a top choice for developing complex parsers and compilers, ParsGN provides a simpler,
+more dynamic approach that is often more suitable for rapid development, context-sensitive parsing, and situations where
+ease of use and flexibility are paramount.
 
 ## Contributing
 
