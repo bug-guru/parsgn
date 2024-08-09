@@ -28,7 +28,7 @@ To use this library in your project, include the following dependency in your po
 Alternatively, you can clone the repository and build the project locally:
 
 ```shell
-git clone https://github.com/yourusername/parsgn.git
+git clone git@github.com:bug-guru/parsgn.git
 cd parsgn
 mvn clean install
 ```
