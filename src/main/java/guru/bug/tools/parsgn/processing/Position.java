@@ -89,6 +89,10 @@ public class Position implements Comparable<Position> {
                 '}';
     }
 
+    public String toShortString() {
+        return row + ":" + col;
+    }
+
     @Override
     public int compareTo(Position o) {
         int result = this.row - o.row;

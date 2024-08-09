@@ -35,9 +35,9 @@ CompressFlag: "^";
 
 RuleParams: "(" I Name [I "," I Name]* I ")";
 
-I: [WS | LT | SingleLineComment | MultiLineComment]*;
+.I: [WS | LT | SingleLineComment | MultiLineComment]*;
 
-SingleLineComment: "//" [!EOL #VALID]* EOL;
+.SingleLineComment: "//" [!EOL #VALID]* EOL;
 
 .EOL: WS LT;
 
@@ -45,7 +45,7 @@ SingleLineComment: "//" [!EOL #VALID]* EOL;
 
 .WS: [" " | "\t"]*;
 
-MultiLineComment: "/*" [!"*/" #VALID]* "*/";
+.MultiLineComment: "/*" [!"*/" #VALID]* "*/";
 
 Name: #UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART*;
 

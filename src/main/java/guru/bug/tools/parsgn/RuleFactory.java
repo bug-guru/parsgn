@@ -34,8 +34,8 @@ import java.util.*;
  * @since 1.0
  */
 public class RuleFactory {
-    private Map<String, Rule> ruleDefinitions = new HashMap<>();
-    private List<ReferenceExpression> unresolved = new LinkedList<>();
+    private final Map<String, Rule> ruleDefinitions = new HashMap<>();
+    private final List<ReferenceExpression> unresolved = new LinkedList<>();
 
     private Expression wrap(Expression... expressions) throws ParsingException {
         if (expressions == null || expressions.length == 0) {
@@ -55,7 +55,7 @@ public class RuleFactory {
         if (expressions.size() > 1) {
             return sequence(expressions);
         } else {
-            return expressions.get(0);
+            return expressions.getFirst();
         }
     }
 
@@ -178,7 +178,7 @@ public class RuleFactory {
         return result;
     }
 
-    public final ReferenceExpression build(String rootRuleName) throws UnresolvedRuleException, NumberOfParametersException {
+    public final ReferenceExpression resolveAllFromRoot(String rootRuleName) throws UnresolvedRuleException, NumberOfParametersException {
         ReferenceExpression result = ref(rootRuleName);
         resolveReferences();
         return result;

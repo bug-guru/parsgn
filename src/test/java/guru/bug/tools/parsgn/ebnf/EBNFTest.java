@@ -23,23 +23,17 @@
 package guru.bug.tools.parsgn.ebnf;
 
 import guru.bug.tools.parsgn.Parser;
+import guru.bug.tools.parsgn.ebnf.descriptor.ConfigFileRuleDescriptor;
+import guru.bug.tools.parsgn.utils.EBNFResultBuilder;
 import guru.bug.tools.parsgn.utils.ParseNode;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.utils.ParseTreeUtils;
-import guru.bug.tools.parsgn.utils.XmlResultBuilder;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.BufferedInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
+import java.io.*;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -50,7 +44,7 @@ public class EBNFTest {
     private Parser generateDefaultParser() throws Exception {
         DefaultParserBuilder builder = new DefaultParserBuilder();
         try (
-                InputStream ebnfInput = getClass().getResourceAsStream("config.rules");
+                InputStream ebnfInput = requireNonNull(getClass().getResourceAsStream("config.rules"));
                 BufferedInputStream buf = new BufferedInputStream(ebnfInput);
                 InputStreamReader reader = new InputStreamReader(buf)
         ) {
@@ -60,7 +54,7 @@ public class EBNFTest {
 
     private ParseNode parseToTree(Parser parser, String resName) throws Exception {
         try (
-                InputStream input = getClass().getResourceAsStream(resName);
+                InputStream input = requireNonNull(getClass().getResourceAsStream(resName));
                 BufferedInputStream buf = new BufferedInputStream(input);
                 InputStreamReader reader = new InputStreamReader(buf)
         ) {
@@ -85,24 +79,24 @@ public class EBNFTest {
     }
 
 
-    @Ignore
     @Test
-    public void printXml() throws Exception {
+    public void ebnfRecursionParsingTest() throws Exception {
         Parser parser = new EBNFParser();
         try (
-                InputStream input = getClass().getResourceAsStream("config.rules");
+                InputStream input = requireNonNull(getClass().getResourceAsStream("config.rules"));
                 BufferedInputStream buf = new BufferedInputStream(input);
-                InputStreamReader reader = new InputStreamReader(buf)
+                InputStreamReader reader1 = new InputStreamReader(buf)
         ) {
-            XmlResultBuilder resultBuilder = new XmlResultBuilder();
-            parser.parse(reader, resultBuilder);
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            StreamResult result = new StreamResult(System.out);
-            DOMSource source = new DOMSource(resultBuilder.getResult());
-            transformer.transform(source, result);
+            var resultBuilder1 = new EBNFResultBuilder();
+            parser.parse(reader1, resultBuilder1);
+            ConfigFileRuleDescriptor root1 = resultBuilder1.getRoot();
+            String strRoot1 = root1.toString();
+            System.out.println(strRoot1);
+            var reader2 = new StringReader(strRoot1);
+            var resultBuilder2 = new EBNFResultBuilder();
+            parser.parse(reader2, resultBuilder2);
+            ConfigFileRuleDescriptor root2 = resultBuilder2.getRoot();
+            assertEquals(root1, root2);
         }
     }
 
@@ -111,7 +105,7 @@ public class EBNFTest {
     public void printParseTree() throws Exception {
         Parser parser = new EBNFParser();
         try (
-                InputStream input = getClass().getResourceAsStream("config.rules");
+                InputStream input = requireNonNull(getClass().getResourceAsStream("config.rules"));
                 BufferedInputStream buf = new BufferedInputStream(input);
                 InputStreamReader reader = new InputStreamReader(buf)
         ) {
@@ -119,7 +113,7 @@ public class EBNFTest {
             parser.parse(reader, resultBuilder);
             StringWriter writer = new StringWriter(2048);
             ParseTreeUtils.serialize(resultBuilder.getRoot(), writer);
-            System.out.println(writer.toString());
+            System.out.println(writer);
         }
     }
 }

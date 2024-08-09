@@ -101,7 +101,7 @@ public class EBNFParser extends Parser implements RuleNames {
                 rb.ref(I),
                 rb.str(")")
         );
-        // I: [WS | LT | SingleLineComment | MultiLineComment]*;
+        // .I: [WS | LT | SingleLineComment | MultiLineComment]*;
         rb.rule(I,
                 rb.zeroOrMore(
                         rb.oneOf(
@@ -111,8 +111,8 @@ public class EBNFParser extends Parser implements RuleNames {
                                 rb.ref(MULTI_LINE_COMMENT)
                         )
                 )
-        );
-        // SingleLineComment: "//" [!EOL #VALID]* EOL;
+        ).hide();
+        // .SingleLineComment: "//" [!EOL #VALID]* EOL;
         rb.rule(SINGLE_LINE_COMMENT,
                 rb.str("//"),
                 rb.zeroOrMore(
@@ -120,7 +120,7 @@ public class EBNFParser extends Parser implements RuleNames {
                         rb.charType(CharType.VALID)
                 ),
                 rb.ref(EOL)
-        );
+        ).hide();
         // .EOL: WS LT;
         rb.rule(EOL,
                 rb.ref(WS),
@@ -141,7 +141,7 @@ public class EBNFParser extends Parser implements RuleNames {
                         rb.str("\t")
                 ))
         ).hide();
-        // MultiLineComment: "/*" [!"*/" #VALID] "*/";
+        // .MultiLineComment: "/*" [!"*/" #VALID] "*/";
         rb.rule(MULTI_LINE_COMMENT,
                 rb.str("/*"),
                 rb.zeroOrMore(
@@ -149,7 +149,7 @@ public class EBNFParser extends Parser implements RuleNames {
                         rb.charType(CharType.VALID)
                 ),
                 rb.str("*/")
-        );
+        ).hide();
         // Name: #UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART*;
         rb.rule(NAME,
                 rb.sequence(
@@ -406,6 +406,6 @@ public class EBNFParser extends Parser implements RuleNames {
         rb.rule(MULTIPLICATION, rb.str("*"));
         // Division: "/";
         rb.rule(DIVISION, rb.str("/"));
-        return rb.build(CONFIG_FILE);
+        return rb.resolveAllFromRoot(CONFIG_FILE);
     }
 }

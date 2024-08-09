@@ -23,17 +23,10 @@
 package guru.bug.tools.parsgn.ebnf;
 
 import guru.bug.tools.parsgn.Parser;
-import guru.bug.tools.parsgn.ebnf.builder.ConfigFileBuilder;
-import guru.bug.tools.parsgn.exceptions.InternalParsingException;
+import guru.bug.tools.parsgn.ebnf.descriptor.ConfigFileRuleDescriptor;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
-import guru.bug.tools.parsgn.utils.XmlResultBuilder;
-import org.w3c.dom.Document;
+import guru.bug.tools.parsgn.utils.EBNFResultBuilder;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
 import java.io.Reader;
 
@@ -48,36 +41,8 @@ import java.io.Reader;
  */
 public class DefaultParserBuilder {
     private final Parser EBNF_PARSER = new EBNFParser();
-    private final JAXBContext jaxbContext;
 
-    /**
-     * Creates new instance of {@code DefaultParserBuilder}.
-     */
-    public DefaultParserBuilder() {
-        try {
-            jaxbContext = JAXBContext.newInstance(ConfigFileBuilder.class);
-        } catch (JAXBException e) {
-            throw new InternalParsingException("Cannot instantiate JAXBContext", e);
-        }
-    }
-
-    public Document readConfigDOM(Reader input) throws IOException, ParsingException {
-        XmlResultBuilder builder = new XmlResultBuilder();
-        EBNF_PARSER.parse(input, builder);
-        return builder.getResult();
-    }
-
-    public ConfigFileBuilder createConfigFileBuilder(Document doc) throws ParsingException {
-        try {
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            Source source = new DOMSource(doc);
-            return (ConfigFileBuilder) unmarshaller.unmarshal(source);
-        } catch (JAXBException e) {
-            throw new ParsingException(e);
-        }
-    }
-
-    public Parser createParser(ConfigFileBuilder builder) {
+    public Parser createParser(ConfigFileRuleDescriptor builder) {
         return new Parser(builder.buildRoot());
     }
 
@@ -90,16 +55,9 @@ public class DefaultParserBuilder {
      * @throws ParsingException if input cannot be parsed.
      */
     public Parser createParser(Reader input) throws IOException, ParsingException {
-        try {
-            var builder = new XmlResultBuilder();
+        var builder = new EBNFResultBuilder();
             EBNF_PARSER.parse(input, builder);
-            Document doc = builder.getResult();
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            Source source = new DOMSource(doc);
-            ConfigFileBuilder configFileBuilder = (ConfigFileBuilder) unmarshaller.unmarshal(source);
+        ConfigFileRuleDescriptor configFileBuilder = builder.getRoot();
             return new Parser(configFileBuilder.buildRoot());
-        } catch (JAXBException e) {
-            throw new ParsingException(e);
-        }
     }
 }
