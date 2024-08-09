@@ -31,8 +31,8 @@ import static org.junit.Assert.assertSame;
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  */
 public class SequentialExpressionTwoExprTest extends SequentialExpressionTestBase {
-    private FakeExpression expr1 = new FakeExpression();
-    private FakeExpression expr2 = new FakeExpression();
+    private final FakeExpression expr1 = new FakeExpression();
+    private final FakeExpression expr2 = new FakeExpression();
 
     public SequentialExpressionTwoExprTest() {
         expression.setExpressions(expr1, expr2);

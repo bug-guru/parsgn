@@ -76,13 +76,11 @@ public class SequentialExpression extends Expression {
 
     class Checker extends BranchExpressionChecker {
         private final Iterator<Expression> expressions = getExpressions().iterator();
-        private Expression curExpr;
         private boolean hasCommitted;
 
         @Override
         public Expression next() {
-            curExpr = expressions.next();
-            return curExpr;
+            return expressions.next();
         }
 
         @Override

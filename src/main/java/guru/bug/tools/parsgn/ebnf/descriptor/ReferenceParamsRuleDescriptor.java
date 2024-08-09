@@ -51,7 +51,7 @@ public class ReferenceParamsRuleDescriptor extends AbstractRuleDescriptor {
         return new ReferenceParamsRuleDescriptor(calculations, startPosition, endPosition);
     }
 
-    public List<Term> generate(RuleFactory rf) {
+    public List<Term> generate() {
         return calculations.stream()
                 .map(CalculationRuleDescriptor::generate)
                 .toList();

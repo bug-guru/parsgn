@@ -79,7 +79,7 @@ public class Holder<T> {
     }
 
     public void commitValue(StringBuilder builder) throws InternalParsingException {
-        if (builder == null || builder.length() == 0) {
+        if (builder == null || builder.isEmpty()) {
             return;
         }
         initValue();

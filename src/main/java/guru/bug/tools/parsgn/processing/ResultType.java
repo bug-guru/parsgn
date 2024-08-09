@@ -120,6 +120,6 @@ public enum ResultType {
     }
 
     public static <T> void empty(Deque<Holder<T>> stack, CodePointSource source) {
-
+        // by design, but need to revisit
     }
 }

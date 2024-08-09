@@ -28,7 +28,7 @@ package guru.bug.tools.parsgn.expr.calc;
  * @since 1.0
  */
 public interface CalculationContext {
-    public Object getValue(String name);
+    Object getValue(String name);
 
-    public void setValue(String name, Object value);
+    void setValue(String name, Object value);
 }

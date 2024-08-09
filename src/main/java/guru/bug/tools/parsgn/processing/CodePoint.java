@@ -33,6 +33,7 @@ import guru.bug.tools.parsgn.utils.StringUtils;
 public class CodePoint {
     private final int codePoint;
     private final Position position;
+    @SuppressWarnings("CanBeFinal")
     private boolean newLine;
 
     public CodePoint(CodePoint prev, int codePoint) {

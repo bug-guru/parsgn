@@ -61,7 +61,7 @@ public class EbnfBuilder01Test {
             parser.parse(reader, resultBuilder);
             StringWriter writer = new StringWriter();
             ParseTreeUtils.serialize(resultBuilder.getRoot(), writer);
-            System.out.println(writer.toString());
+            System.out.println(writer);
         }
     }
 }

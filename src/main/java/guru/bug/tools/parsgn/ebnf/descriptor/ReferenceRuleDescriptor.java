@@ -67,7 +67,7 @@ public class ReferenceRuleDescriptor extends AbstractExpressionTypeDescriptor {
     public Expression generate(RuleFactory rf) {
         List<Term> params = null;
         if (this.referenceParams != null) {
-            params = this.referenceParams.generate(rf);
+            params = this.referenceParams.generate();
         }
         return updatePosTo(rf.ref(name.getValue()).params(params));
     }

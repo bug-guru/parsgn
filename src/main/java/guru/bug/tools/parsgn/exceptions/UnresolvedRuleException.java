@@ -33,7 +33,7 @@ import java.util.List;
  * @since 1.0
  */
 public class UnresolvedRuleException extends ParsingException {
-    private Collection<String> ruleNames;
+    private final Collection<String> ruleNames;
 
     public UnresolvedRuleException(Collection<String> names) {
         super("Unresolved rules: " + names);

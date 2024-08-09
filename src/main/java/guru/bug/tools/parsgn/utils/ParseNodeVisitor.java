@@ -28,7 +28,7 @@ package guru.bug.tools.parsgn.utils;
  * @since 1.0
  */
 public interface ParseNodeVisitor {
-    public ParseNodeVisitResult startNode(ParseNode node);
+    ParseNodeVisitResult startNode(ParseNode node);
 
-    public void endNode(ParseNode node);
+    void endNode(ParseNode node);
 }

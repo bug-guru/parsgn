@@ -34,6 +34,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  */
@@ -62,9 +64,10 @@ public class Calculator01Test {
     }
 
     private void doTest(String name) throws Exception {
+        // TODO need to complete this code
         String sampleFileName = "calculator01" + name + "_sample.txt";
         String expectedFileName = "calculator01" + name + "_tree.xml";
-        try (InputStream sample = Calculator01Test.class.getResourceAsStream(sampleFileName);
+        try (InputStream sample = requireNonNull(Calculator01Test.class.getResourceAsStream(sampleFileName));
              BufferedInputStream bufSample = new BufferedInputStream(sample);
              InputStreamReader bufReader = new InputStreamReader(bufSample);
              InputStream expected = Calculator01Test.class.getResourceAsStream(expectedFileName)) {
@@ -72,7 +75,7 @@ public class Calculator01Test {
             parser.parse(bufReader, builder);
             StringWriter out = new StringWriter(2048);
             ParseTreeUtils.serialize(builder.getRoot(), out);
-            System.out.println(out.toString());
+            System.out.println(out);
         }
     }
 

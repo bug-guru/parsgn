@@ -33,6 +33,7 @@ import guru.bug.tools.parsgn.processing.ResultType;
  * @version 1.0
  * @since 1.0
  */
+@SuppressWarnings("UnusedReturnValue")
 public class QuantityExpression extends Expression {
     private Expression expression;
     private Term minOccurrences = Term.constant(0);

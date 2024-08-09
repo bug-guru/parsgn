@@ -31,5 +31,5 @@ import java.util.Deque;
  */
 @FunctionalInterface
 public interface ResultAction {
-    public <T> void apply(Deque<Holder<T>> stack, CodePointSource codePointSource);
+    <T> void apply(Deque<Holder<T>> stack, CodePointSource codePointSource);
 }

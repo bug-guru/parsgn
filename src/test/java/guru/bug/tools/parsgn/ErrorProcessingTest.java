@@ -36,25 +36,22 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  */
 public class ErrorProcessingTest {
 
-    private Parser createParser(String fileName) throws Exception {
-        try (
-                InputStream input = getClass().getResourceAsStream(fileName);
-                BufferedInputStream bufInput = new BufferedInputStream(input);
-                InputStreamReader reader = new InputStreamReader(bufInput)) {
-            DefaultParserBuilder builder = new DefaultParserBuilder();
-            return builder.createParser(reader);
-        }
-    }
-
     @Test
     public void testEBNFError() throws Exception {
-        try {
-            createParser("ebnf_error01.rules");
+        try (
+                InputStream input = requireNonNull(getClass().getResourceAsStream("ebnf_error01.rules"));
+                BufferedInputStream bufInput = new BufferedInputStream(input);
+                InputStreamReader reader = new InputStreamReader(bufInput)
+        ) {
+            DefaultParserBuilder builder = new DefaultParserBuilder();
+            builder.createParser(reader);
             Assert.fail();
         } catch (SyntaxErrorException ex) {
             Assert.assertEquals(27, ex.getPosition().getRow());
@@ -75,7 +72,7 @@ public class ErrorProcessingTest {
             parser.parse(reader, resultBuilder);
             StringWriter writer = new StringWriter(2048);
             ParseTreeUtils.serialize(resultBuilder.getRoot(), writer);
-            System.out.println(writer.toString());
+            System.out.println(writer);
         }
     }
 

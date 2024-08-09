@@ -44,6 +44,7 @@ public class RuleParametersTest {
             return builder.createParser(reader);
         }
     }
+
     @Test
     public void testParameters() throws Exception {
         Parser parser = createParser();
@@ -56,6 +57,7 @@ public class RuleParametersTest {
             parser.parse(reader, resultBuilder);
             StringWriter writer = new StringWriter();
             ParseTreeUtils.serialize(resultBuilder.getRoot(), writer);
-            System.out.println(writer.toString());        }
+            System.out.println(writer);
+        }
     }
 }

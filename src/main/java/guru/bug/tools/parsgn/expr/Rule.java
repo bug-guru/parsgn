@@ -35,7 +35,7 @@ import java.util.List;
 public class Rule extends BaseExpression {
     private final String name;
     private Expression expression;
-    private List<String> params = new ArrayList<>(2);
+    private final List<String> params = new ArrayList<>(2);
     private boolean hidden;
     private boolean compressed;
 

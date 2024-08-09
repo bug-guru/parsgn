@@ -81,11 +81,10 @@ public class CodePointSource {
         tmp.cp = cp;
         if (next == null) {
             next = tmp;
-            last = tmp;
         } else {
             last.rightNode = tmp;
-            last = tmp;
         }
+        last = tmp;
     }
 
     private int toCodePoint(int ch1, int ch2) {

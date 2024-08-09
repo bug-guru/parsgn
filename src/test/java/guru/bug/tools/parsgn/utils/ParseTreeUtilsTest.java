@@ -38,13 +38,13 @@ import static org.junit.Assert.assertEquals;
  */
 public class ParseTreeUtilsTest {
     private static final Position fakePos = new Position(1, 1);
-    private static ParseNode n111 = createNode("n111");
-    private static ParseNode n11 = createNode("n11", n111);
-    private static ParseNode n12 = createNode("n12");
-    private static ParseNode n1 = createNode("n1", n11, n12);
-    private static ParseNode n21 = createNode("n21");
-    private static ParseNode n2 = createNode("n2", n21);
-    private static ParseNode root = createNode("root", n1, n2);
+    private static final ParseNode n111 = createNode("n111");
+    private static final ParseNode n11 = createNode("n11", n111);
+    private static final ParseNode n12 = createNode("n12");
+    private static final ParseNode n1 = createNode("n1", n11, n12);
+    private static final ParseNode n21 = createNode("n21");
+    private static final ParseNode n2 = createNode("n2", n21);
+    private static final ParseNode root = createNode("root", n1, n2);
 
     private static ParseNode createNode(String name) {
         return new ParseNode(name, null, null, fakePos, fakePos);
