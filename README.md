@@ -17,6 +17,7 @@ builds a parser, and then uses that parser to process input files, resulting in 
 To use this library in your project, include the following dependency in your pom.xml if using Maven:
 
 ```xml
+
 <dependency>
     <groupId>guru.bug.tools</groupId>
     <artifactId>parsgn</artifactId>
@@ -247,35 +248,28 @@ While ANTLR is a powerful tool for generating parsers and compilers for complex 
 advantages that make it preferable in certain scenarios:
 
 1. **Dynamic Parser Creation**:
-
-- **ParsGN** allows for the creation of parsers on-the-fly based on EBNF-like descriptions without the need for code
-  generation. This makes it ideal for scenarios where you need to quickly develop and test parsers without the overhead
-  of integrating generated code into your project.
-- **ANTLR** requires code generation and compilation, which can be more complex and time-consuming, especially for rapid
-  prototyping or when the grammar is frequently changing.
-
+   - **ParsGN** allows for the creation of parsers on-the-fly based on EBNF-like descriptions without the need for code
+     generation. This makes it ideal for scenarios where you need to quickly develop and test parsers without the
+     overhead of integrating generated code into your project.
+   - **ANTLR** requires code generation and compilation, which can be more complex and time-consuming, especially for
+     rapid prototyping or when the grammar is frequently changing.
 2. **Simplicity and Ease of Use**:
-
-- **ParsGN** uses a straightforward, EBNF-like syntax that is easy to learn and use, making it accessible even for those
-  who may not have deep experience with parser generators.
-- **ANTLR**, while more powerful, has a steeper learning curve and requires a good understanding of its syntax and
-  concepts like predicates, actions, and the distinction between lexer and parser rules.
-
+   - **ParsGN** uses a straightforward, EBNF-like syntax that is easy to learn and use, making it accessible even for
+     those who may not have deep experience with parser generators.
+   - **ANTLR**, while more powerful, has a steeper learning curve and requires a good understanding of its syntax and
+     concepts like predicates, actions, and the distinction between lexer and parser rules.
 3. **Context-Sensitive Parsing**:
-
-- **ParsGN** excels in scenarios where context-sensitive rules are needed, thanks to its support for variables and
-  arithmetic expressions within grammars. This allows for flexible and powerful grammar definitions, such as handling
-  indentation or other context-dependent features.
-- **ANTLR** can handle context-sensitive parsing but typically requires more complex configurations, such as semantic
-  predicates or actions embedded in the grammar.
-
+   - **ParsGN** excels in scenarios where context-sensitive rules are needed, thanks to its support for variables and
+     arithmetic expressions within grammars. This allows for flexible and powerful grammar definitions, such as
+     handling indentation or other context-dependent features.
+   - **ANTLR** can handle context-sensitive parsing but typically requires more complex configurations, such as
+     semantic predicates or actions embedded in the grammar.
 4. **Rapid Development and Prototyping**:
-
-- **ParsGN** is particularly well-suited for rapid development and prototyping of custom data formats or domain-specific
-  languages. Its ability to quickly define and deploy parsers directly from grammar descriptions without intermediate
-  steps streamlines the development process.
-- **ANTLR**, while powerful, might introduce additional steps in the development process due to its code generation
-  phase.
+   - **ParsGN** is particularly well-suited for rapid development and prototyping of custom data formats or
+     domain-specific languages. Its ability to quickly define and deploy parsers directly from grammar descriptions
+     without intermediate steps streamlines the development process.
+   - **ANTLR**, while powerful, might introduce additional steps in the development process due to its code generation
+     phase.
 
 In summary, while ANTLR remains a top choice for developing complex parsers and compilers, ParsGN provides a simpler,
 more dynamic approach that is often more suitable for rapid development, context-sensitive parsing, and situations where
