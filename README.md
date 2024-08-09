@@ -132,7 +132,7 @@ public class ParserExample {
 }
 ```
 
-### Parse Tree Output
+#### Parse Tree Output
 
 After parsing the input "12345+678" using the example grammar, the resulting parse tree would look like this:
 
@@ -146,7 +146,7 @@ expression
       number=678
 ```
 
-### Visitor Output
+#### Visitor Output
 
 When traversing the parse tree with the ParseNodeVisitor, the output would look like this:
 
@@ -167,7 +167,7 @@ END  : operand
 END  : expression
 ```
 
-## Advanced Grammar Example
+### Advanced Grammar Example
 
 ParsGN also supports the use of variables and arithmetic expressions within grammar definitions. This allows for the
 creation of context-sensitive rules, such as those that depend on indentation levels or other dynamically calculated
@@ -198,7 +198,7 @@ This feature adds significant flexibility to your grammars, allowing you to hand
 context. The use of variables makes the Line rule recursive, allowing lines with greater indentation to be treated as
 children of previous lines with lesser indentation.
 
-### Example Input and Parse Tree
+#### Example Input and Parse Tree
 
 Given the following input content:
 
