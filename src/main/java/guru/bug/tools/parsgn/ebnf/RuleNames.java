@@ -68,5 +68,7 @@ public interface RuleNames {
     String MULTIPLICATION = "Multiplication";
     String DIVISION = "Division";
     String STRING_CONSTANT = "StringConstant";
+    String CASE_SENSITIVE_STRING_CONSTANT = "CaseSensitiveStringConstant";
+    String CASE_INSENSITIVE_STRING_CONSTANT = "CaseInsensitiveStringConstant";
     String VARIABLE = "Variable";
 }

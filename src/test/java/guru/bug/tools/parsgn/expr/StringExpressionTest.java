@@ -43,6 +43,7 @@ public class StringExpressionTest {
 
     @BeforeEach
     public void setUp() {
+        expression.setCaseSensitive(true);
         checker = (StringExpression.Checker) expression.checker(null);
     }
 
@@ -51,6 +52,21 @@ public class StringExpressionTest {
         expression.setValue("Hello, World!");
         expression.setTransform(null);
         test(ResultType.MATCH, "Hello, World!");
+    }
+
+    @Test
+    public void testChecker_OK_Insensitive() throws Exception {
+        expression.setCaseSensitive(false);
+        expression.setValue("Hello, World!");
+        expression.setTransform(null);
+        test(ResultType.MATCH, "hElLo, WORLD!");
+    }
+
+    @Test
+    public void testChecker_FAIL_Sensitive() throws Exception {
+        expression.setValue("Hello, World!");
+        expression.setTransform(null);
+        test(ResultType.MISMATCH, "h");
     }
 
     @Test

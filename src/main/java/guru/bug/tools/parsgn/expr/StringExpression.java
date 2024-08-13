@@ -38,6 +38,7 @@ public class StringExpression extends Expression {
     private String transform;
     private int[] codePoints;
     private int len;
+    private boolean caseSensitive = true;
 
     public String getValue() {
         return value;
@@ -60,6 +61,14 @@ public class StringExpression extends Expression {
 
     public void setTransform(String transform) {
         this.transform = transform;
+    }
+
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
+
+    public void setCaseSensitive(boolean caseSensitive) {
+        this.caseSensitive = caseSensitive;
     }
 
     public StringExpression transform(String transform) {
@@ -87,7 +96,9 @@ public class StringExpression extends Expression {
 
         @Override
         public Result check(int codePoint) throws ParsingException {
-            if (codePoints[offset] != codePoint) {
+            int expected = caseSensitive ? codePoints[offset] : Character.toLowerCase(codePoints[offset]);
+            int actual = caseSensitive ? codePoint : Character.toLowerCase(codePoint);
+            if (expected != actual) {
                 return ResultType.MISMATCH.andRollback();
             } else {
                 offset++;

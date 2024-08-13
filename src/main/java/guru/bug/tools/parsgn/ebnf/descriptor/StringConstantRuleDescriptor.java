@@ -22,37 +22,46 @@
 
 package guru.bug.tools.parsgn.ebnf.descriptor;
 
+import guru.bug.tools.parsgn.exceptions.ExpectationFailedException;
 import guru.bug.tools.parsgn.processing.Position;
 
+import java.util.List;
 import java.util.Objects;
 
 public class StringConstantRuleDescriptor extends AbstractRuleDescriptor {
-    private final String value;
+    private final AbstractStringConstantDescriptor value;
 
-    protected StringConstantRuleDescriptor(String value, Position startPosition, Position endPosition) {
+    protected StringConstantRuleDescriptor(AbstractStringConstantDescriptor value, Position startPosition, Position endPosition) {
         super(startPosition, endPosition);
         this.value = value;
     }
 
-    public static StringConstantRuleDescriptor create(String value, Position startPosition, Position endPosition) {
-        return new StringConstantRuleDescriptor(value, startPosition, endPosition);
+    public static StringConstantRuleDescriptor create(List<AbstractRuleDescriptor> children, Position startPosition, Position endPosition) {
+        if (children.size() != 1) {
+            throw new ExpectationFailedException("Single String Constant", startPosition, endPosition);
+        }
+        if (children.getFirst() instanceof AbstractStringConstantDescriptor d) {
+            return new StringConstantRuleDescriptor(d, startPosition, endPosition);
+        } else {
+            throw new ExpectationFailedException("Single String Constant", startPosition, endPosition);
+        }
+    }
+
+    public boolean isCaseSensitive() {
+        return value instanceof CaseSensitiveStringConstantRuleDescriptor;
+    }
+
+    public boolean isCaseInsensitive() {
+        return value instanceof CaseInsensitiveStringConstantRuleDescriptor;
     }
 
     public String getValue() {
-        return value;
+        return value.getValue();
     }
 
     @Override
     protected void print(StringBuilder sb) {
-        String esc = value
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t")
-                .replace("\f", "\\f")
-                .replace("\b", "\\b");
-        sb.append('"').append(esc).append('"');
+        value.print(sb);
     }
 
     @Override

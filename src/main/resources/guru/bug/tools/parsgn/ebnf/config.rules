@@ -92,17 +92,31 @@ CharType: "#" Name; //TODO: list all possible char types
 
 String: StringConstant [I "->" I StringConstant]?;
 
-StringConstant: "\"" [!"\""
-                            [   "\\\"" -> "\""
-                              | "\\\\" -> "\\"
-                              | "\\n" -> "\n"
-                              | "\\r" -> "\r"
-                              | "\\t" -> "\t"
-                              | "\\f" -> "\f"
-                              | "\\b" -> "\b"
-                              | #VALID
-                            ]
-                ]* "\"";
+StringConstant: CaseSensitiveStringConstant | CaseInsensitiveStringConstant;
+
+CaseSensitiveStringConstant: "\"" [!"\""
+                                    [   "\\\"" -> "\""
+                                      | "\\\\" -> "\\"
+                                      | "\\n" -> "\n"
+                                      | "\\r" -> "\r"
+                                      | "\\t" -> "\t"
+                                      | "\\f" -> "\f"
+                                      | "\\b" -> "\b"
+                                      | #VALID
+                                    ]
+                                  ]* "\"";
+
+CaseInsensitiveStringConstant: "'" [!"'"
+                                        [   "\\'" -> "'"
+                                          | "\\\\" -> "\\"
+                                          | "\\n" -> "\n"
+                                          | "\\r" -> "\r"
+                                          | "\\t" -> "\t"
+                                          | "\\f" -> "\f"
+                                          | "\\b" -> "\b"
+                                          | #VALID
+                                        ]
+                                    ]* "'";
 
 Sequence: "[" ExpressionList I "]";
 

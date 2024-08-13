@@ -73,7 +73,11 @@ public class EBNFResultBuilder extends ResultBuilder<AbstractRuleDescriptor> {
             case RuleNames.SUBTRACTION -> SubtractionRuleDescriptor.create(startPos, endPos);
             case RuleNames.MULTIPLICATION -> MultiplicationRuleDescriptor.create(startPos, endPos);
             case RuleNames.DIVISION -> DivisionRuleDescriptor.create(startPos, endPos);
-            case RuleNames.STRING_CONSTANT -> StringConstantRuleDescriptor.create(value, startPos, endPos);
+            case RuleNames.STRING_CONSTANT -> StringConstantRuleDescriptor.create(children, startPos, endPos);
+            case RuleNames.CASE_SENSITIVE_STRING_CONSTANT ->
+                    CaseSensitiveStringConstantRuleDescriptor.create(value, startPos, endPos);
+            case RuleNames.CASE_INSENSITIVE_STRING_CONSTANT ->
+                    CaseInsensitiveStringConstantRuleDescriptor.create(value, startPos, endPos);
             case RuleNames.VARIABLE -> VariableRuleDescriptor.create(children, startPos, endPos);
             default -> throw new SyntaxErrorException(startPos);
         };

@@ -172,10 +172,19 @@ public class RuleFactory {
         return expr;
     }
 
-    public final StringExpression str(String str) {
+    public final StringExpression str(String str, boolean caseSensitive) {
         StringExpression result = new StringExpression();
         result.setValue(str);
+        result.setCaseSensitive(caseSensitive);
         return result;
+    }
+
+    public final StringExpression strSensitive(String str) {
+        return str(str, true);
+    }
+
+    public final StringExpression strInsensitive(String str) {
+        return str(str, false);
     }
 
     public final ReferenceExpression resolveAllFromRoot(String rootRuleName) throws UnresolvedRuleException, NumberOfParametersException {

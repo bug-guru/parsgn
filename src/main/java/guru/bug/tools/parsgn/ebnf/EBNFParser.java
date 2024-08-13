@@ -69,10 +69,10 @@ public class EBNFParser extends Parser implements RuleNames {
                 rb.ref(I),
                 rb.zeroOrOne(rb.ref(RULE_PARAMS)),
                 rb.ref(I),
-                rb.str(":"),
+                rb.strSensitive(":"),
                 rb.ref(EXPRESSION_LIST),
                 rb.ref(I),
-                rb.str(";")
+                rb.strSensitive(";")
         );
         // ^Flag:
         //     HideFlag | CompressFlag I;
@@ -84,22 +84,22 @@ public class EBNFParser extends Parser implements RuleNames {
                 rb.ref(I)
         ).compress();
         // HideFlag: ".";
-        rb.rule(HIDE_FLAG, rb.str("."));
+        rb.rule(HIDE_FLAG, rb.strSensitive("."));
         // CompressFlag: "^";
-        rb.rule(COMPRESS_FLAG, rb.str("^"));
+        rb.rule(COMPRESS_FLAG, rb.strSensitive("^"));
         // RuleParams: "(" I Name [I "," I Name]* I ")";
         rb.rule(RULE_PARAMS,
-                rb.str("("),
+                rb.strSensitive("("),
                 rb.ref(I),
                 rb.ref(NAME),
                 rb.zeroOrMore(rb.sequence(
                         rb.ref(I),
-                        rb.str(","),
+                        rb.strSensitive(","),
                         rb.ref(I),
                         rb.ref(NAME)
                 )),
                 rb.ref(I),
-                rb.str(")")
+                rb.strSensitive(")")
         );
         // .I: [WS | LT | SingleLineComment | MultiLineComment]*;
         rb.rule(I,
@@ -114,7 +114,7 @@ public class EBNFParser extends Parser implements RuleNames {
         ).hide();
         // .SingleLineComment: "//" [!EOL #VALID]* EOL;
         rb.rule(SINGLE_LINE_COMMENT,
-                rb.str("//"),
+                rb.strSensitive("//"),
                 rb.zeroOrMore(
                         rb.not(rb.ref(EOL)),
                         rb.charType(CharType.VALID)
@@ -129,26 +129,26 @@ public class EBNFParser extends Parser implements RuleNames {
         // .LT: ["\r\n" | "\r" | "\n"];
         rb.rule(LT,
                 rb.oneOf(
-                        rb.str("\r\n"),
-                        rb.str("\r"),
-                        rb.str("\n")
+                        rb.strSensitive("\r\n"),
+                        rb.strSensitive("\r"),
+                        rb.strSensitive("\n")
                 )
         ).hide();
         // .WS: [" " | "\t"]*;
         rb.rule(WS,
                 rb.zeroOrMore(rb.oneOf(
-                        rb.str(" "),
-                        rb.str("\t")
+                        rb.strSensitive(" "),
+                        rb.strSensitive("\t")
                 ))
         ).hide();
         // .MultiLineComment: "/*" [!"*/" #VALID] "*/";
         rb.rule(MULTI_LINE_COMMENT,
-                rb.str("/*"),
+                rb.strSensitive("/*"),
                 rb.zeroOrMore(
-                        rb.not(rb.str("*/")),
+                        rb.not(rb.strSensitive("*/")),
                         rb.charType(CharType.VALID)
                 ),
-                rb.str("*/")
+                rb.strSensitive("*/")
         ).hide();
         // Name: #UNICODE_IDENTIFIER_START #UNICODE_IDENTIFIER_PART*;
         rb.rule(NAME,
@@ -183,7 +183,7 @@ public class EBNFParser extends Parser implements RuleNames {
         );
         // NegativeFlag: "!" I ;
         rb.rule(NEGATIVE_FLAG,
-                rb.str("!"),
+                rb.strSensitive("!"),
                 rb.ref(I)
         );
         // ExpressionSuffix: I [ZeroOrOne
@@ -207,68 +207,68 @@ public class EBNFParser extends Parser implements RuleNames {
         );
         // ZeroOrOne: "?";
         rb.rule(ZERO_OR_ONE,
-                rb.str("?")
+                rb.strSensitive("?")
         );
         // OneOrMore: "+";
         rb.rule(ONE_OR_MORE,
-                rb.str("+")
+                rb.strSensitive("+")
         );
         // ZeroOrMore: "*";
         rb.rule(ZERO_OR_MORE,
-                rb.str("*")
+                rb.strSensitive("*")
         );
         // ExactlyNTimes: "{" I CalcExpression I "}";
         rb.rule(EXACTLY_N_TIMES,
-                rb.str("{"),
+                rb.strSensitive("{"),
                 rb.ref(I),
                 rb.ref(CALCULATION),
                 rb.ref(I),
-                rb.str("}")
+                rb.strSensitive("}")
         );
         // AtLeastMinTimes: "{" I CalcExpression I "," I "}";
         rb.rule(AT_LEAST_MIN_TIMES,
-                rb.str("{"),
+                rb.strSensitive("{"),
                 rb.ref(I),
                 rb.ref(CALCULATION),
                 rb.ref(I),
-                rb.str(","),
+                rb.strSensitive(","),
                 rb.ref(I),
-                rb.str("}")
+                rb.strSensitive("}")
         );
         // AtLeastMinButNotMoreThanMaxTimes: "{" I CalcExpression I "," I CalcExpression I "}";
         rb.rule(AT_LEAST_MIN_BUT_NOT_MORE_THAN_MAX_TIMES,
-                rb.str("{"),
+                rb.strSensitive("{"),
                 rb.ref(I),
                 rb.ref(CALCULATION),
                 rb.ref(I),
-                rb.str(","),
+                rb.strSensitive(","),
                 rb.ref(I),
                 rb.ref(CALCULATION),
                 rb.ref(I),
-                rb.str("}")
+                rb.strSensitive("}")
         );
         // OneOf: ["[" I OneOfExpression [I "|" I OneOfExpression]+ I "]"]
         //      | [OneOfExpression [I "|" I OneOfExpression]+];
         rb.rule(ONE_OF,
                 rb.oneOf(
                         rb.sequence(
-                                rb.str("["),
+                                rb.strSensitive("["),
                                 rb.ref(I),
                                 rb.ref(ONE_OF_EXPRESSION),
                                 rb.oneOrMore(
                                         rb.ref(I),
-                                        rb.str("|"),
+                                        rb.strSensitive("|"),
                                         rb.ref(I),
                                         rb.ref(ONE_OF_EXPRESSION)
                                 ),
                                 rb.ref(I),
-                                rb.str("]")
+                                rb.strSensitive("]")
                         ),
                         rb.sequence(
                                 rb.ref(ONE_OF_EXPRESSION),
                                 rb.oneOrMore(
                                         rb.ref(I),
-                                        rb.str("|"),
+                                        rb.strSensitive("|"),
                                         rb.ref(I),
                                         rb.ref(ONE_OF_EXPRESSION)
                                 )
@@ -296,21 +296,21 @@ public class EBNFParser extends Parser implements RuleNames {
         );
         // ReferenceParams: "(" I CalcExpression [I "," I CalcExpression]* I ")";
         rb.rule(REFERENCE_PARAMS,
-                rb.str("("),
+                rb.strSensitive("("),
                 rb.ref(I),
                 rb.ref(CALCULATION),
                 rb.zeroOrMore(
                         rb.ref(I),
-                        rb.str(","),
+                        rb.strSensitive(","),
                         rb.ref(I),
                         rb.ref(CALCULATION)
                 ),
                 rb.ref(I),
-                rb.str(")")
+                rb.strSensitive(")")
         );
         // CharType: "#" Name; //TODO: list all possible char types
         rb.rule(CHAR_TYPE,
-                rb.str("#"),
+                rb.strSensitive("#"),
                 rb.ref(NAME)
         );
         // String: StringConstant [I "->" I StringConstant]?;
@@ -318,45 +318,80 @@ public class EBNFParser extends Parser implements RuleNames {
                 rb.ref(STRING_CONSTANT),
                 rb.zeroOrOne(
                         rb.ref(I),
-                        rb.str("->"),
+                        rb.strSensitive("->"),
                         rb.ref(I),
                         rb.ref(STRING_CONSTANT)
                 )
         );
-        // StringConstant: "\"" [!"\""
-        //                             [   "\\\"" -> "\""
-        //                               | "\\\\" -> "\\"
-        //                               | "\\n" -> "\n"
-        //                               | "\\r" -> "\r"
-        //                               | "\\t" -> "\t"
-        //                               | "\\f" -> "\f"
-        //                               | "\\b" -> "\b"
-        //                               | #VALID
-        //                             ]
-        //                 ]* "\"";
+        // StringConstant: CaseSensitiveStringConstant | CaseInsensitiveStringConstant;
         rb.rule(STRING_CONSTANT,
-                rb.str("\""),
+                rb.oneOf(
+                        rb.ref(CASE_SENSITIVE_STRING_CONSTANT),
+                        rb.ref(CASE_INSENSITIVE_STRING_CONSTANT)
+                )
+        );
+        // CaseSensitiveStringConstant: "\"" [!"\""
+        //                                     [   "\\\"" -> "\""
+        //                                       | "\\\\" -> "\\"
+        //                                       | "\\n" -> "\n"
+        //                                       | "\\r" -> "\r"
+        //                                       | "\\t" -> "\t"
+        //                                       | "\\f" -> "\f"
+        //                                       | "\\b" -> "\b"
+        //                                       | #VALID
+        //                                     ]
+        //                                   ]* "\"";
+        rb.rule(CASE_SENSITIVE_STRING_CONSTANT,
+                rb.strSensitive("\""),
                 rb.zeroOrMore(
-                        rb.not(rb.str("\"")),
+                        rb.not(rb.strSensitive("\"")),
                         rb.oneOf(
-                                rb.str("\\\"").transform("\""),
-                                rb.str("\\\\").transform("\\"),
-                                rb.str("\\n").transform("\n"),
-                                rb.str("\\r").transform("\r"),
-                                rb.str("\\t").transform("\t"),
-                                rb.str("\\f").transform("\f"),
-                                rb.str("\\b").transform("\b"),
+                                rb.strSensitive("\\\"").transform("\""),
+                                rb.strSensitive("\\\\").transform("\\"),
+                                rb.strSensitive("\\n").transform("\n"),
+                                rb.strSensitive("\\r").transform("\r"),
+                                rb.strSensitive("\\t").transform("\t"),
+                                rb.strSensitive("\\f").transform("\f"),
+                                rb.strSensitive("\\b").transform("\b"),
                                 rb.charType(CharType.VALID)
                         )
                 ),
-                rb.str("\"")
+                rb.strSensitive("\"")
+        );
+        // CaseInsensitiveStringConstant: "'" [!"'"
+        //                                      [   "\\'" -> "'"
+        //                                        | "\\\\" -> "\\"
+        //                                        | "\\n" -> "\n"
+        //                                        | "\\r" -> "\r"
+        //                                        | "\\t" -> "\t"
+        //                                        | "\\f" -> "\f"
+        //                                        | "\\b" -> "\b"
+        //                                        | #VALID
+        //                                      ]
+        //                                    ]* "'";
+        rb.rule(CASE_INSENSITIVE_STRING_CONSTANT,
+                rb.strSensitive("'"),
+                rb.zeroOrMore(
+                        rb.not(rb.strSensitive("'")),
+                        rb.oneOf(
+                                rb.strSensitive("\\'").transform("'"),
+                                rb.strSensitive("\\\\").transform("\\"),
+                                rb.strSensitive("\\n").transform("\n"),
+                                rb.strSensitive("\\r").transform("\r"),
+                                rb.strSensitive("\\t").transform("\t"),
+                                rb.strSensitive("\\f").transform("\f"),
+                                rb.strSensitive("\\b").transform("\b"),
+                                rb.charType(CharType.VALID)
+                        )
+                ),
+                rb.strSensitive("'")
         );
         // Sequence: "[" ExpressionList I "]";
         rb.rule(SEQUENCE,
-                rb.str("["),
+                rb.strSensitive("["),
                 rb.ref(EXPRESSION_LIST),
                 rb.ref(I),
-                rb.str("]")
+                rb.strSensitive("]")
         );
 
         // CALCULATION EXPRESSION
@@ -376,9 +411,9 @@ public class EBNFParser extends Parser implements RuleNames {
         rb.rule(TERM,
                 rb.oneOf(
                         rb.sequence(
-                                rb.str("("),
+                                rb.strSensitive("("),
                                 rb.ref(CALCULATION),
-                                rb.str(")")),
+                                rb.strSensitive(")")),
                         rb.ref(VARIABLE),
                         rb.ref(CONSTANT))
         );
@@ -399,13 +434,13 @@ public class EBNFParser extends Parser implements RuleNames {
                         rb.ref(DIVISION))
         );
         // Addition: "+";
-        rb.rule(ADDITION, rb.str("+"));
+        rb.rule(ADDITION, rb.strSensitive("+"));
         // Subtraction: "-";
-        rb.rule(SUBTRACTION, rb.str("-"));
+        rb.rule(SUBTRACTION, rb.strSensitive("-"));
         // Multiplication: "*";
-        rb.rule(MULTIPLICATION, rb.str("*"));
+        rb.rule(MULTIPLICATION, rb.strSensitive("*"));
         // Division: "/";
-        rb.rule(DIVISION, rb.str("/"));
+        rb.rule(DIVISION, rb.strSensitive("/"));
         return rb.resolveAllFromRoot(CONFIG_FILE);
     }
 }

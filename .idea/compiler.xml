@@ -18,6 +18,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="parsgn" />
         <module name="parsgn-debugger" />
+        <module name="query-dsl" />
       </profile>
     </annotationProcessing>
   </component>

@@ -67,7 +67,7 @@ public class StringRuleDescriptor extends AbstractExpressionTypeDescriptor {
     public Expression generate(RuleFactory rf) {
         String str = stringConstant.getValue();
         String subst = substitution == null ? null : substitution.getValue();
-        return updatePosTo(rf.str(str).transform(subst));
+        return updatePosTo(rf.str(str, stringConstant.isCaseSensitive()).transform(subst));
     }
 
 
