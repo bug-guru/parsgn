@@ -144,16 +144,4 @@ public class Holder<T> {
     public void setChecker(Expression.ExpressionChecker checker) {
         this.checker = checker;
     }
-
-    public Expression.LeafExpressionChecker getLeafExpressionChecker() {
-        return (Expression.LeafExpressionChecker) checker;
-    }
-
-    public Expression.BranchExpressionChecker getBranchExpressionChecker() {
-        return (Expression.BranchExpressionChecker) checker;
-    }
-
-    public Expression.ExpressionChecker getExpressionChecker() {
-        return checker;
-    }
 }

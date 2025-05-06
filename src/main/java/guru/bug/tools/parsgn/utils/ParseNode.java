@@ -24,8 +24,8 @@ package guru.bug.tools.parsgn.utils;
 
 import guru.bug.tools.parsgn.processing.Position;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -39,12 +39,20 @@ public class ParseNode {
     private final Position start;
     private final Position end;
 
-    public ParseNode(String name, String value, List<ParseNode> children, Position start, Position end) {
+    ParseNode(String name, String value, List<ParseNode> children, Position start, Position end) {
         this.name = name;
         this.value = value;
-        this.children = children == null ? Collections.<ParseNode>emptyList() : Collections.unmodifiableList(children);
+        this.children = children == null ? List.of() : List.copyOf(children);
         this.start = start;
         this.end = end;
+    }
+
+    public static ParseNode create(String name, ParseNode... children) {
+        return new ParseNode(name, null, List.of(children), null, null);
+    }
+
+    public static ParseNode create(String name, String value, ParseNode... children) {
+        return new ParseNode(name, value, List.of(children), null, null);
     }
 
     public String getName() {
@@ -88,26 +96,14 @@ public class ParseNode {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ParseNode parseNode = (ParseNode) o;
-
-        return children.equals(parseNode.children)
-                && end.equals(parseNode.end)
-                && name.equals(parseNode.name)
-                && start.equals(parseNode.start)
-                && !(value != null
-                ? !value.equals(parseNode.value)
-                : parseNode.value != null);
+        if (!(o instanceof ParseNode parseNode)) return false;
+        return Objects.equals(name, parseNode.name)
+               && Objects.equals(children, parseNode.children)
+               && Objects.equals(value, parseNode.value);
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + children.hashCode();
-        result = 31 * result + (value != null ? value.hashCode() : 0);
-        result = 31 * result + start.hashCode();
-        result = 31 * result + end.hashCode();
-        return result;
+        return Objects.hash(name, children, value);
     }
 }

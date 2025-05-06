@@ -26,6 +26,7 @@ import guru.bug.tools.parsgn.ResultBuilder;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
 import guru.bug.tools.parsgn.expr.Expression;
+import guru.bug.tools.parsgn.expr.ReferenceExpression;
 import guru.bug.tools.parsgn.expr.calc.CalculationContext;
 import guru.bug.tools.parsgn.processing.debug.DebugFrame;
 import guru.bug.tools.parsgn.processing.debug.DebugInjection;
@@ -36,9 +37,12 @@ import java.io.IOException;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -79,25 +83,52 @@ public class ParsingContext<T> implements CalculationContext {
 
     private void completePath() {
         Expression nextExpr;
-        while (stack.peek().getChecker() instanceof Expression.BranchExpressionChecker) {
-            nextExpr = stack.peek().getBranchExpressionChecker().next();
+        while (requireNonNull(stack.peek()).getChecker() instanceof Expression.BranchExpressionChecker branchChecker) {
+            nextExpr = branchChecker.next();
             pushExpression(nextExpr);
         }
     }
 
     private void pushExpression(Expression nextExpr) {
+        Position nextPos = source.getNextPos();
+        if (nextExpr instanceof ReferenceExpression) {
+            var recursedHolder = detectRecursion(nextExpr, nextPos);
+            if (recursedHolder != null) {
+                logger.log(Level.FINE, "detected recursion at: {0}", nextPos);
+            }
+        }
         Holder<T> holder = new Holder<>(builder);
-        stack.push(holder);
+        holder.setStart(nextPos);
         holder.setChecker(nextExpr.checker(this));
+        stack.push(holder);
         source.mark();
-        holder.setStart(source.getNextPos());
+    }
+
+    private Holder<T> detectRecursion(Expression nextExpr, Position nextPos) {
+        for (Holder<T> h : stack) {
+            var pos = h.getStart();
+            var checker = h.getChecker();
+            if (checker == null) {
+                continue;
+            }
+            var expr = checker.getExpression();
+            if (pos.equals(nextPos)
+                && expr instanceof ReferenceExpression refExpr1
+                && nextExpr instanceof ReferenceExpression refExpr2
+                && refExpr1.getReference().equals(refExpr2.getReference())) {
+                return h;
+            }
+        }
+        return null;
     }
 
     private void process() throws ParsingException, IOException {
         Position lastPos = source.getNextPos();
         int codePoint = source.getNext();
-        Holder<T> leafHolder = stack.peek();
-        Expression.LeafExpressionChecker leafChecker = leafHolder.getLeafExpressionChecker();
+        Holder<T> leafHolder = requireNonNull(stack.peek());
+        if (!(leafHolder.getChecker() instanceof Expression.LeafExpressionChecker leafChecker)) {
+            throw new IllegalStateException("is not a leaf" + leafHolder);
+        }
         if (logger.isLoggable(Level.FINER)) {
             logger.log(Level.FINER, "checking: {0}; codePoint {1} at: {2}",
                     new Object[]{StringUtils.codePointToString(codePoint), codePoint, lastPos});
@@ -123,8 +154,10 @@ public class ParsingContext<T> implements CalculationContext {
                 break;
             }
 
-            Holder holder = stack.peek();
-            Expression.BranchExpressionChecker branchChecker = holder.getBranchExpressionChecker();
+            Holder<T> holder = requireNonNull(stack.peek());
+            if (!(holder.getChecker() instanceof Expression.BranchExpressionChecker branchChecker)) {
+                throw new IllegalStateException("is not a branch" + holder);
+            }
 
             if (logger.isLoggable(Level.FINER)) {
                 logger.log(Level.FINER, "Expr stack: {0}", stackToString(stack));
@@ -163,7 +196,7 @@ public class ParsingContext<T> implements CalculationContext {
     @Override
     public Object getValue(String name) {
         Object result = null;
-        for (Holder h : stack) {
+        for (Holder<?> h : stack) {
             result = h.getVariables().get(name);
             if (result != null) {
                 break;
@@ -174,7 +207,9 @@ public class ParsingContext<T> implements CalculationContext {
 
     @Override
     public void setValue(String name, Object value) {
-        stack.peek().getVariables().put(name, value);
+        Holder<T> last = stack.peek();
+        Objects.requireNonNull(last);
+        last.getVariables().put(name, value);
     }
 
     private class ResultHolder extends Holder<T> {
