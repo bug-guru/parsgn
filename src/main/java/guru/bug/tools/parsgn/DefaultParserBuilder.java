@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2025 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,12 +20,12 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.ebnf;
+package guru.bug.tools.parsgn;
 
-import guru.bug.tools.parsgn.Parser;
+import guru.bug.tools.parsgn.ebnf.EBNFParser;
+import guru.bug.tools.parsgn.ebnf.EBNFResultBuilder;
 import guru.bug.tools.parsgn.ebnf.descriptor.ConfigFileRuleDescriptor;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
-import guru.bug.tools.parsgn.utils.EBNFResultBuilder;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -41,10 +41,6 @@ import java.io.Reader;
  */
 public class DefaultParserBuilder {
     private final Parser EBNF_PARSER = new EBNFParser();
-
-    public Parser createParser(ConfigFileRuleDescriptor builder) {
-        return new Parser(builder.buildRoot());
-    }
 
     /**
      * Creates the parser reading EBNF from a reader.

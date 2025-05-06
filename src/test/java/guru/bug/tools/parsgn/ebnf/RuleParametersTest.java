@@ -22,6 +22,7 @@
 
 package guru.bug.tools.parsgn.ebnf;
 
+import guru.bug.tools.parsgn.DefaultParserBuilder;
 import guru.bug.tools.parsgn.Parser;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.utils.ParseTreeUtils;

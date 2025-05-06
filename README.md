@@ -80,7 +80,7 @@ tree:
 package guru.bug.tools.parsgn.demo;
 
 import guru.bug.tools.parsgn.Parser;
-import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
+import guru.bug.tools.parsgn.DefaultParserBuilder;
 import guru.bug.tools.parsgn.utils.*;
 
 import java.io.BufferedInputStream;

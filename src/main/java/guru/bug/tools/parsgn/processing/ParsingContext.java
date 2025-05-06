@@ -32,14 +32,14 @@ import guru.bug.tools.parsgn.processing.debug.DebugFrame;
 import guru.bug.tools.parsgn.processing.debug.DebugInjection;
 import guru.bug.tools.parsgn.processing.debug.StackElement;
 import guru.bug.tools.parsgn.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -50,7 +50,7 @@ import static java.util.Objects.requireNonNull;
  * @since 1.0
  */
 public class ParsingContext<T> implements CalculationContext {
-    private static final Logger logger = Logger.getLogger(ParsingContext.class.getSimpleName());
+    private static final Logger LOG = LoggerFactory.getLogger(ParsingContext.class);
     private final Deque<Holder<T>> stack = new LinkedList<>();
     private final ResultBuilder<T> builder;
     private final CodePointSource source;
@@ -94,7 +94,7 @@ public class ParsingContext<T> implements CalculationContext {
         if (nextExpr instanceof ReferenceExpression) {
             var recursedHolder = detectRecursion(nextExpr, nextPos);
             if (recursedHolder != null) {
-                logger.log(Level.FINE, "detected recursion at: {0}", nextPos);
+                LOG.debug("detected recursion at: {}", nextPos);
             }
         }
         Holder<T> holder = new Holder<>(builder);
@@ -129,10 +129,9 @@ public class ParsingContext<T> implements CalculationContext {
         if (!(leafHolder.getChecker() instanceof Expression.LeafExpressionChecker leafChecker)) {
             throw new IllegalStateException("is not a leaf" + leafHolder);
         }
-        if (logger.isLoggable(Level.FINER)) {
-            logger.log(Level.FINER, "checking: {0}; codePoint {1} at: {2}",
-                    new Object[]{StringUtils.codePointToString(codePoint), codePoint, lastPos});
-            logger.log(Level.FINER, "Expr stack: {0}", stackToString(stack));
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("checking: {}; codePoint {} at: {}", StringUtils.codePointToString(codePoint), codePoint, lastPos);
+            LOG.trace("Expr stack: {}", stackToString(stack));
         }
 
         Result result;
@@ -144,7 +143,7 @@ public class ParsingContext<T> implements CalculationContext {
         ResultType prevResult = result.getBasicResult();
         afterCheck(prevResult);
         result.apply(stack, source);
-        logger.log(Level.FINER, "result: {0}\n", prevResult);
+        LOG.trace("result: {}\n", prevResult);
 
         while (prevResult != ResultType.CONTINUE) {
             if (stack.size() == 1 && !builder.isFinished()) {
@@ -159,15 +158,15 @@ public class ParsingContext<T> implements CalculationContext {
                 throw new IllegalStateException("is not a branch" + holder);
             }
 
-            if (logger.isLoggable(Level.FINER)) {
-                logger.log(Level.FINER, "Expr stack: {0}", stackToString(stack));
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Expr stack: {}", stackToString(stack));
             }
             result = branchChecker.check(prevResult);
             prevResult = result.getBasicResult();
             afterCheck(prevResult);
             result.apply(stack, source);
 
-            logger.log(Level.FINER, "result: {0}\n", prevResult);
+            LOG.trace("result: {}\n", prevResult);
         }
     }
 

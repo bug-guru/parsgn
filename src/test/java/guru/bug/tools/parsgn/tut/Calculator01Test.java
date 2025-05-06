@@ -22,8 +22,8 @@
 
 package guru.bug.tools.parsgn.tut;
 
+import guru.bug.tools.parsgn.DefaultParserBuilder;
 import guru.bug.tools.parsgn.Parser;
-import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.utils.ParseTreeUtils;
 import org.junit.jupiter.api.BeforeAll;

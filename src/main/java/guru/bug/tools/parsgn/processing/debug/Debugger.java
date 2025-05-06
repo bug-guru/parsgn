@@ -22,8 +22,8 @@
 
 package guru.bug.tools.parsgn.processing.debug;
 
+import guru.bug.tools.parsgn.DefaultParserBuilder;
 import guru.bug.tools.parsgn.Parser;
-import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
 import guru.bug.tools.parsgn.ebnf.EBNFParser;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
 import guru.bug.tools.parsgn.processing.CodePoint;

@@ -22,12 +22,10 @@
 
 package guru.bug.tools.parsgn;
 
-import guru.bug.tools.parsgn.ebnf.DefaultParserBuilder;
 import guru.bug.tools.parsgn.ebnf.EBNFParser;
 import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.utils.ParseTreeUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedInputStream;
@@ -36,8 +34,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 
 import static java.util.Objects.requireNonNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
@@ -60,21 +57,22 @@ public class ErrorProcessingTest {
         }
     }
 
-    @Disabled
     @Test
     public void printParseTree() throws Exception {
-        Parser parser = new EBNFParser();
-        try (
-                InputStream input = getClass().getResourceAsStream("ebnf_error01.rules");
-                BufferedInputStream buf = new BufferedInputStream(input);
-                InputStreamReader reader = new InputStreamReader(buf)
-        ) {
-            ParseTreeResultBuilder resultBuilder = new ParseTreeResultBuilder();
-            parser.parse(reader, resultBuilder);
-            StringWriter writer = new StringWriter(2048);
-            ParseTreeUtils.serialize(resultBuilder.getRoot(), writer);
-            System.out.println(writer);
-        }
+        assertThrows(SyntaxErrorException.class, () -> {
+            Parser parser = new EBNFParser();
+            try (
+                    InputStream input = getClass().getResourceAsStream("ebnf_error01.rules");
+                    BufferedInputStream buf = new BufferedInputStream(input);
+                    InputStreamReader reader = new InputStreamReader(buf)
+            ) {
+                ParseTreeResultBuilder resultBuilder = new ParseTreeResultBuilder();
+                parser.parse(reader, resultBuilder);
+                StringWriter writer = new StringWriter(2048);
+                ParseTreeUtils.serialize(resultBuilder.getRoot(), writer);
+                System.out.println(writer);
+            }
+        });
     }
 
 }

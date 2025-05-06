@@ -22,13 +22,12 @@
 
 package guru.bug.tools.parsgn.ebnf;
 
+import guru.bug.tools.parsgn.DefaultParserBuilder;
 import guru.bug.tools.parsgn.Parser;
 import guru.bug.tools.parsgn.ebnf.descriptor.ConfigFileRuleDescriptor;
-import guru.bug.tools.parsgn.utils.EBNFResultBuilder;
 import guru.bug.tools.parsgn.utils.ParseNode;
 import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.utils.ParseTreeUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -100,7 +99,7 @@ public class EBNFTest {
         }
     }
 
-    @Disabled
+    //    @Disabled
     @Test
     public void printParseTree() throws Exception {
         Parser parser = new EBNFParser();
