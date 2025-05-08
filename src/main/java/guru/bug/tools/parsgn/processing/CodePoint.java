@@ -65,17 +65,12 @@ public class CodePoint {
 
     @Override
     public String toString() {
-        switch (codePoint) {
-            case '\\':
-                return "\\";
-            case '\'':
-                return "'";
-            case '\"':
-                return "\"";
-            case '\t':
-                return "\\t       ";
-            default:
-                return StringUtils.codePointToString(codePoint);
-        }
+        return switch (codePoint) {
+            case '\\' -> "\\";
+            case '\'' -> "'";
+            case '\"' -> "\"";
+            case '\t' -> "\\t       ";
+            default -> StringUtils.codePointToString(codePoint);
+        };
     }
 }

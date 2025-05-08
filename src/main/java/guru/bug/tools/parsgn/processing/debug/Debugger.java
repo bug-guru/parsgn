@@ -246,7 +246,7 @@ public class Debugger {
             tryMore();
             hasNext = index < history.size() - 1;
         }
-        lastIndex = lastIndex < 0 ? 0 : lastIndex;
+        lastIndex = Math.max(lastIndex, 0);
         isLastFrame = index >= lastIndex;
     }
 
@@ -265,7 +265,7 @@ public class Debugger {
     private class DebugInjectionImpl extends Thread implements DebugInjection {
         final Reader reader;
 
-        public DebugInjectionImpl(String txt) throws IOException {
+        public DebugInjectionImpl(String txt) {
             reader = new StringReader(txt);
             setDaemon(true);
             start();
@@ -329,6 +329,6 @@ public class Debugger {
 
     }
 
-    private class StopEvent extends RuntimeException {
+    private static class StopEvent extends RuntimeException {
     }
 }

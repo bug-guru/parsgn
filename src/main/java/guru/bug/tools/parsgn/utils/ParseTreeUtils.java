@@ -44,6 +44,7 @@ public final class ParseTreeUtils {
         boolean terminate = false;
         do {
             NodeHolder current = stack.peek();
+            assert current != null;
             if (!terminate && current.iterator.hasNext()) {
                 ParseNode node = current.iterator.next();
                 ParseNodeVisitResult result = visitor.startNode(node);
