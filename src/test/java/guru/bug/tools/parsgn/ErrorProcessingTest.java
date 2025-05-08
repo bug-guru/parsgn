@@ -24,7 +24,6 @@ package guru.bug.tools.parsgn;
 
 import guru.bug.tools.parsgn.ebnf.EBNFParser;
 import guru.bug.tools.parsgn.exceptions.SyntaxErrorException;
-import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.utils.ParseTreeUtils;
 import org.junit.jupiter.api.Test;
 

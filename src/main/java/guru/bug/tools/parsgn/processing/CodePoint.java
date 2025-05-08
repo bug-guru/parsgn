@@ -43,7 +43,7 @@ public class CodePoint {
         }
         this.newLine = CharType.LINE_SEPARATOR.apply(codePoint);
         if (prev == null) {
-            position = new Position(1, 1);
+            position = new Position(0, 1, 1);
         } else if (prev.newLine) {
             position = Position.newRow(prev.position);
         } else {
@@ -69,7 +69,7 @@ public class CodePoint {
             case '\\':
                 return "\\";
             case '\'':
-                return "\'";
+                return "'";
             case '\"':
                 return "\"";
             case '\t':

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2025 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,9 +20,12 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.utils;
+package guru.bug.tools.parsgn;
 
 import guru.bug.tools.parsgn.processing.Position;
+import guru.bug.tools.parsgn.utils.ParseNodeVisitResult;
+import guru.bug.tools.parsgn.utils.ParseNodeVisitor;
+import guru.bug.tools.parsgn.utils.ParseTreeUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -37,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 1.0
  */
 public class ParseTreeUtilsTest {
-    private static final Position fakePos = new Position(1, 1);
+    private static final Position fakePos = new Position(0, 1, 1);
     private static final ParseNode n111 = createNode("n111");
     private static final ParseNode n11 = createNode("n11", n111);
     private static final ParseNode n12 = createNode("n12");

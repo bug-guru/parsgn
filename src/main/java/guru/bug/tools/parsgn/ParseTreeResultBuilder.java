@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Dimitrijs Fedotovs http://www.bug.guru
+ * Copyright (c) 2025 Dimitrijs Fedotovs http://www.bug.guru
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,9 +20,8 @@
  * THE SOFTWARE.
  */
 
-package guru.bug.tools.parsgn.utils;
+package guru.bug.tools.parsgn;
 
-import guru.bug.tools.parsgn.ResultBuilder;
 import guru.bug.tools.parsgn.processing.Position;
 
 import java.util.List;

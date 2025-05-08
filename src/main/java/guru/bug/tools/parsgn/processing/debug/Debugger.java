@@ -23,6 +23,7 @@
 package guru.bug.tools.parsgn.processing.debug;
 
 import guru.bug.tools.parsgn.DefaultParserBuilder;
+import guru.bug.tools.parsgn.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.Parser;
 import guru.bug.tools.parsgn.ebnf.EBNFParser;
 import guru.bug.tools.parsgn.exceptions.ParsingException;
@@ -30,7 +31,6 @@ import guru.bug.tools.parsgn.processing.CodePoint;
 import guru.bug.tools.parsgn.processing.CodePointSource;
 import guru.bug.tools.parsgn.processing.Position;
 import guru.bug.tools.parsgn.utils.FileUtils;
-import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;

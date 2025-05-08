@@ -23,10 +23,10 @@
 package guru.bug.tools.parsgn.ebnf;
 
 import guru.bug.tools.parsgn.DefaultParserBuilder;
+import guru.bug.tools.parsgn.ParseNode;
+import guru.bug.tools.parsgn.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.Parser;
 import guru.bug.tools.parsgn.ebnf.descriptor.ConfigFileRuleDescriptor;
-import guru.bug.tools.parsgn.utils.ParseNode;
-import guru.bug.tools.parsgn.utils.ParseTreeResultBuilder;
 import guru.bug.tools.parsgn.utils.ParseTreeUtils;
 import org.junit.jupiter.api.Test;
 

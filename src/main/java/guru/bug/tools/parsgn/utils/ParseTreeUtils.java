@@ -22,6 +22,8 @@
 
 package guru.bug.tools.parsgn.utils;
 
+import guru.bug.tools.parsgn.ParseNode;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collections;

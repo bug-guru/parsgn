@@ -22,6 +22,8 @@
 
 package guru.bug.tools.parsgn.utils;
 
+import guru.bug.tools.parsgn.ParseNode;
+
 /**
  * @author Dimitrijs Fedotovs <a href="http://www.bug.guru">www.bug.guru</a>
  * @version 1.0

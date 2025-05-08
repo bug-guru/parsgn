@@ -28,20 +28,22 @@ package guru.bug.tools.parsgn.processing;
  * @since 1.0
  */
 public class Position implements Comparable<Position> {
+    private final int index;
     private final int row;
     private final int col;
 
-    public Position(int row, int col) {
+    public Position(int index, int row, int col) {
+        this.index = index;
         this.row = row;
         this.col = col;
     }
 
     public static Position newRow(Position prev) {
-        return new Position(prev.row + 1, 1);
+        return new Position(prev.index + 1, prev.row + 1, 1);
     }
 
     public static Position newCol(Position prev) {
-        return new Position(prev.row, prev.col + 1);
+        return new Position(prev.index + 1, prev.row, prev.col + 1);
     }
 
     public static Position max(Position pos1, Position pos2) {
@@ -54,6 +56,10 @@ public class Position implements Comparable<Position> {
         }
 
         return (pos1.row == pos2.row && pos1.col < pos2.col || pos1.row < pos2.row) ? pos2 : pos1;
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     public int getRow() {
@@ -84,9 +90,9 @@ public class Position implements Comparable<Position> {
     @Override
     public String toString() {
         return "Position{" +
-                "row=" + row +
-                ", col=" + col +
-                '}';
+               "row=" + row +
+               ", col=" + col +
+               '}';
     }
 
     public String toShortString() {
